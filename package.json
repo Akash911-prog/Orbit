@@ -1,13 +1,10 @@
 {
-  "dependencies": {
-    "typescript": "^6.0.3"
-  },
-  "name": "orbit",
-  "module": "./src/index.ts",
+  "name": "orbit-1",
+  "module": "src/index.ts",
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "bun run ./src/index.ts"
+    "dev": "bun ."
   },
   "devDependencies": {
     "@types/bun": "latest"

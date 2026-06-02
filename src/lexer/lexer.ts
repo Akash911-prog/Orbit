@@ -31,7 +31,6 @@ export class Lexer {
 
     tokenize(): Token[] {
         const tokens: Token[] = [];
-        let char = this.peek();
 
         while (this.cursor < this.source.length) {
             const char = this.peek();
@@ -42,8 +41,6 @@ export class Lexer {
             }
 
             if (char === '"') {
-                console.log('literal');
-
                 tokens.push(this.readLiteralString());
                 break;
             }
@@ -56,14 +53,12 @@ export class Lexer {
         let literal = '';
         const startLine = this.line;
         const startCol = this.col;
-        const startCursor = this.cursor;
+        this.next();
 
         while (this.peek() !== '"') {
             literal += this.peek();
             this.next();
         }
-
-        console.log(literal);
         const token: Token = {
             type: TokenType.StrLiteral,
             value: literal,
@@ -71,7 +66,6 @@ export class Lexer {
             col: startCol,
         };
 
-        console.log(token);
         return token;
     }
 }

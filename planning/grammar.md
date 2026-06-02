@@ -1,178 +1,251 @@
-## Orbit EBNF Grammar
+# Orbit Language — Complete EBNF Grammar
 
-### 1. Program & Source Structure
+> **Notation:** `{ x }` = zero or more, `[ x ]` = optional, `( x | y )` = choice, `"x"` = terminal keyword or symbol.
 
-A program in Orbit is a sequence of top-level declarations, which can be global variable bindings, standard functions, or asynchronous event handlers (`nova`).
+---
+
+## 1. Program & Source Structure
 
 ```ebnf
 Program             = { TopLevelDeclaration } ;
 
-TopLevelDeclaration = VariableDecl | FunctionDecl | NovaDecl | RootOrbitDecl ;
+TopLevelDeclaration = VariableDecl
+                    | FunctionDecl
+                    | StructDecl
+                    | NovaDecl
+                    | RootOrbitDecl ;
 
-(* The application entry point constraint *)
 RootOrbitDecl       = "orbit" "main" Block ;
 
 Block               = "{" { Statement } "}" ;
-
 ```
 
-### 2. Statements & Control Flow
+---
 
-Statements govern the execution flow inside blocks, including control flow, resource management, and event triggering.
+## 2. Statements
 
 ```ebnf
 Statement           = VariableDecl
                     | Assignment
                     | IfStatement
+                    | ForStatement
+                    | WhileStatement
+                    | LoopStatement
                     | MatchStatement
                     | OrbitBlock
                     | DriftStatement
                     | DecayBlock
                     | FireStatement
                     | ReturnStatement
+                    | BreakStatement
+                    | ContinueStatement
                     | ExpressionStatement ;
 
-VariableDecl        = "let" Identifier ":" Type "=" Expression ;
-Assignment          = Identifier "=" Expression ;
+VariableDecl        = ( "let" | "var" ) Identifier ":" Type "=" Expression ;
+Assignment          = Identifier { "." Identifier } "=" Expression ;
 ReturnStatement     = "return" [ Expression ] ;
+BreakStatement      = "break" [ Identifier ] ;         (* Identifier for labeled loop break *)
+ContinueStatement   = "continue" ;
 ExpressionStatement = Expression ;
-
 ```
 
-### 3. Control Flow & Pattern Matching
+---
+
+## 3. Control Flow
 
 ```ebnf
-IfStatement         = "if" Expression Block { "else" "if" Expression Block } [ "else" Block ] ;
+IfStatement         = "if" Expression Block
+                      { "else" "if" Expression Block }
+                      [ "else" Block ] ;
+
+ForStatement        = "for" Identifier "in" Expression Block ;
+
+WhileStatement      = "while" Expression Block ;
+
+LoopStatement       = "loop" Block ;
 
 MatchStatement      = "match" Expression "{" MatchArm { "," MatchArm } [ "," ] "}" ;
-MatchArm            = MatchPattern "=>" Expression ;
-MatchPattern        = Literal | Identifier | "_" ;
+MatchArm            = MatchPattern "=>" ( Expression | Block ) ;
 
+MatchPattern        = Literal
+                    | Identifier
+                    | "_"
+                    | Identifier "(" { MatchPattern { "," MatchPattern } } ")" ;
+                    (* constructor patterns: ok(data), err(e), Some(x) *)
 ```
 
-### 4. The Execution Lifecycle Quad & Events
+---
 
-This section formalizes Orbit's unique memory-safety and execution primitives.
+## 4. Orbit Lifecycle Primitives
 
 ```ebnf
 OrbitBlock          = "orbit" Identifier Block ;
-DriftStatement      = "drift" Identifier "->" | "into" Identifier
-                    | "drift" Identifier "->" | "into" "shared(" Identifier, Identifier ")"
-                    | "drift" Identifier "->" | "into" "sync(" Identifier, Identifier ")" ;
-DecayBlock          = "decay" Block | "decay" Identifier ;
 
-NovaDecl            = "nova" Identifier "receives" "(" ParameterList ")" Block ;
+DriftStatement      = "drift" Identifier ( "->" | "into" ) DriftTarget
+                    | "drift" Identifier "~>>" "shared" "(" Identifier "," Identifier ")"
+                    | "drift" Identifier "~>*" "sync"   "(" Identifier "," Identifier ")" ;
+
+DriftTarget         = Identifier ;                          (* exclusive drift *)
+
+DecayBlock          = "decay" [ Identifier ] Block ;
+                    (* no identifier = nearest orbit *)
+                    (* with identifier = targeted orbit, inner orbits decay first *)
+
+NovaDecl            = "nova" Identifier "receives" "(" [ ParameterList ] ")" Block ;
+
 FireStatement       = "fire" Identifier "(" [ ArgumentList ] ")" ;
-
 ```
 
-### 5. Expressions & Ranges
+---
+
+## 5. Functions
 
 ```ebnf
-Expression          = LogicalExpr [ ( ".." | "..=" ) LogicalExpr ] ; (* Includes Ranges *)
-LogicalExpr         = EqualityExpr { ( "&&" | "||" ) EqualityExpr } ;
-EqualityExpr        = RelationalExpr { ( "==" | "!=" ) RelationalExpr } ;
-RelationalExpr      = AdditiveExpr { ( "<" | "<=" | ">" | ">=" ) AdditiveExpr } ;
-AdditiveExpr        = MultiplicativeExpr { ( "+" | "-" ) MultiplicativeExpr } ;
-MultiplicativeExpr  = PrimaryExpr { ( "*" | "/" ) PrimaryExpr } ;
+FunctionDecl        = "fn" Identifier [ "<" Identifier ">" ]
+                      "(" [ ParameterList ] ")"
+                      [ ":" Type ]
+                      Block ;
 
-PrimaryExpr         = Identifier
-                    | Literal
-                    | FunctionCall
-                    | "(" Expression ")" ;
-
-```
-
-### 6. Functions, Parameters, & Types
-
-```ebnf
-FunctionDecl        = "fn" Identifier "(" [ ParameterList ] ")" [ ":" Type ] Block ;
 ParameterList       = Parameter { "," Parameter } ;
 Parameter           = Identifier ":" Type ;
 
 FunctionCall        = Identifier "(" [ ArgumentList ] ")" ;
 ArgumentList        = Expression { "," Expression } ;
-
-Type                = "int" | "str" | "bool" | Identifier ;
-
 ```
 
-### 7. Lexical Tokens (Identifiers & Literals)
+---
+
+## 6. Structs
 
 ```ebnf
-Identifier          = Letter { Letter | Digit | "_" } ;
-Literal             = IntLiteral | StrLiteral | BoolLiteral ;
+StructDecl          = "struct" Identifier [ "<" Identifier ">" ]
+                      "{" { StructMember } "}" ;
+
+StructMember        = VariableDecl
+                    | FunctionDecl
+                    | ResponsibleBlock ;
+
+ResponsibleBlock    = "responsible" { Identifier } [ Block ] ;
+                    (* identifiers = values struct is responsible for freeing *)
+                    (* block = actions that must run on lifecycle end          *)
+                    (* unmet responsibility = compile error                   *)
+
+StructInit          = Identifier "{" [ FieldInit { "," FieldInit } ] "}" ;
+FieldInit           = Identifier ":" Expression ;
+```
+
+---
+
+## 7. Types
+
+```ebnf
+Type                = BaseType [ "?" ]                      (* nullable: int?    *)
+                    | Type "[]"                             (* array:   int[]    *)
+                    | "map" "<" Type "," Type ">"           (* map:     map<str,int> *)
+                    | "(" Type { "," Type } ")"             (* tuple:   (int,str)*)
+                    | "Result" "<" Type "," Type ">"        (* result:  Result<str,Error> *)
+                    | Identifier [ "<" Type ">" ] ;         (* generic: Stack<T> *)
+
+BaseType            = "int"
+                    | "i8"  | "i16" | "i32" | "i64"
+                    | "u8"  | "u16" | "u32" | "u64"
+                    | "f32" | "f64" | "float"
+                    | "bool"
+                    | "char"
+                    | "byte"
+                    | "str"
+                    | "String" ;
+```
+
+---
+
+## 8. Expressions
+
+Expressions are ordered from lowest to highest precedence.
+
+```ebnf
+Expression          = LogicalExpr [ ( ".." | "..=" ) LogicalExpr ] ;
+                    (* ranges sit at the outermost expression layer *)
+
+LogicalExpr         = EqualityExpr { ( "&&" | "||" ) EqualityExpr } ;
+
+EqualityExpr        = RelationalExpr { ( "==" | "!=" ) RelationalExpr } ;
+
+RelationalExpr      = AdditiveExpr { ( "<" | "<=" | ">" | ">=" ) AdditiveExpr } ;
+
+AdditiveExpr        = MultiplicativeExpr { ( "+" | "-" ) MultiplicativeExpr } ;
+
+MultiplicativeExpr  = UnaryExpr { ( "*" | "/" | "%" ) UnaryExpr } ;
+
+UnaryExpr           = ( "!" | "-" ) UnaryExpr
+                    | NullCheckExpr ;
+
+NullCheckExpr       = PrimaryExpr [ "?" ] ;
+                    (* if y? {} — nullable check/unwrap *)
+
+PrimaryExpr         = Atom { "." Identifier [ "(" [ ArgumentList ] ")" ] } ;
+                    (* chains member access and method calls left to right *)
+
+Atom                = Literal
+                    | Identifier
+                    | FunctionCall
+                    | StructInit
+                    | "(" Expression ")"
+                    | "null" ;
+```
+
+---
+
+## 9. Literals & Lexical Tokens
+
+```ebnf
+Literal             = IntLiteral
+                    | FloatLiteral
+                    | StrLiteral
+                    | BoolLiteral ;
 
 IntLiteral          = Digit { Digit } ;
+FloatLiteral        = Digit { Digit } "." { Digit } ;
 StrLiteral          = '"' { Character } '"' ;
 BoolLiteral         = "true" | "false" ;
 
-Letter              = "a" | ... | "z" | "A" | ... | "Z" ;
+Identifier          = Letter { Letter | Digit | "_" } ;
+
+Letter              = "a" | ... | "z" | "A" | ... | "Z" | "_" ;
 Digit               = "0" | ... | "9" ;
 Character           = ? Any Unicode character except '"' or "\" ? ;
-
 ```
 
 ---
 
-If a top-level declaration can be an `orbit` block named `main`, it transforms `main` into the application's root entry point and baseline execution context. This means the entire program starts execution inside a tracked stack frame with its own responsibility record and a root `decay` layer.
+## 10. Keywords (Reserved)
 
-Here is how the grammar rules change to adapt to this design, along with the architectural implications.
+The following identifiers are reserved and cannot be used as variable or function names:
 
----
-
-## 8. Updated Code Structure Example
-
-With this rule, a standard Orbit application would look like this:
-
-```orbit
-// Top-level variable declaration
-let GLOBAL_CONFIG: str = "/etc/orbit/config"
-
-// The Root Orbit Execution Frame
-orbit main {
-    let logger = init_logger()
-    
-    // Root decay block: Guaranteed to run when the application gracefully terminates
-    decay {
-        logger.flush()
-        logger.close()
-    }
-    
-    let server = start_server(GLOBAL_CONFIG)
-    fire handle_traffic(server)
-}
-
-nova handle_traffic(s: Server) {
-    // Background execution loop
-}
-
+```
+orbit   drift   decay   nova    fire
+let     var     fn      struct  responsible
+if      else    for     while   loop
+match   return  break   continue
+in      into    shared  sync    receives
+true    false   null
+int     i8      i16     i32     i64
+u8      u16     u32     u64     f32     f64
+float   bool    char    byte    str     String
+Result  map
 ```
 
 ---
 
-## 9. Architectural & Compiler Implications
+## 11. Key Grammar Design Notes
 
-Making the top-level declaration an `orbit main` block instead of a standard `fn main()` introduces powerful systems-level benefits:
-
-### A. The Root Lifecycle Chain
-
-Every resource initialized inside `orbit main` is instantly bound to the application's ultimate stack boundary.
-
-* If a background `nova` event is still running when `orbit main` hits its closing brace, **Rule 2 (The Nova Asynchronous Capture Rule)** activates.
-* The background tasks automatically inherit full ownership of whatever root resources they were reading, preventing standard "use-after-free" or "dropped context" panics at shutdown.
-
-### B. The Absolute Bottom Decay Layer
-
-Any `decay` block defined directly inside `orbit main` acts as the application's global cleanup routine. It replaces traditional `atexit` functions or manual shutdown hooks. Whether the application completes normally or suffers an asynchronous panic, the root decay chain is guaranteed by the compiler to unwind cleanly.
-
-### C. Structural Layout Constraint
-
-Because `orbit` establishes an explicit tracking boundary on a stack frame, a top-level `orbit main` means the application doesn't just call a main function—it boots *directly* into a monitored tracking state.
-
-## Key Grammar Notes on Orbit's Design
-
-* **The Semicolon-less Design:** The grammar assumes newline-separated or whitespace-separated statements, matching your design snippets (e.g., `let x: int = 5` without a trailing `;`).
-* **Condition Syntax:** In `IfStatement`, there are explicitly **no parentheses** allowed around the conditional `Expression`, making `if x > 0` standard and `if (x > 0)` a syntax error unless evaluating an explicit sub-expression.
-* **Type vs Production Separation:** The grammar enforces strict segregation between `:` (used strictly in `VariableDecl`, `Parameter`, and `FunctionDecl` return paths) and `=>` (used exclusively in `MatchArm`).
-* **Range Precedence:** Ranges (`..` and `..=`) are integrated right at the outer expression layer, giving them appropriate structural evaluation room without mathematical symbol clashing.
+- **Semicolon-free:** Statements are newline or whitespace separated. No trailing `;` required.
+- **No parentheses on conditions:** `if x > 0 {}` is standard. `if (x > 0) {}` is a syntax error unless evaluating a grouped sub-expression.
+- **`:` vs `=>`:** Strict segregation enforced. `:` is used only for type annotation in declarations and parameters. `=>` is used only in match arms.
+- **Unary `?` for nullables:** `y?` in an expression context is a null check/unwrap. `int?` in a type context declares a nullable type. Context disambiguates.
+- **`responsible` block:** If a struct declares a `responsible` block and the compiler cannot prove it runs on all lifecycle paths, it is a **compile error** — not a warning.
+- **Constructor patterns in match:** `ok(data)` and `err(e)` are constructor patterns, enabling clean `Result` destructuring directly in match arms.
+- **Left-recursive chaining:** Member access and method calls chain left-to-right in `PrimaryExpr` via iteration, avoiding left-recursion in the recursive descent parser.
+- **Break with label:** `break identifier` targets a specific named loop, equivalent to labeled break in other languages.
+- **Drift operators:** `->` and `into` are interchangeable exclusive drift forms. `~>>` is shared-read drift. `~>*` is synchronized drift requiring a mutex owned by the common parent orbit.
+```

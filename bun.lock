@@ -3,9 +3,6 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "dependencies": {
-        "typescript": "^6.0.3",
-      },
       "devDependencies": {
         "@types/bun": "latest",
       },
