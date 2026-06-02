@@ -12,6 +12,38 @@ export enum TokenType {
     KeywordInt = 'int',
     KeywordStr = 'str',
     KeywordBool = 'bool',
+    KeywordStruct = 'struct',
+    KeywordFn = 'fn',
+    KeywordVar = 'var',
+    KeywordPrint = 'print',
+    // Control flow keywords you'll need
+    KeywordIf = 'if',
+    KeywordElse = 'else',
+    KeywordFor = 'for',
+    KeywordWhile = 'while',
+    KeywordLoop = 'loop',
+    KeywordIn = 'in',
+    KeywordReturn = 'return',
+    KeywordBreak = 'break',
+    KeywordContinue = 'continue',
+    KeywordMatch = 'match',
+    KeywordTrue = 'true',
+    KeywordFalse = 'false',
+
+    // Types you declared as MVP
+    KeywordFloat = 'float',
+
+    // Symbols you're missing
+    Dot = '.', // member access — conn.socket
+    Arrow = '->', // will be drift later, but also return type? no wait you use :
+    FatArrow = '=>', // match arms
+    DotDot = '..', // range exclusive
+    DotDotEquals = '..=', // range inclusive
+    OpenBracket = '[', // arrays
+    CloseBracket = ']', // arrays
+
+    // Float literal
+    FloatLiteral = 'FLOAT_LITERAL',
 
     // Structural Operators & Punctuators
     Colon = ':',
