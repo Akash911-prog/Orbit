@@ -2,7 +2,13 @@ import { ErrorType } from '../errors/errorTypes';
 import { globalErrorBucket } from '../globals';
 import type { Lexer } from '../lexer/lexer';
 import { TokenType, type Token } from '../lexer/token';
-import type { Program, TopLevelDeclaration, VariableDecl } from './nodeTypes';
+import type {
+    Block,
+    Program,
+    Statement,
+    TopLevelDeclaration,
+    VariableDecl,
+} from './nodeTypes';
 
 export class Parser {
     private current: Token;
@@ -74,19 +80,44 @@ export class Parser {
                 throw new Error('Out of bound');
         }
     }
+
+    private parseVariableDeclaration(): VariableDecl {
+        throw new Error('Method not implemented.');
+    }
+
     private parseStructDecl(): TopLevelDeclaration {
         throw new Error('Method not implemented.');
     }
+
     private parseNovaDecl(): TopLevelDeclaration {
         throw new Error('Method not implemented.');
     }
+
     private parseRootOrbitDecl(): TopLevelDeclaration {
-        throw new Error('Method not implemented.');
+        this.expect(TokenType.KeywordOrbit);
+        this.expect(TokenType.KeywordMain);
+
+        const block = this.parseBlock();
+
+        return { type: 'RootOrbitDecl', body: block };
     }
+
     private parseFunctionDecl(): TopLevelDeclaration {
         throw new Error('Method not implemented.');
     }
-    private parseVariableDeclaration(): VariableDecl {
+
+    private parseBlock(): Block {
+        const statements: Statement[] = [];
+        this.expect(TokenType.OpenBrace);
+
+        while (this.current.type !== TokenType.CloseBrace) {
+            statements.push(this.parseStatement());
+        }
+        this.expect(TokenType.CloseBrace);
+        return { type: 'Block', statements: statements };
+    }
+
+    private parseStatement(): Statement {
         throw new Error('Method not implemented.');
     }
 }

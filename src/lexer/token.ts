@@ -15,7 +15,6 @@ export enum TokenType {
     KeywordStruct = 'struct',
     KeywordFn = 'fn',
     KeywordVar = 'var',
-    KeywordPrint = 'print',
     // Control flow keywords you'll need
     KeywordIf = 'if',
     KeywordElse = 'else',
