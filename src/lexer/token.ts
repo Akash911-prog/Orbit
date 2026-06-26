@@ -90,6 +90,9 @@ export enum TokenType {
 
     Error = 'Error',
     KeywordNova = 'KeywordNova',
+    KeywordDrift = 'KeywordDrift',
+    KeywordDecay = 'KeywordDecay',
+    KeywordFire = 'KeywordFire',
 }
 
 export interface Token {
