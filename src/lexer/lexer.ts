@@ -38,6 +38,7 @@ import {
     OpenParen,
     PercentEquals,
     PlusEquals,
+    QuestionMark,
     Semicolon,
     SlashEquals,
     StarEquals,
@@ -297,6 +298,7 @@ export class Lexer {
         else if (LessThan.test(symbol)) type = TokenType.LessThan;
         else if (GreaterThan.test(symbol)) type = TokenType.GreaterThan;
         else if (LogicalNot.test(symbol)) type = TokenType.LogicalNot;
+        else if (QuestionMark.test(symbol)) type = TokenType.QuestionMark;
 
         if (!type) {
             const error: OrbitError = {

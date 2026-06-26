@@ -51,3 +51,4 @@ export const Modulo = /^%$/;
 export const LessThan = /^<$/;
 export const GreaterThan = /^>$/;
 export const LogicalNot = /^!$/;
+export const QuestionMark = /^\?$/;

@@ -1,6 +1,7 @@
 import { globalErrorBucket, initiateGlobals } from './globals';
 import { Lexer } from './lexer/lexer';
 import { TokenType } from './lexer/token';
+import { Parser } from './parser/parser';
 import { editDistance } from './utility/distanceAutoCorrect';
 
 // src/index.ts
@@ -17,12 +18,10 @@ const src = await Bun.file(filePath).text();
 initiateGlobals(src);
 
 const lexer = new Lexer(src);
+const parser = new Parser(lexer);
 
-let token = lexer.nextToken();
+const program = parser.parseProgram();
 
-while (token.type !== TokenType.EOF) {
-    console.log(token);
-    token = lexer.nextToken();
-}
+console.log(JSON.stringify(program, null, 4));
 // after things finished / temp sol for errors
 globalErrorBucket.showAll();
