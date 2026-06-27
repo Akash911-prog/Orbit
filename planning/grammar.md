@@ -82,8 +82,8 @@ MatchPattern        = Literal
 OrbitBlock          = "orbit" Identifier Block ;
 
 DriftStatement      = "drift" Identifier ( "->" | "into" ) DriftTarget
-                    | "drift" Identifier "~>>" "shared" "(" Identifier "," Identifier ")"
-                    | "drift" Identifier "~>*" "sync"   "(" Identifier "," Identifier ")" ;
+                    | "drift" Identifier ("->" | "into" ) "shared" "(" Identifier "," Identifier ")"
+                    | "drift" Identifier ("->" | "into" ) "sync"   "(" Identifier "," Identifier ")" ;
 
 DriftTarget         = Identifier ;                          (* exclusive drift *)
 

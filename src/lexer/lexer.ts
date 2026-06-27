@@ -44,6 +44,7 @@ import {
     StarEquals,
     Subtract,
     symbolStart,
+    Underscore,
     whitespace,
 } from '../regex';
 import { editDistance } from '../utility/distanceAutoCorrect';
@@ -299,6 +300,7 @@ export class Lexer {
         else if (GreaterThan.test(symbol)) type = TokenType.GreaterThan;
         else if (LogicalNot.test(symbol)) type = TokenType.LogicalNot;
         else if (QuestionMark.test(symbol)) type = TokenType.QuestionMark;
+        else if (Underscore.test(symbol)) type = TokenType.Underscore;
 
         if (!type) {
             const error: OrbitError = {

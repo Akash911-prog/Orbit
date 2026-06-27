@@ -122,8 +122,8 @@ export interface OrbitBlock {
 
 export type DriftStatement =
     | { type: 'DriftExclusive'; name: string; target: string } // -> or into
-    | { type: 'DriftShared'; name: string; a: string; b: string } // ~>> shared(a, b)
-    | { type: 'DriftSync'; name: string; a: string; b: string }; // ~>* sync(a, b)
+    | { type: 'DriftShared'; name: string; a: string; b: string } // -> or into shared(a, b)
+    | { type: 'DriftSync'; name: string; a: string; b: string }; // -> or into sync(a, b)
 
 export interface DecayBlock {
     type: 'DecayBlock';

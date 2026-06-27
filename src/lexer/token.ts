@@ -1,9 +1,9 @@
 export enum TokenType {
     // Section 7: Lexical Tokens
     Identifier = 'IDENTIFIER',
-    IntLiteral = 'INT_LITERAL',
-    StrLiteral = 'STR_LITERAL',
-    BoolLiteral = 'BOOL_LITERAL',
+    IntLiteral = 'IntLiteral',
+    StrLiteral = 'StrLiteral',
+    BoolLiteral = 'BoolLiteral',
 
     // Keywords (Derived from Identifiers during scanning)
     KeywordOrbit = 'orbit',
@@ -42,7 +42,7 @@ export enum TokenType {
     CloseBracket = ']', // arrays
 
     // Float literal
-    FloatLiteral = 'FLOAT_LITERAL',
+    FloatLiteral = 'FloatLiteral',
 
     // Structural Operators & Punctuators
     Colon = ':',
@@ -110,6 +110,10 @@ export enum TokenType {
     KeywordChar = 'char',
     KeywordByte = 'byte',
     KeywordString = 'String',
+    Underscore = '_',
+    KeywordInto = 'into',
+    KeywordShared = 'shared',
+    KeywordSync = 'sync',
 }
 
 export interface Token {

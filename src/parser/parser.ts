@@ -5,14 +5,17 @@ import { TokenType, type Token } from '../lexer/token';
 import type {
     Assignment,
     Block,
+    DriftStatement,
     Expression,
     ExpressionStatement,
     ForStatement,
     IfStatement,
+    Literal,
     LoopStatement,
     MatchArm,
     MatchPattern,
     MatchStatement,
+    OrbitBlock,
     Program,
     Statement,
     TopLevelDeclaration,
@@ -416,14 +419,140 @@ export class Parser {
         };
     }
     private parseMatchPattern(): MatchPattern {
-        throw new Error('Method not implemented.');
+        let kind = this.expect([
+            TokenType.IntLiteral,
+            TokenType.StrLiteral,
+            TokenType.FloatLiteral,
+            TokenType.BoolLiteral,
+            TokenType.Identifier,
+            TokenType.Underscore,
+        ]);
+
+        switch (kind.type) {
+            case TokenType.IntLiteral:
+            case TokenType.StrLiteral:
+            case TokenType.BoolLiteral:
+            case TokenType.FloatLiteral:
+                const literal: Literal = this.parseLiteral();
+
+                return {
+                    type: 'LiteralPattern',
+                    value: literal,
+                };
+            case TokenType.Underscore:
+                return {
+                    type: 'WildcardPattern',
+                };
+
+            case TokenType.Identifier:
+                let name = this.consume().value;
+                if (this.peek(0).type === TokenType.OpenParen) {
+                    this.consume();
+                    let patterns: MatchPattern[] = [];
+                    patterns.push(this.parseMatchPattern());
+                    while (this.current.type === TokenType.Comma) {
+                        patterns.push(this.parseMatchPattern());
+                    }
+
+                    return {
+                        type: 'ConstructorPattern',
+                        name: name,
+                        args: patterns,
+                    };
+                }
+                return {
+                    type: 'IdentifierPattern',
+                    name: name,
+                };
+            default:
+                globalErrorBucket.add({
+                    type: ErrorType.SyntaxError,
+                    message: `SyntaxError: Unkown match pattern`,
+                    line: this.current.line,
+                    col: this.current.col,
+                });
+                throw new Error(
+                    'Expected Identifier, Constructor, Literal or _'
+                );
+        }
     }
-    private parseOrbitBlock(): Statement {
-        throw new Error('Method not implemented.');
+    private parseLiteral(): Literal {
+        switch (this.current.type) {
+            case TokenType.IntLiteral:
+                return { type: 'IntLiteral', value: this.consume().value };
+
+            case TokenType.FloatLiteral:
+                return { type: 'FloatLiteral', value: this.consume().value };
+
+            case TokenType.StrLiteral:
+                return { type: 'StrLiteral', value: this.consume().value };
+
+            case TokenType.BoolLiteral:
+                return {
+                    type: 'BoolLiteral',
+                    value: this.consume().value === 'true',
+                };
+            default:
+                globalErrorBucket.add({
+                    type: ErrorType.SyntaxError,
+                    message: `Expexted a Literal but got ${this.current.value}`,
+                    line: this.current.line,
+                    col: this.current.col,
+                    length: this.current.value.length,
+                });
+                throw new Error('Expected Literal');
+        }
     }
-    private parseDriftStatement(): Statement {
-        throw new Error('Method not implemented.');
+    private parseOrbitBlock(): OrbitBlock {
+        this.expect([TokenType.KeywordOrbit]);
+        const name = this.expect([TokenType.Identifier]).value;
+        const block = this.parseBlock();
+
+        return {
+            type: 'OrbitBlock',
+            name,
+            body: block,
+        };
     }
+
+    private parseDriftStatement(): DriftStatement {
+        this.expect([TokenType.KeywordDrift]);
+        const name = this.expect([TokenType.Identifier]).value;
+        this.expect([TokenType.Arrow, TokenType.KeywordInto]);
+        if (
+            this.current.type === TokenType.KeywordShared ||
+            this.current.type === TokenType.KeywordSync
+        ) {
+            let kind = this.current.type;
+            this.expect([TokenType.OpenParen]);
+            let a = this.expect([TokenType.Identifier]).value;
+            this.expect([TokenType.Comma]);
+            let b = this.expect([TokenType.Identifier]).value;
+            if (kind === TokenType.KeywordShared)
+                return {
+                    type: 'DriftShared',
+                    name,
+                    a,
+                    b,
+                };
+            else
+                return {
+                    type: 'DriftSync',
+                    name,
+                    a,
+                    b,
+                };
+        }
+
+        const target = this.expect([TokenType.Identifier]).value;
+
+        return {
+            type: 'DriftExclusive',
+            name,
+            target,
+        };
+    }
+
     private parseDecayBlock(): Statement {
         throw new Error('Method not implemented.');
     }

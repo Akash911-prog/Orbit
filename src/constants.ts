@@ -71,4 +71,7 @@ export const KEYWORDS: Record<string, TokenType> = {
     byte: TokenType.KeywordByte,
     String: TokenType.KeywordString,
     main: TokenType.KeywordMain,
+    into: TokenType.KeywordInto,
+    shared: TokenType.KeywordShared,
+    sync: TokenType.KeywordSync,
 };
