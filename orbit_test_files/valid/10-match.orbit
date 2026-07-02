@@ -1,0 +1,24 @@
+fn classify(n: int): str {
+    match n {
+        0 => "zero",
+        1 => "one",
+        _ => "many",
+    }
+}
+
+fn handleResult(r: Result<int, str>): int {
+    match r {
+        ok(value) => value,
+        err(message) => {
+            print(message);
+        },
+    }
+}
+
+orbit main {
+    let x: int = 5;
+    match x {
+        5 => print("five"),
+        _ => print("other"),
+    }
+}

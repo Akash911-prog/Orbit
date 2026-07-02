@@ -1,0 +1,36 @@
+struct Point {
+    let x: int = 0;
+    let y: int = 0;
+}
+
+struct Player {
+    let name: str = "unknown";
+    let health: int = 100;
+
+    fn isAlive(): bool {
+        return health > 0;
+    }
+}
+
+struct Stack<T> {
+    let size: int = 0;
+}
+
+struct ManagedResource {
+    let handle: int = 0;
+
+    responsible handle {
+        print("cleaning up");
+    }
+}
+
+struct SimpleOwner {
+    let buffer: int = 0;
+
+    responsible buffer;
+}
+
+orbit main {
+    let p: Point = Point { x: 1, y: 2 };
+    print(p.x);
+}

@@ -7,7 +7,7 @@ export const underscore = /_/;
 export const whitespace = /\s/;
 export const alphanum = /[A-Za-z0-9]/;
 export const aplhaAll = /[A-Za-z]/;
-export const symbolStart = /^[.:\->=\[\]{}();,\+*\/%&|!<]/;
+export const symbolStart = /^[.:\->=\[\]{}();,\+*\/%&|!<?_]$/;
 
 export const Arrow = /^->$/;
 export const FatArrow = /^=>$/;

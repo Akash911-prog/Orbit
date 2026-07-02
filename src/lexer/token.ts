@@ -114,6 +114,7 @@ export enum TokenType {
     KeywordInto = 'into',
     KeywordShared = 'shared',
     KeywordSync = 'sync',
+    KeywordResponsible = 'responsible',
 }
 
 export interface Token {

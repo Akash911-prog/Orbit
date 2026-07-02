@@ -1,0 +1,28 @@
+struct Vec2 {
+    let x: int = 0;
+    let y: int = 0;
+}
+
+fn process(v: Vec2): int {
+    return v.x;
+}
+
+orbit main {
+    let p: Vec2 = Vec2 { x: 1, y: 2 };
+    let q: Vec2 = Vec2 {};
+
+    print(p.x);
+    print(p.x.y);
+
+    let r: int = process(p);
+    let s: int = p.x + p.y;
+
+    let n: int? = null;
+    if n? {
+        print(n);
+    }
+
+    let result: int = (1 + 2) * (3 + 4);
+
+    foo().bar().baz();
+}

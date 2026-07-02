@@ -44,7 +44,7 @@ export interface VariableDecl {
     type: 'VariableDecl';
     kind: 'let' | 'var';
     name: string;
-    varType: TypeNode;
+    varType: TypeNode | null;
     initializer: Expression;
 }
 
@@ -92,6 +92,7 @@ export interface WhileStatement {
 }
 export interface LoopStatement {
     type: 'LoopStatement';
+    name: string | null;
     body: Block;
 }
 

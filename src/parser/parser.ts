@@ -11,6 +11,7 @@ import type {
     DriftStatement,
     Expression,
     ExpressionStatement,
+    FieldInit,
     FireStatement,
     ForStatement,
     FunctionDecl,
@@ -24,9 +25,12 @@ import type {
     OrbitBlock,
     Parameter,
     Program,
+    ResponsibleBlock,
     ReturnStatement,
     RootOrbitDecl,
     Statement,
+    StructDecl,
+    StructMember,
     TopLevelDeclaration,
     TypeNode,
     VariableDecl,
@@ -37,10 +41,19 @@ export class Parser {
     private current: Token;
     private lookahead: Token[] = [];
     private lexer: Lexer;
+    private debug: Boolean;
 
-    constructor(lexer: Lexer) {
+    constructor(lexer: Lexer, debug = false) {
         this.lexer = lexer;
         this.current = this.lexer.nextToken();
+        this.debug = debug;
+    }
+
+    private log(label: string) {
+        if (!this.debug) return;
+        console.log(
+            `[${label}] current=${this.current.type}(${JSON.stringify(this.current.value)}) line=${this.current.line} col=${this.current.col}`
+        );
     }
 
     private peek(offset: number): Token {
@@ -67,9 +80,12 @@ export class Parser {
 
     private expect(tokenTypes: TokenType[]): Token {
         if (!tokenTypes.includes(this.current.type)) {
+            // Map the types to strings (or use them directly if they are strings) and join them
+            const expectedList = tokenTypes.join(', ');
+
             globalErrorBucket.add({
                 type: ErrorType.SyntaxError,
-                message: `Expected ${tokenTypes.forEach((type) => console.log(type))} but found ${this.current.type}`,
+                message: `Expected one of: [${expectedList}] but found ${this.current.type}`,
                 line: this.current.line,
                 col: this.current.col,
                 length: this.current.value.length,
@@ -105,11 +121,15 @@ export class Parser {
     }
 
     private parseVariableDecl(): VariableDecl {
+        this.log('parseVariableDecl');
         const kind = this.expect([TokenType.KeywordLet, TokenType.KeywordVar])
             .value as 'let' | 'var';
         const name = this.expect([TokenType.Identifier]).value;
-        this.expect([TokenType.Colon]);
-        const type: TypeNode = this.parseType();
+        let type: TypeNode | null = null;
+        if (this.current.type === TokenType.Colon) {
+            this.expect([TokenType.Colon]);
+            type = this.parseType();
+        }
         this.expect([TokenType.Equals]);
         const expression: Expression = this.parseExpression();
         this.expect([TokenType.Semicolon]);
@@ -124,6 +144,7 @@ export class Parser {
     }
 
     private parseType(): TypeNode {
+        this.log('parseType');
         let type = this.parseCoreType();
 
         // postfix modifiers: ? and [] can both repeat/stack
@@ -145,6 +166,7 @@ export class Parser {
     }
 
     private parseCoreType(): TypeNode {
+        this.log('parseCoreType');
         switch (this.current.type) {
             case TokenType.KeywordMap: {
                 this.consume();
@@ -191,6 +213,7 @@ export class Parser {
             }
 
             // base types — int, i8..i64, u8..u64, f32, f64, float, bool, char, byte, str, String
+
             case TokenType.KeywordInt:
             case TokenType.KeywordI8:
             case TokenType.KeywordI16:
@@ -223,12 +246,73 @@ export class Parser {
         }
     }
 
-    private parseStructDecl(): TopLevelDeclaration {
-        //TODO: add parser
-        throw new Error('Method not implemented.');
+    private parseStructDecl(): StructDecl {
+        this.log('parseStructDecl');
+        this.expect([TokenType.KeywordStruct]);
+        const name = this.expect([TokenType.Identifier]).value;
+        let structMembers: StructMember[] = [];
+        let generic: string | null = null;
+        if (this.current.type === TokenType.LessThan) {
+            this.consume();
+            generic = this.expect([TokenType.Identifier]).value;
+            this.expect([TokenType.GreaterThan]);
+        }
+        this.expect([TokenType.OpenBrace]);
+        while (this.current.type !== TokenType.CloseBrace) {
+            structMembers.push(this.parseStructMember());
+        }
+        this.expect([TokenType.CloseBrace]);
+
+        return {
+            type: 'StructDecl',
+            name,
+            generic,
+            members: structMembers,
+        };
+    }
+
+    private parseStructMember(): StructMember {
+        this.log('parseStructMember');
+        switch (this.current.type) {
+            case TokenType.KeywordVar:
+            case TokenType.KeywordLet:
+                return this.parseVariableDecl();
+            case TokenType.KeywordFn:
+                return this.parseFunctionDecl();
+            case TokenType.KeywordResponsible:
+                return this.parseResponsibleDecl();
+            default:
+                globalErrorBucket.add({
+                    type: ErrorType.SyntaxError,
+                    message: `Expected a struct member but found ${this.current.type}`,
+                    line: this.current.line,
+                    col: this.current.col,
+                });
+                throw new Error('Expected a struct member');
+        }
+    }
+
+    private parseResponsibleDecl(): ResponsibleBlock {
+        this.log('parseResponsibleDecl');
+        this.expect([TokenType.KeywordResponsible]);
+        let owns: string[] = [];
+        while (
+            this.current.type !== TokenType.OpenBrace &&
+            this.current.type !== TokenType.Semicolon
+        ) {
+            owns.push(this.expect([TokenType.Identifier]).value);
+        }
+        let block: Block | null = null;
+        if (this.current.type === TokenType.OpenBrace) {
+            block = this.parseBlock();
+        } else {
+            this.consume();
+        }
+        return { type: 'ResponsibleBlock', owns, cleanup: block };
     }
 
     private parseNovaDecl(): NovaDecl {
+        this.log('parseNovaDecl');
         this.expect([TokenType.KeywordNova]);
         const name = this.expect([TokenType.Identifier]).value;
         let paramList: Parameter[] = [];
@@ -249,15 +333,18 @@ export class Parser {
     }
 
     private parseParameterList(): Parameter[] {
+        this.log('parseParameterList');
         let paramList: Parameter[] = [];
         paramList.push(this.parseParameter());
         while (this.current.type === TokenType.Comma) {
+            this.consume();
             paramList.push(this.parseParameter());
         }
         return paramList;
     }
 
     private parseParameter(): Parameter {
+        this.log('parseParameter');
         const name = this.expect([TokenType.Identifier]).value;
         this.expect([TokenType.Colon]);
         const type = this.parseType();
@@ -265,6 +352,7 @@ export class Parser {
     }
 
     private parseRootOrbitDecl(): RootOrbitDecl {
+        this.log('parseRootOrbitDecl');
         this.expect([TokenType.KeywordOrbit]);
         this.expect([TokenType.KeywordMain]);
 
@@ -274,6 +362,7 @@ export class Parser {
     }
 
     private parseFunctionDecl(): FunctionDecl {
+        this.log('parseFunctionDecl');
         this.expect([TokenType.KeywordFn]);
         const name = this.expect([TokenType.Identifier]).value;
         let generic: string | null = null;
@@ -305,6 +394,7 @@ export class Parser {
     }
 
     private parseBlock(): Block {
+        this.log('parseBlock');
         const statements: Statement[] = [];
         this.expect([TokenType.OpenBrace]);
 
@@ -316,6 +406,7 @@ export class Parser {
     }
 
     private parseStatement(): Statement {
+        this.log('parseStatement');
         switch (this.current.type) {
             case TokenType.KeywordLet:
             case TokenType.KeywordVar:
@@ -368,6 +459,7 @@ export class Parser {
     }
 
     private parseExpressionStatement(): ExpressionStatement {
+        this.log('parseExpressionStatement');
         const expression = this.parseExpression();
         this.expect([TokenType.Semicolon]);
         return {
@@ -377,8 +469,11 @@ export class Parser {
     }
 
     private parseIfStatement(): IfStatement {
+        this.log('parseIfStatement');
         this.expect([TokenType.KeywordIf]);
+        this.expect([TokenType.OpenParen]);
         const condition = this.parseExpression();
+        this.expect([TokenType.CloseParen]);
         const then = this.parseBlock();
         let elseBranch: Block | IfStatement | null;
 
@@ -415,6 +510,7 @@ export class Parser {
     }
 
     private parseForStatement(): ForStatement {
+        this.log('parseForStatement');
         this.expect([TokenType.KeywordFor]);
         const variable = this.expect([TokenType.Identifier]).value;
         this.expect([TokenType.KeywordIn]);
@@ -430,6 +526,7 @@ export class Parser {
     }
 
     private parseWhileStatement(): WhileStatement {
+        this.log('parseWhileStatement');
         this.expect([TokenType.KeywordWhile]);
         const expr = this.parseExpression();
         const block = this.parseBlock();
@@ -442,16 +539,23 @@ export class Parser {
     }
 
     private parseLoopStatement(): LoopStatement {
+        this.log('parseLoopStatement');
         this.expect([TokenType.KeywordLoop]);
+        const name =
+            this.current.type === TokenType.Identifier
+                ? this.consume().value
+                : null;
         const block = this.parseBlock();
 
         return {
             type: 'LoopStatement',
+            name,
             body: block,
         };
     }
 
     private parseMatchStatement(): MatchStatement {
+        this.log('parseMatchStatement');
         this.expect([TokenType.KeywordMatch]);
         const subject = this.parseExpression();
         const matchArms: MatchArm[] = [];
@@ -472,6 +576,7 @@ export class Parser {
         };
     }
     private parseMatchArm(): MatchArm {
+        this.log('parseMatchArm');
         const pattern = this.parseMatchPattern();
         this.expect([TokenType.FatArrow]);
         let body: Expression | Block;
@@ -489,16 +594,8 @@ export class Parser {
         };
     }
     private parseMatchPattern(): MatchPattern {
-        let kind = this.expect([
-            TokenType.IntLiteral,
-            TokenType.StrLiteral,
-            TokenType.FloatLiteral,
-            TokenType.BoolLiteral,
-            TokenType.Identifier,
-            TokenType.Underscore,
-        ]);
-
-        switch (kind.type) {
+        this.log('parseMatchPattern');
+        switch (this.current.type) {
             case TokenType.IntLiteral:
             case TokenType.StrLiteral:
             case TokenType.BoolLiteral:
@@ -510,19 +607,21 @@ export class Parser {
                     value: literal,
                 };
             case TokenType.Underscore:
+                this.expect([TokenType.Underscore]);
                 return {
                     type: 'WildcardPattern',
                 };
 
             case TokenType.Identifier:
                 let name = this.consume().value;
-                if (this.peek(0).type === TokenType.OpenParen) {
+                if (this.current.type === TokenType.OpenParen) {
                     this.consume();
                     let patterns: MatchPattern[] = [];
                     patterns.push(this.parseMatchPattern());
                     while (this.current.type === TokenType.Comma) {
                         patterns.push(this.parseMatchPattern());
                     }
+                    this.expect([TokenType.CloseParen]);
 
                     return {
                         type: 'ConstructorPattern',
@@ -547,6 +646,7 @@ export class Parser {
         }
     }
     private parseLiteral(): Literal {
+        this.log('parseLiteral');
         switch (this.current.type) {
             case TokenType.IntLiteral:
                 return { type: 'IntLiteral', value: this.consume().value };
@@ -574,6 +674,7 @@ export class Parser {
         }
     }
     private parseOrbitBlock(): OrbitBlock {
+        this.log('parseOrbitBlock');
         this.expect([TokenType.KeywordOrbit]);
         const name = this.expect([TokenType.Identifier]).value;
         const block = this.parseBlock();
@@ -586,6 +687,7 @@ export class Parser {
     }
 
     private parseDriftStatement(): DriftStatement {
+        this.log('parseDriftStatement');
         this.expect([TokenType.KeywordDrift]);
         const name = this.expect([TokenType.Identifier]).value;
         this.expect([TokenType.Arrow, TokenType.KeywordInto]);
@@ -593,37 +695,28 @@ export class Parser {
             this.current.type === TokenType.KeywordShared ||
             this.current.type === TokenType.KeywordSync
         ) {
-            let kind = this.current.type;
+            const kind = this.current.type;
+            this.consume(); // eat "shared"/"sync" keyword itself
             this.expect([TokenType.OpenParen]);
-            let a = this.expect([TokenType.Identifier]).value;
+            const a = this.expect([TokenType.Identifier]).value;
             this.expect([TokenType.Comma]);
-            let b = this.expect([TokenType.Identifier]).value;
+            const b = this.expect([TokenType.Identifier]).value;
+            this.expect([TokenType.CloseParen]);
+            this.expect([TokenType.Semicolon]);
+
             if (kind === TokenType.KeywordShared)
-                return {
-                    type: 'DriftShared',
-                    name,
-                    a,
-                    b,
-                };
-            else
-                return {
-                    type: 'DriftSync',
-                    name,
-                    a,
-                    b,
-                };
+                return { type: 'DriftShared', name, a, b };
+            else return { type: 'DriftSync', name, a, b };
         }
 
         const target = this.expect([TokenType.Identifier]).value;
+        this.expect([TokenType.Semicolon]);
 
-        return {
-            type: 'DriftExclusive',
-            name,
-            target,
-        };
+        return { type: 'DriftExclusive', name, target };
     }
 
     private parseDecayBlock(): DecayBlock {
+        this.log('parseDecayBlock');
         this.expect([TokenType.KeywordDecay]);
         let target: string | null = null;
         if (this.current.type === TokenType.Identifier) {
@@ -638,6 +731,7 @@ export class Parser {
     }
 
     private parseFireStatement(): FireStatement {
+        this.log('parseFireStatement');
         this.expect([TokenType.KeywordFire]);
         const name = this.expect([TokenType.Identifier]).value;
         this.expect([TokenType.OpenParen]);
@@ -655,6 +749,7 @@ export class Parser {
     }
 
     private parseReturnStatement(): ReturnStatement {
+        this.log('parseReturnStatement');
         this.expect([TokenType.KeywordReturn]);
         let expr: Expression | null = null;
         if (this.current.type !== TokenType.Semicolon) {
@@ -665,6 +760,7 @@ export class Parser {
     }
 
     private parseBreakStatement(): BreakStatement {
+        this.log('parseBreakStatement');
         this.expect([TokenType.KeywordBreak]);
         let label: string | null = null;
         if (this.current.type !== TokenType.Semicolon) {
@@ -675,6 +771,7 @@ export class Parser {
     }
 
     private parseContinueStatement(): ContinueStatement {
+        this.log('parseContinueStatement');
         this.expect([TokenType.KeywordContinue]);
         this.expect([TokenType.Semicolon]);
         return { type: 'ContinueStatement' };
@@ -683,6 +780,7 @@ export class Parser {
     private parseIdentifierStartedStatement():
         | Assignment
         | ExpressionStatement {
+        this.log('parseIdentifierStartedStatement');
         const expr = this.parseExpression();
 
         if (this.current.type === TokenType.Equals) {
@@ -693,10 +791,12 @@ export class Parser {
             return { type: 'Assignment', target, value };
         }
 
+        this.expect([TokenType.Semicolon]);
         return { type: 'ExpressionStatement', expression: expr };
     }
 
     private expressionToAssignmentTarget(expr: Expression): string[] {
+        this.log('expressionToAssignmentTarget');
         // Walk a MemberAccess/Identifier chain back into a flat string[].
         // e.g. Identifier("x") -> ["x"]
         //      MemberAccess(MemberAccess(Identifier("x"), "foo"), "bar") -> ["x", "foo", "bar"]
@@ -726,6 +826,7 @@ export class Parser {
     }
 
     private parseExpression(): Expression {
+        this.log('parseExpression');
         const left = this.parseLogicalExpr();
 
         if (
@@ -742,6 +843,7 @@ export class Parser {
     }
 
     private parseLogicalExpr(): Expression {
+        this.log('parseLogicalExpr');
         let left = this.parseEqualityExpr();
 
         while (
@@ -757,6 +859,7 @@ export class Parser {
     }
 
     private parseEqualityExpr(): Expression {
+        this.log('parseEqualityExpr');
         let left = this.parseRelationalExpr();
 
         while (
@@ -772,6 +875,7 @@ export class Parser {
     }
 
     private parseRelationalExpr(): Expression {
+        this.log('parseRelationalExpr');
         let left = this.parseAdditiveExpr();
 
         while (
@@ -789,6 +893,7 @@ export class Parser {
     }
 
     private parseAdditiveExpr(): Expression {
+        this.log('parseAdditiveExpr');
         let left = this.parseMultiplicativeExpr();
 
         while (
@@ -804,6 +909,7 @@ export class Parser {
     }
 
     private parseMultiplicativeExpr(): Expression {
+        this.log('parseMultiplicativeExpr');
         let left = this.parseUnaryExpr();
 
         while (
@@ -820,6 +926,7 @@ export class Parser {
     }
 
     private parseUnaryExpr(): Expression {
+        this.log('parseUnaryExpr');
         if (
             this.current.type === TokenType.LogicalNot ||
             this.current.type === TokenType.Subtract
@@ -833,6 +940,7 @@ export class Parser {
     }
 
     private parseNullCheckExpr(): Expression {
+        this.log('parseNullCheckExpr');
         const expr = this.parsePrimaryExpr();
 
         if (this.current.type === TokenType.QuestionMark) {
@@ -844,6 +952,7 @@ export class Parser {
     }
 
     private parsePrimaryExpr(): Expression {
+        this.log('parsePrimaryExpr');
         let expr = this.parseAtom();
 
         while (this.current.type === TokenType.Dot) {
@@ -873,6 +982,7 @@ export class Parser {
     }
 
     private parseAtom(): Expression {
+        this.log('parseAtom');
         switch (this.current.type) {
             case TokenType.IntLiteral:
                 return { type: 'IntLiteral', value: this.consume().value };
@@ -911,6 +1021,12 @@ export class Parser {
                 }
 
                 if (this.current.type === TokenType.OpenBrace) {
+                    if (
+                        this.peek(1).type === TokenType.FatArrow ||
+                        this.peek(1).type === TokenType.OpenParen
+                    ) {
+                        return { type: 'Identifier', name };
+                    }
                     return this.parseStructInit(name);
                 }
 
@@ -929,6 +1045,7 @@ export class Parser {
     }
 
     private parseArgumentList(): Expression[] {
+        this.log('parseArgumentList');
         const args: Expression[] = [];
 
         if (this.current.type === TokenType.CloseParen) {
@@ -945,8 +1062,9 @@ export class Parser {
     }
 
     private parseStructInit(name: string): Expression {
+        this.log('parseStructInit');
         this.expect([TokenType.OpenBrace]);
-        const fields: import('./nodeTypes').FieldInit[] = [];
+        const fields: FieldInit[] = [];
 
         if (this.current.type !== TokenType.CloseBrace) {
             fields.push(this.parseFieldInit());
@@ -960,7 +1078,8 @@ export class Parser {
         return { type: 'StructInit', name, fields };
     }
 
-    private parseFieldInit(): import('./nodeTypes').FieldInit {
+    private parseFieldInit(): FieldInit {
+        this.log('parseFieldInit');
         const fieldName = this.expect([TokenType.Identifier]).value;
         this.expect([TokenType.Colon]);
         const value = this.parseExpression();

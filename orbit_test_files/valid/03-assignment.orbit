@@ -1,0 +1,6 @@
+orbit main {
+    let x: int = 1;
+    x = 2;
+    player.health = 100;
+    player.stats.armor = 5;
+}

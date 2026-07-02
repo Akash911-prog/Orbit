@@ -2,7 +2,7 @@ import { globalErrorBucket, initiateGlobals } from './globals';
 import { Lexer } from './lexer/lexer';
 import { TokenType } from './lexer/token';
 import { Parser } from './parser/parser';
-import { editDistance } from './utility/distanceAutoCorrect';
+import { appendFile } from 'node:fs/promises';
 
 // src/index.ts
 const filePath = process.argv[2];
@@ -17,11 +17,21 @@ const src = await Bun.file(filePath).text();
 
 initiateGlobals(src);
 
-const lexer = new Lexer(src);
-const parser = new Parser(lexer);
+try {
+    const lexer = new Lexer(src);
+    // let current = lexer.nextToken();
+    // while (current.type !== TokenType.EOF) {
+    //     await appendFile('./temp.json', JSON.stringify(current, null, 4));
+    //     current = lexer.nextToken();
+    // }
+    const parser = new Parser(lexer, process.argv.includes('--debug'));
 
-const program = parser.parseProgram();
+    const program = parser.parseProgram();
 
-console.log(JSON.stringify(program, null, 4));
-// after things finished / temp sol for errors
-globalErrorBucket.showAll();
+    console.log(JSON.stringify(program, null, 4));
+} catch (error) {
+    console.error(error);
+} finally {
+    // after things finished / temp sol for errors
+    globalErrorBucket.showAll();
+}

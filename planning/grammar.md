@@ -62,7 +62,7 @@ ForStatement        = "for" Identifier "in" Expression Block ;
 
 WhileStatement      = "while" Expression Block ;
 
-LoopStatement       = "loop" Block ;
+LoopStatement       = "loop" [Identifier] Block ;
 
 MatchStatement      = "match" Expression "{" MatchArm { "," MatchArm } [ "," ] "}" ;
 MatchArm            = MatchPattern "=>" ( Expression | Block ) ;
@@ -125,13 +125,13 @@ StructMember        = VariableDecl
                     | FunctionDecl
                     | ResponsibleBlock ;
 
-ResponsibleBlock    = "responsible" { Identifier } [ Block ] ;
+ResponsibleBlock    = "responsible" { Identifier } [ Block ] ";";
                     (* identifiers = values struct is responsible for freeing *)
                     (* block = actions that must run on lifecycle end          *)
                     (* unmet responsibility = compile error                   *)
 
 StructInit          = Identifier "{" [ FieldInit { "," FieldInit } ] "}" ;
-FieldInit           = Identifier ":" Expression ;
+FieldInit           = Identifier ":" Expression ";";
 ```
 
 ---

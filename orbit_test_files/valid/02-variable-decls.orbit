@@ -1,0 +1,7 @@
+orbit main {
+    let a: int = 1;
+    var b: float = 2.5;
+    let c: str = "hello";
+    let d: bool = true;
+    let e: bool = false;
+}

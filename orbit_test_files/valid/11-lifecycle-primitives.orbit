@@ -1,0 +1,24 @@
+nova OnDamage(amount: int) {
+    print(amount);
+}
+
+orbit main {
+    orbit child {
+        let x: int = 5;
+    }
+
+    drift x -> y;
+    drift x into y;
+    drift x into shared(a, b);
+    drift x into sync(a, b);
+
+    decay {
+        print("cleaning up nearest");
+    }
+
+    decay child {
+        print("cleaning up child");
+    }
+
+    fire OnDamage(10);
+}

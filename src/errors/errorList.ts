@@ -25,7 +25,7 @@ function formatError(error: OrbitError, source: string): string {
 }
 
 export class ErrorBucket {
-    private errors: OrbitError[] = [];
+    public errors: OrbitError[] = [];
     private source: string;
 
     constructor(source: string) {
@@ -47,6 +47,10 @@ export class ErrorBucket {
             console.log(formatError(error, this.source));
             console.log(); // blank line between errors
         }
+        this.errors = [];
+    }
+
+    clear(): void {
         this.errors = [];
     }
 }

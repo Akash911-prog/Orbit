@@ -1,0 +1,60 @@
+fn nullable(x: int?): int? {
+    return x;
+}
+
+fn arrayParam(x: int[]): int[] {
+    return x;
+}
+
+fn nested2DArray(x: int[][]): int[][] {
+    return x;
+}
+
+fn nullableArray(x: int?[]): int?[] {
+    return x;
+}
+
+fn arrayOfNullable(x: int[]?): int[]? {
+    return x;
+}
+
+fn mapParam(x: Map<str, int>): Map<str, int> {
+    return x;
+}
+
+fn tupleParam(x: (int, str)): (int, str) {
+    return x;
+}
+
+fn tupleThreeParam(x: (int, str, bool)): (int, str, bool) {
+    return x;
+}
+
+fn resultParam(x: Result<int, str>): Result<int, str> {
+    return x;
+}
+
+fn genericParam(x: Box<int>): Box<int> {
+    return x;
+}
+
+fn bareGeneric(x: Box): Box {
+    return x;
+}
+
+orbit main {
+    let a: int? = null;
+    let b: i8 = 1;
+    let c: i16 = 1;
+    let d: i32 = 1;
+    let e: i64 = 1;
+    let f: u8 = 1;
+    let g: u16 = 1;
+    let h: u32 = 1;
+    let i: u64 = 1;
+    let j: f32 = 1.0;
+    let k: f64 = 1.0;
+    let l: char = 1;
+    let m: byte = 1;
+    let n: String = "hello";
+}

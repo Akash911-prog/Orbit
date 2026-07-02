@@ -1,4 +1,4 @@
-import { KEYWORDS } from '../constants';
+import { KEYWORDS, SINGLE_CHAR_SYMBOLS } from '../constants';
 import { globalErrorBucket } from '../globals';
 import {
     Add,
@@ -204,7 +204,7 @@ export class Lexer {
                         col: col,
                         length: str.length,
                     };
-                    globalErrorBucket.add(error);
+                    // globalErrorBucket.add(error);
                 }
             }
             return null;
@@ -222,19 +222,22 @@ export class Lexer {
         const startLine = this.line;
         const startCol = this.col;
         let tokenType = TokenType.IntLiteral;
-        let sawDot = false;
 
-        while (!this.isEnd() && digitAndDot.test(this.peek())) {
-            const char = this.peek();
-
-            if (char === '.') {
-                if (sawDot) break; // second dot — stop, don't consume it
-                sawDot = true;
-                tokenType = TokenType.FloatLiteral;
-            }
-
-            number += char;
+        while (!this.isEnd() && digit.test(this.peek())) {
+            number += this.peek();
             this.next();
+        }
+
+        // only treat '.' as a decimal point if it's NOT the start of a range operator (.. or ..=)
+        if (this.peek() === '.' && this.peekNext() !== '.') {
+            tokenType = TokenType.FloatLiteral;
+            number += this.peek();
+            this.next();
+
+            while (!this.isEnd() && digit.test(this.peek())) {
+                number += this.peek();
+                this.next();
+            }
         }
 
         const token: Token = {
@@ -247,13 +250,31 @@ export class Lexer {
         return token;
     }
 
+    private peekNext(): string {
+        return this.cursor + 1 < this.source.length
+            ? this.source[this.cursor + 1]!
+            : '';
+    }
+
     private readSymbols(): Token {
         let symbol = '';
         const startLine = this.line;
         const startCol = this.col;
-        while (!this.isEnd() && symbolStart.test(this.peek())) {
-            symbol += this.peek();
-            this.next();
+
+        const first = this.peek();
+        symbol += first;
+        this.next();
+
+        if (!SINGLE_CHAR_SYMBOLS.has(first)) {
+            // only keep consuming if this character is one that CAN combine with more
+            while (
+                !this.isEnd() &&
+                symbolStart.test(this.peek()) &&
+                !SINGLE_CHAR_SYMBOLS.has(this.peek())
+            ) {
+                symbol += this.peek();
+                this.next();
+            }
         }
 
         let type: TokenType | null = null;

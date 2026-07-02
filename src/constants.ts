@@ -74,4 +74,17 @@ export const KEYWORDS: Record<string, TokenType> = {
     into: TokenType.KeywordInto,
     shared: TokenType.KeywordShared,
     sync: TokenType.KeywordSync,
+    responsible: TokenType.KeywordResponsible,
 };
+
+export const SINGLE_CHAR_SYMBOLS = new Set([
+    '(',
+    ')',
+    '{',
+    '}',
+    '[',
+    ']',
+    ',',
+    ';',
+    ':',
+]);

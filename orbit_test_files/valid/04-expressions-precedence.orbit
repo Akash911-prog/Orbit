@@ -1,0 +1,16 @@
+orbit main {
+    let a: int = 1 + 2 * 3;
+    let b: int = (1 + 2) * 3;
+    let c: bool = 1 < 2 && 3 >= 4 || 5 == 5;
+    let d: bool = !true;
+    let e: int = -5;
+    let f: bool = !(1 == 2);
+    let g: int = 1 + -2;
+    let h: bool = 1 < 2;
+    let i: bool = 1 <= 2;
+    let j: bool = 1 > 2;
+    let k: bool = 1 >= 2;
+    let l: bool = 1 != 2;
+    let m: int = 10 % 3;
+    let n: int = 10 / 3;
+}

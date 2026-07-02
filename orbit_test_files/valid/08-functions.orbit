@@ -1,0 +1,20 @@
+fn greet() {
+    print("hello");
+}
+
+fn add(a: int, b: int): int {
+    return a + b;
+}
+
+fn identity<T>(x: T): T {
+    return x;
+}
+
+fn noReturn(x: int) {
+    return;
+}
+
+orbit main {
+    let result: int = add(1, 2);
+    print(result);
+}

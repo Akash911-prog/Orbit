@@ -1,0 +1,4 @@
+orbit main {
+    let score: int = 10;
+    print(score);
+}
