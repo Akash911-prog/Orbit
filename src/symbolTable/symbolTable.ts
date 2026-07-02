@@ -35,13 +35,22 @@ export class SymbolTable {
         this.parent = parent;
     }
 
-    define(name: string, entry: SymbolEntry): void {
+    define(name: string, entry: SymbolEntry): Boolean {
+        if (this.table.has(name)) {
+            return false;
+        }
         this.table.set(name, entry);
+        return true;
     }
 
     lookup(name: string): SymbolEntry | null {
         if (this.table.has(name)) return this.table.get(name)!;
         if (this.parent) return this.parent.lookup(name);
+        return null;
+    }
+
+    lookupLocal(name: string): SymbolEntry | null {
+        if (this.table.has(name)) return this.table.get(name)!;
         return null;
     }
 
