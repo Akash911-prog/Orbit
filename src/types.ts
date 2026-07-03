@@ -13,7 +13,8 @@ export type OrbType =
     | { kind: 'fn'; params: OrbType[]; returnType: OrbType }
     | { kind: 'struct'; name: string }
     | { kind: 'generic'; name: string }
-    | { kind: 'unknown' };
+    | { kind: 'unknown' }
+    | { kind: 'nullable'; inner: OrbType };
 
 export const OrbTypes = {
     int: (): OrbType => ({ kind: 'int' }),
@@ -36,4 +37,7 @@ export const OrbTypes = {
     }),
     struct: (name: string): OrbType => ({ kind: 'struct', name }),
     generic: (name: string): OrbType => ({ kind: 'generic', name }),
+    char: (): OrbType => ({ kind: 'char' }),
+    byte: (): OrbType => ({ kind: 'byte' }),
+    nullable: (inner: OrbType): OrbType => ({ kind: 'nullable', inner }),
 };

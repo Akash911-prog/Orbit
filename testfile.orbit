@@ -1,3 +1,18 @@
+fn helloWorld(): int {
+    print("hello");
+}
+
+struct Player {
+    let name: str = "unknown";
+    let health: int = 100;
+
+    fn isAlive(): bool {
+        return health > 0;
+    }
+}
+
 orbit main {
     let x = 5 + 5;
 }
+
+var hello: Player = 35;

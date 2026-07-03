@@ -4,14 +4,14 @@ import { BUILTIN_FUNCTIONS_MAP } from './builtIn';
 
 export type SymbolEntry = VariableEntry | FunctionEntry | StructEntry;
 
-type VariableEntry = {
+export type VariableEntry = {
     kind: 'variable';
     name: string;
     type: OrbType;
     mutable: boolean; // let vs var
 };
 
-type FunctionEntry = {
+export type FunctionEntry = {
     kind: 'function';
     name: string;
     params: { name: string; type: OrbType }[];
@@ -19,10 +19,10 @@ type FunctionEntry = {
     builtin: boolean; // true for print, println etc
 };
 
-type StructEntry = {
+export type StructEntry = {
     kind: 'struct';
     name: string;
-    fields: { name: string; type: OrbType; mutable: boolean }[];
+    fields: { name: string | null; type: OrbType; mutable: boolean }[];
     methods: FunctionEntry[];
 };
 
@@ -35,7 +35,7 @@ export class SymbolTable {
         this.parent = parent;
     }
 
-    define(name: string, entry: SymbolEntry): Boolean {
+    define(name: string, entry: SymbolEntry): boolean {
         if (this.table.has(name)) {
             return false;
         }
@@ -60,6 +60,10 @@ export class SymbolTable {
 
     exitScope(): SymbolTable {
         return this.parent!;
+    }
+
+    logMap(): void {
+        console.log(JSON.stringify([...this.table], null, 2));
     }
 }
 

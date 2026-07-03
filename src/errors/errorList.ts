@@ -44,7 +44,7 @@ export class ErrorBucket {
     // this is the terminal step of one compile cycle, called from `finally`
     showAll(): void {
         for (const error of this.errors) {
-            console.log(formatError(error, this.source));
+            console.error(formatError(error, this.source));
             console.log(); // blank line between errors
         }
         this.errors = [];

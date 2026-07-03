@@ -1,4 +1,5 @@
-import { globalErrorBucket, initiateGlobals } from './globals';
+import { SemanticAnalyzer } from './analyzer/analyzer';
+import { globalErrorBucket, globalTable, initiateGlobals } from './globals';
 import { Lexer } from './lexer/lexer';
 import { TokenType } from './lexer/token';
 import { Parser } from './parser/parser';
@@ -28,7 +29,12 @@ try {
 
     const program = parser.parseProgram();
 
-    console.log(JSON.stringify(program, null, 4));
+    const analyzer = new SemanticAnalyzer(program);
+    const decoratedAst = analyzer.analyze();
+
+    globalTable.logMap();
+
+    // console.log(JSON.stringify(program, null, 4));
 } catch (error) {
     console.error(error);
 } finally {

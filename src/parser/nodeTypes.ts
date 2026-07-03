@@ -1,3 +1,8 @@
+export interface NodeBase {
+    line: number;
+    col: number;
+}
+
 // ===== Program =======
 export interface Program {
     type: 'Program';
@@ -12,12 +17,12 @@ export type TopLevelDeclaration =
     | NovaDecl
     | RootOrbitDecl;
 
-export interface RootOrbitDecl {
+export interface RootOrbitDecl extends NodeBase {
     type: 'RootOrbitDecl';
     body: Block;
 }
 
-export interface Block {
+export interface Block extends NodeBase {
     type: 'Block';
     statements: Statement[];
 }
@@ -40,7 +45,7 @@ export type Statement =
     | ContinueStatement
     | ExpressionStatement;
 
-export interface VariableDecl {
+export interface VariableDecl extends NodeBase {
     type: 'VariableDecl';
     kind: 'let' | 'var';
     name: string;
@@ -48,105 +53,109 @@ export interface VariableDecl {
     initializer: Expression;
 }
 
-export interface Assignment {
+export interface Assignment extends NodeBase {
     type: 'Assignment';
     target: string[]; // Identifier { "." Identifier } — the access chain
     value: Expression;
 }
 
-export interface ReturnStatement {
+export interface ReturnStatement extends NodeBase {
     type: 'ReturnStatement';
     value: Expression | null;
 }
-export interface BreakStatement {
+export interface BreakStatement extends NodeBase {
     type: 'BreakStatement';
     label: string | null;
 }
-export interface ContinueStatement {
+export interface ContinueStatement extends NodeBase {
     type: 'ContinueStatement';
 }
-export interface ExpressionStatement {
+export interface ExpressionStatement extends NodeBase {
     type: 'ExpressionStatement';
     expression: Expression;
 }
 
 // ===== Control flow =====
-export interface IfStatement {
+export interface IfStatement extends NodeBase {
     type: 'IfStatement';
     condition: Expression;
     thenBranch: Block;
     elseBranch: Block | IfStatement | null; // nested, per our earlier decision
 }
 
-export interface ForStatement {
+export interface ForStatement extends NodeBase {
     type: 'ForStatement';
     variable: string;
     iterable: Expression;
     body: Block;
 }
 
-export interface WhileStatement {
+export interface WhileStatement extends NodeBase {
     type: 'WhileStatement';
     condition: Expression;
     body: Block;
 }
-export interface LoopStatement {
+export interface LoopStatement extends NodeBase {
     type: 'LoopStatement';
     name: string | null;
     body: Block;
 }
 
-export interface MatchStatement {
+export interface MatchStatement extends NodeBase {
     type: 'MatchStatement';
     subject: Expression;
     arms: MatchArm[];
 }
 
-export interface MatchArm {
+export interface MatchArm extends NodeBase {
     type: 'MatchArm';
     pattern: MatchPattern;
     body: Expression | Block;
 }
 
 export type MatchPattern =
-    | { type: 'LiteralPattern'; value: Literal }
-    | { type: 'IdentifierPattern'; name: string }
-    | { type: 'WildcardPattern' } // "_"
-    | { type: 'ConstructorPattern'; name: string; args: MatchPattern[] }; // ok(data), err(e)
+    | ({ type: 'LiteralPattern'; value: Literal } & NodeBase)
+    | ({ type: 'IdentifierPattern'; name: string } & NodeBase)
+    | ({ type: 'WildcardPattern' } & NodeBase)
+    | ({
+          type: 'ConstructorPattern';
+          name: string;
+          args: MatchPattern[];
+      } & NodeBase);
 
 // ===== Orbit lifecycle primitives =====
-export interface OrbitBlock {
+export interface OrbitBlock extends NodeBase {
     type: 'OrbitBlock';
     name: string;
     body: Block;
 }
 
 export type DriftStatement =
-    | { type: 'DriftExclusive'; name: string; target: string } // -> or into
-    | { type: 'DriftShared'; name: string; a: string; b: string } // -> or into shared(a, b)
-    | { type: 'DriftSync'; name: string; a: string; b: string }; // -> or into sync(a, b)
+    | ({ type: 'DriftExclusive'; name: string; target: string } & NodeBase)
+    | ({ type: 'DriftShared'; name: string; a: string; b: string } & NodeBase)
+    | ({ type: 'DriftSync'; name: string; a: string; b: string } & NodeBase);
 
-export interface DecayBlock {
+export interface DecayBlock extends NodeBase {
     type: 'DecayBlock';
     target: string | null; // null = nearest orbit
     body: Block;
 }
 
-export interface NovaDecl {
+export interface NovaDecl extends NodeBase {
     type: 'NovaDecl';
     name: string;
     parameters: Parameter[];
     body: Block;
 }
 
-export interface FireStatement {
+export interface FireStatement extends NodeBase {
     type: 'FireStatement';
     name: string;
     args: Expression[];
 }
 
 // ===== Functions =====
-export interface FunctionDecl {
+export interface FunctionDecl extends NodeBase {
     type: 'FunctionDecl';
     name: string;
     generic: string | null; // <T>
@@ -155,14 +164,14 @@ export interface FunctionDecl {
     body: Block;
 }
 
-export interface Parameter {
+export interface Parameter extends NodeBase {
     type: 'Parameter';
     name: string;
     paramType: TypeNode;
 }
 
 // ===== Structs =====
-export interface StructDecl {
+export interface StructDecl extends NodeBase {
     type: 'StructDecl';
     name: string;
     generic: string | null;
@@ -171,7 +180,7 @@ export interface StructDecl {
 
 export type StructMember = VariableDecl | FunctionDecl | ResponsibleBlock;
 
-export interface ResponsibleBlock {
+export interface ResponsibleBlock extends NodeBase {
     type: 'ResponsibleBlock';
     owns: string[]; // identifiers struct is responsible for freeing
     cleanup: Block | null; // optional action block
@@ -179,13 +188,17 @@ export interface ResponsibleBlock {
 
 // ===== Types (these are type ANNOTATIONS, separate AST family from expressions) =====
 export type TypeNode =
-    | { type: 'BaseType'; name: string } // int, f32, str, ...
-    | { type: 'NullableType'; inner: TypeNode } // int?
-    | { type: 'ArrayType'; element: TypeNode } // int[]
-    | { type: 'MapType'; key: TypeNode; value: TypeNode } // map<K,V>
-    | { type: 'TupleType'; elements: TypeNode[] } // (int, str)
-    | { type: 'ResultType'; ok: TypeNode; err: TypeNode } // Result<T,E>
-    | { type: 'GenericType'; name: string; typeArg: TypeNode | null }; // Stack<T>
+    | ({ type: 'BaseType'; name: string } & NodeBase)
+    | ({ type: 'NullableType'; inner: TypeNode } & NodeBase)
+    | ({ type: 'ArrayType'; element: TypeNode } & NodeBase)
+    | ({ type: 'MapType'; key: TypeNode; value: TypeNode } & NodeBase)
+    | ({ type: 'TupleType'; elements: TypeNode[] } & NodeBase)
+    | ({ type: 'ResultType'; ok: TypeNode; err: TypeNode } & NodeBase)
+    | ({
+          type: 'GenericType';
+          name: string;
+          typeArg: TypeNode | null;
+      } & NodeBase);
 
 // ===== Expressions =====
 export type Expression =
@@ -201,14 +214,14 @@ export type Expression =
     | Literal
     | NullLiteral;
 
-export interface RangeExpr {
+export interface RangeExpr extends NodeBase {
     type: 'RangeExpr';
     inclusive: boolean; // false = .. , true = ..=
     start: Expression;
     end: Expression;
 }
 
-export interface BinaryExpr {
+export interface BinaryExpr extends NodeBase {
     type: 'BinaryExpr';
     operator:
         | '&&'
@@ -228,68 +241,68 @@ export interface BinaryExpr {
     right: Expression;
 }
 
-export interface UnaryExpr {
+export interface UnaryExpr extends NodeBase {
     type: 'UnaryExpr';
     operator: '!' | '-';
     operand: Expression;
 }
 
-export interface NullCheckExpr {
+export interface NullCheckExpr extends NodeBase {
     type: 'NullCheckExpr';
     expression: Expression;
 }
 
-export interface MemberAccess {
+export interface MemberAccess extends NodeBase {
     type: 'MemberAccess';
     object: Expression;
     property: string;
 }
-export interface MethodCall {
+export interface MethodCall extends NodeBase {
     type: 'MethodCall';
     object: Expression;
     method: string;
     args: Expression[];
 }
 
-export interface FunctionCall {
+export interface FunctionCall extends NodeBase {
     type: 'FunctionCall';
     name: string;
     args: Expression[];
 }
 
-export interface StructInit {
+export interface StructInit extends NodeBase {
     type: 'StructInit';
     name: string;
     fields: FieldInit[];
 }
-export interface FieldInit {
+export interface FieldInit extends NodeBase {
     type: 'FieldInit';
     name: string;
     value: Expression;
 }
 
-export interface Identifier {
+export interface Identifier extends NodeBase {
     type: 'Identifier';
     name: string;
 }
 
 export type Literal = IntLiteral | FloatLiteral | StrLiteral | BoolLiteral;
-export interface IntLiteral {
+export interface IntLiteral extends NodeBase {
     type: 'IntLiteral';
     value: string;
 }
-export interface FloatLiteral {
+export interface FloatLiteral extends NodeBase {
     type: 'FloatLiteral';
     value: string;
 }
-export interface StrLiteral {
+export interface StrLiteral extends NodeBase {
     type: 'StrLiteral';
     value: string;
 }
-export interface BoolLiteral {
+export interface BoolLiteral extends NodeBase {
     type: 'BoolLiteral';
     value: boolean;
 }
-export interface NullLiteral {
+export interface NullLiteral extends NodeBase {
     type: 'NullLiteral';
 }
