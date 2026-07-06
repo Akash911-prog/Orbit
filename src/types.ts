@@ -7,6 +7,7 @@ export type OrbType =
     | { kind: 'char' }
     | { kind: 'byte' }
     | { kind: 'void' }
+    | { kind: 'null' }
     | { kind: 'array'; element: OrbType }
     | { kind: 'map'; key: OrbType; value: OrbType }
     | { kind: 'tuple'; elements: OrbType[] }
@@ -40,4 +41,5 @@ export const OrbTypes = {
     char: (): OrbType => ({ kind: 'char' }),
     byte: (): OrbType => ({ kind: 'byte' }),
     nullable: (inner: OrbType): OrbType => ({ kind: 'nullable', inner }),
+    null: (): OrbType => ({ kind: 'null' }),
 };

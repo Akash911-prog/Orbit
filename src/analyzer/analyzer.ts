@@ -1,7 +1,7 @@
 import type { OrbitError } from '../errors/errorList';
 import { ErrorType } from '../errors/errorTypes';
 import { globalErrorBucket, globalTable } from '../globals';
-import type { Program, TypeNode } from '../parser/nodeTypes';
+import type { Program, TypeNode, VariableDecl } from '../parser/nodeTypes';
 import type {
     FunctionEntry,
     StructEntry,
@@ -9,6 +9,7 @@ import type {
 } from '../symbolTable/symbolTable';
 import { OrbTypes, type OrbType } from '../types';
 import type { AnalyzerContext } from './context';
+import { handleExpression } from './handlers/expression';
 
 export class SemanticAnalyzer {
     private ast: Program;
@@ -29,6 +30,12 @@ export class SemanticAnalyzer {
     public analyze(): Program {
         this.hoistSignatures(this.ast, this.ctx);
 
+        for (const node of this.ast.declarations) {
+            if (node.type === 'VariableDecl') {
+                this.analyzeVariableDecl(node, this.ctx); // fills in real type, was 'unknown' from hoisting
+            }
+        }
+
         // this.ctx.visit(this.ast, this.ctx);
 
         return this.ast;
@@ -47,6 +54,23 @@ export class SemanticAnalyzer {
 
     private visit(node: any, ctx: AnalyzerContext): OrbType {
         throw new Error('Method not implemented.');
+    }
+
+    private analyzeVariableDecl(
+        node: VariableDecl,
+        ctx: AnalyzerContext
+    ): OrbType {
+        const varType = handleExpression(node.initializer, ctx);
+
+        const entry: VariableEntry = {
+            kind: 'variable',
+            name: node.name,
+            type: varType,
+            mutable: node.kind === 'var',
+        };
+
+        ctx.globalScope.update(node.name, entry);
+        return varType;
     }
 
     private hoistSignatures(ast: Program, ctx: AnalyzerContext): void {
@@ -205,6 +229,8 @@ export class SemanticAnalyzer {
                         return OrbTypes.byte();
                     case 'void':
                         return OrbTypes.void();
+                    case 'null':
+                        return OrbTypes.null();
                     default: {
                         // Not a primitive — assume it's a struct reference
                         const entry = ctx.globalScope.lookup(node.name);

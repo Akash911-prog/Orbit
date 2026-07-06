@@ -54,6 +54,15 @@ export class SymbolTable {
         return null;
     }
 
+    update(name: string, entry: SymbolEntry): boolean {
+        const isRemoved = this.table.delete(name);
+        if (isRemoved) {
+            this.table.set(name, entry);
+            return true;
+        }
+        return false;
+    }
+
     enterScope(): SymbolTable {
         return new SymbolTable(this);
     }

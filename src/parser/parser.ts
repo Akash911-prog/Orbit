@@ -235,6 +235,7 @@ export class Parser {
             case TokenType.KeywordChar:
             case TokenType.KeywordByte:
             case TokenType.KeywordStr:
+            case TokenType.KeywordNull:
             case TokenType.KeywordString: {
                 const name = this.consume().value;
                 return { type: 'BaseType', name, line, col };

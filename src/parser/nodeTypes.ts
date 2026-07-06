@@ -1,6 +1,10 @@
+import type { OrbType } from '../types';
+
 export interface NodeBase {
     line: number;
     col: number;
+    resolvedType?: OrbType;
+    isStringConcat?: boolean;
 }
 
 // ===== Program =======
