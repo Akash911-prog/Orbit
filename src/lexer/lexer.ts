@@ -102,7 +102,7 @@ export class Lexer {
 
         const char = this.peek();
 
-        if (char === '"') {
+        if (char === '"' || char === "'") {
             return this.readLiteralString();
         }
 
@@ -127,16 +127,21 @@ export class Lexer {
         let literal = '';
         const startLine = this.line;
         const startCol = this.col;
-        this.next(); // consume opening "
 
-        while (this.peek() !== '"') {
-            literal += this.peek();
+        // 1. Capture whether this string started with " or '
+        const quoteChar = this.peek();
+        this.next(); // consume opening quote
+
+        // 2. Loop until we hit the matching closing quote
+        while (this.peek() !== quoteChar) {
             if (this.isEnd()) break;
+            literal += this.peek();
             this.next();
         }
 
-        if (!this.isEnd()) {
-            this.next(); // consume closing "
+        // 3. Cleanly consume the matching closing quote
+        if (!this.isEnd() && this.peek() === quoteChar) {
+            this.next();
         }
 
         const token: Token = {
@@ -148,7 +153,6 @@ export class Lexer {
 
         return token;
     }
-
     private readIdentifierString(): Token {
         let identifier = '';
         const startLine = this.line;

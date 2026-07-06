@@ -47,7 +47,10 @@ export type Statement =
     | ReturnStatement
     | BreakStatement
     | ContinueStatement
-    | ExpressionStatement;
+    | ExpressionStatement
+    | FunctionDecl
+    | NovaDecl
+    | StructDecl;
 
 export interface VariableDecl extends NodeBase {
     type: 'VariableDecl';

@@ -472,6 +472,15 @@ export class Parser {
                 // needs lookahead/backtracking to disambiguate (see note above)
                 return this.parseIdentifierStartedStatement();
 
+            case TokenType.KeywordFn:
+                return this.parseFunctionDecl();
+
+            case TokenType.KeywordStruct:
+                return this.parseStructDecl();
+
+            case TokenType.KeywordNova:
+                return this.parseNovaDecl();
+
             default:
                 return this.parseExpressionStatement();
         }

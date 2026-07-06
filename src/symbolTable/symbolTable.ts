@@ -2,7 +2,12 @@ import type { TokenType } from '../lexer/token';
 import { OrbTypes, type OrbType } from '../types';
 import { BUILTIN_FUNCTIONS_MAP } from './builtIn';
 
-export type SymbolEntry = VariableEntry | FunctionEntry | StructEntry;
+export type SymbolEntry =
+    | VariableEntry
+    | FunctionEntry
+    | StructEntry
+    | OrbitEntry
+    | LoopEntry;
 
 export type VariableEntry = {
     kind: 'variable';
@@ -24,6 +29,16 @@ export type StructEntry = {
     name: string;
     fields: { name: string | null; type: OrbType; mutable: boolean }[];
     methods: FunctionEntry[];
+};
+
+export type OrbitEntry = {
+    kind: 'orbit';
+    name: string;
+};
+
+export type LoopEntry = {
+    kind: 'loop';
+    name: string;
 };
 
 export class SymbolTable {

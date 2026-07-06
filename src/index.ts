@@ -18,6 +18,8 @@ const src = await Bun.file(filePath).text();
 
 initiateGlobals(src);
 
+let program;
+
 try {
     const lexer = new Lexer(src);
     // let current = lexer.nextToken();
@@ -27,17 +29,16 @@ try {
     // }
     const parser = new Parser(lexer, process.argv.includes('--debug'));
 
-    const program = parser.parseProgram();
+    program = parser.parseProgram();
 
-    const analyzer = new SemanticAnalyzer(program);
-    const decoratedAst = analyzer.analyze();
+    // const analyzer = new SemanticAnalyzer(program);
+    // const decoratedAst = analyzer.analyze();
 
-    globalTable.logMap();
-
-    // console.log(JSON.stringify(program, null, 4));
+    // globalTable.logMap();
 } catch (error) {
     console.error(error);
 } finally {
     // after things finished / temp sol for errors
+    console.log(JSON.stringify(program, null, 4));
     globalErrorBucket.showAll();
 }

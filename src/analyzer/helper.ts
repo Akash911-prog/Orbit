@@ -5,10 +5,12 @@ export function expectType(
     expected: OrbType,
     actual: OrbType,
     node: any,
-    ctx: AnalyzerContext
+    ctx: AnalyzerContext,
+    msg?: string
 ): boolean {
     if (expected.kind !== actual.kind) {
-        ctx.reportError(`Expected type ${expected.kind}`, node);
+        msg = msg || `Expected type ${expected.kind}, got ${actual.kind}`;
+        ctx.reportError(msg, node);
         return false;
     }
     return true;

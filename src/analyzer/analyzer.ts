@@ -10,6 +10,7 @@ import type {
 import { OrbTypes, type OrbType } from '../types';
 import type { AnalyzerContext } from './context';
 import { handleExpression } from './handlers/expression';
+import { HandlerRegistry } from './registery';
 
 export class SemanticAnalyzer {
     private ast: Program;
@@ -21,6 +22,9 @@ export class SemanticAnalyzer {
             scope: globalTable,
             globalScope: globalTable,
             currentFunction: null,
+            loopDepth: 0,
+            typenodeToOrbType: (node: TypeNode, ctx: AnalyzerContext) =>
+                this.typeNodeToOrbType(node, ctx),
             reportError: (msg: string, node: any) =>
                 this.reportError(msg, node),
             visit: (node: any, ctx: AnalyzerContext) => this.visit(node, ctx),
@@ -53,7 +57,13 @@ export class SemanticAnalyzer {
     }
 
     private visit(node: any, ctx: AnalyzerContext): OrbType {
-        throw new Error('Method not implemented.');
+        const handler = HandlerRegistry[node.type];
+        if (!handler) {
+            ctx.reportError(`Unknown node type: ${node.type}`, node);
+            return OrbTypes.unknown();
+        }
+
+        return handler(node, ctx);
     }
 
     private analyzeVariableDecl(
@@ -104,10 +114,10 @@ export class SemanticAnalyzer {
                         name: node.name,
                         params: node.parameters.map((p) => ({
                             name: p.name,
-                            type: this.TypeNodeToOrbType(p.paramType, ctx),
+                            type: this.typeNodeToOrbType(p.paramType, ctx),
                         })),
                         returnType: node.returnType
-                            ? this.TypeNodeToOrbType(node.returnType, ctx)
+                            ? this.typeNodeToOrbType(node.returnType, ctx)
                             : OrbTypes.void(),
                         builtin: false,
                     };
@@ -117,7 +127,7 @@ export class SemanticAnalyzer {
 
                 case 'VariableDecl':
                     const varType = node.varType
-                        ? this.TypeNodeToOrbType(node.varType, ctx)
+                        ? this.typeNodeToOrbType(node.varType, ctx)
                         : OrbTypes.unknown();
 
                     const entry: VariableEntry = {
@@ -150,13 +160,13 @@ export class SemanticAnalyzer {
                                     name: member.name,
                                     params: member.parameters.map((p) => ({
                                         name: p.name,
-                                        type: this.TypeNodeToOrbType(
+                                        type: this.typeNodeToOrbType(
                                             p.paramType,
                                             ctx
                                         ),
                                     })),
                                     returnType: member.returnType
-                                        ? this.TypeNodeToOrbType(
+                                        ? this.typeNodeToOrbType(
                                               member.returnType,
                                               ctx
                                           )
@@ -172,7 +182,7 @@ export class SemanticAnalyzer {
                                     kind: 'variable',
                                     name: member.name,
                                     type: member.varType
-                                        ? this.TypeNodeToOrbType(
+                                        ? this.typeNodeToOrbType(
                                               member.varType,
                                               ctx
                                           )
@@ -209,7 +219,7 @@ export class SemanticAnalyzer {
         }
     }
 
-    private TypeNodeToOrbType(node: TypeNode, ctx: AnalyzerContext): OrbType {
+    private typeNodeToOrbType(node: TypeNode, ctx: AnalyzerContext): OrbType {
         switch (node.type) {
             case 'BaseType': {
                 switch (node.name) {
@@ -249,23 +259,23 @@ export class SemanticAnalyzer {
             case 'NullableType':
                 // No nullable wrapper in OrbType yet — flagging, see note below
                 return OrbTypes.nullable(
-                    this.TypeNodeToOrbType(node.inner, ctx)
+                    this.typeNodeToOrbType(node.inner, ctx)
                 );
 
             case 'ArrayType':
                 return OrbTypes.array(
-                    this.TypeNodeToOrbType(node.element, ctx)
+                    this.typeNodeToOrbType(node.element, ctx)
                 );
 
             case 'MapType':
                 return OrbTypes.map(
-                    this.TypeNodeToOrbType(node.key, ctx),
-                    this.TypeNodeToOrbType(node.value, ctx)
+                    this.typeNodeToOrbType(node.key, ctx),
+                    this.typeNodeToOrbType(node.value, ctx)
                 );
 
             case 'TupleType':
                 return OrbTypes.tuple(
-                    node.elements.map((e) => this.TypeNodeToOrbType(e, ctx))
+                    node.elements.map((e) => this.typeNodeToOrbType(e, ctx))
                 );
 
             case 'ResultType':

@@ -1,3 +1,7 @@
+orbit main {
+    fn hello(world: str): str {
+        return 'hello';
+    }
 
-
-var hello = "hello";
+    print(24);
+}
