@@ -29,7 +29,7 @@ Ownership in Orbit always has exactly one home. If a shared drift exists between
 
 ## Type System
 
-Orbit is statically typed, semi-colon free, and eliminates raw null pointers.
+Orbit is statically typed, and eliminates raw null pointers.
 
 * **Primitives:** Auto-sized (`int`, `float`, `bool`, `char`, `byte`, `str`, `String`) and explicitly sized (`i8` to `u64`, `f32`, `f64`).
 * **Composites:** Fixed arrays (`int[]`), maps (`map<str, int>`), tuples (`(int, str)`), and `Result<T, E>` types.
@@ -38,12 +38,12 @@ Orbit is statically typed, semi-colon free, and eliminates raw null pointers.
 
 ```orbit
 struct Connection {
-    var socket: Socket
-    var buffer: Buffer
+    var socket: Socket;
+    var buffer: Buffer;
 
     responsible socket, buffer {
-        flush(socket)
-        close(socket)
+        flush(socket);
+        close(socket);
     }
 }
 
@@ -57,22 +57,22 @@ The following program moves files concurrently while logging operations, demonst
 
 ```orbit
 orbit main {
-    let mutex = Mutex::new()
-    let log = open_file("transfer.log")
+    let mutex = Mutex::new();
+    let log = open_file("transfer.log");
 
-    var files: str[] = []
+    var files: str[] = [];
     for entry in read_dir("./source") {
         if entry.is_file() {
-            files.push(entry.path)
+            files.push(entry.path);
         }
     }
 
     for path in files {
-        let file = open_file(path)
+        let file = open_file(path);
         
         orbit transfer {
             // Synchronized drift verified against the common parent (main)
-            drift file ~>* sync(transfer, mutex)
+            drift file ~>* sync(transfer, mutex);
             
             match move_file(file, "./dest") {
                 ok(moved) => fire on_log(moved.path),
@@ -80,19 +80,19 @@ orbit main {
             }
             
             decay transfer {
-                close(file)
+                close(file);
             }
         }
     }
 
     // 'log' is automatically shared-drifted into this boundary on access
     nova on_log receives(message: str) {
-        write(log, message)
+        write(log, message);
     }
 
     decay main {
-        flush(log)
-        close(log)
+        flush(log);
+        close(log);
     }
 }
 
