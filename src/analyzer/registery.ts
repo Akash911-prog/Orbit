@@ -8,6 +8,7 @@ import { handleForStatement } from './handlers/for';
 import { handleFunctionDecl } from './handlers/functionDecl';
 import { handleIfStatement } from './handlers/ifStatement';
 import { handleLoopStatement } from './handlers/loop';
+import { handleOrbit } from './handlers/orbit';
 import { handleProgram } from './handlers/program';
 import { handleReturnStatement } from './handlers/returnStatement';
 import { handleStructDecl } from './handlers/structDecl';
@@ -47,4 +48,7 @@ export const HandlerRegistry: Record<string, HandlerFn> = {
     MethodCall: handleExpression,
     FunctionCall: handleExpression,
     StructInit: handleExpression,
+
+    RootOrbitDecl: handleOrbit,
+    OrbitDecl: handleOrbit,
 };

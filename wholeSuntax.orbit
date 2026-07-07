@@ -1,0 +1,143 @@
+
+// 1. Struct Declarations (with default values, generics, methods, and resource management)
+struct Point {
+    let x: int = 0;
+    let y: int = 0;
+}
+
+struct PlayerStats {
+    var armor: int = 5;
+}
+
+struct Player {
+    let name: str = "unknown";
+    let health: int = 100;
+    let stats: PlayerStats = PlayerStats {};
+
+    fn isAlive(): bool {
+        return health > 0;
+    }
+}
+
+struct Stack<T> {
+    let size: int = 0;
+}
+
+struct ManagedResource {
+    let handle: int = 0;
+    responsible handle {
+        print("cleaning up");
+    }
+}
+
+struct SimpleOwner {
+    let buffer: int = 0;
+    responsible buffer;
+}
+
+// 2. Function Declarations (with explicit returns, generic types, and empty returns)
+fn greet() {
+    print("hello");
+}
+
+fn add(a: int, b: int): int {
+    return a + b;
+}
+
+fn identity<T>(x: T): T {
+    return x;
+}
+
+fn noReturn(x: int) {
+    return;
+}
+
+fn classify(n: int): str {
+    match n {
+        0 => "zero",
+        1 => "one",
+        _ => "many",
+    }
+}
+
+// 3. Main Program Entry Point
+orbit main {
+    // Variable Declarations (Immutable 'let' and Mutable 'var')
+    let score: int = 10;
+    let a: int = 1;
+    var b: float = 2.5;
+    let c: str = "hello";
+    let d: bool = true;
+    let e: bool = false;
+
+    // Expressions, Unary Operators, and Precedence
+    let math1: int = 1 + 2 * 3;
+    let math2: int = (1 + 2) * 3;
+    let math3: int = 10 % 3;
+    let math4: int = 10 / 3;
+    let negative: int = -5;
+    let mixed: int = 1 + -2;
+
+    // Logical and Comparison Operators
+    let comp1: bool = 1 < 2 && 3 >= 4 || 5 == 5;
+    let comp2: bool = !true;
+    let comp3: bool = !(1 == 2);
+    let comp4: bool = 1 <= 2;
+    let comp5: bool = 1 > 2;
+    let comp6: bool = 1 != 2;
+
+    // Struct Instantiation and Assignments (with dot-notation)
+    var p: Point = Point { x: 1, y: 2 };
+    print(p.x);
+
+    var player: Player = Player { name: "Hero", health: 100 };
+    player.health = 80;
+    player.stats.armor = 10;
+
+    // Control Flow: If-Else Chains
+    let x: int = 5;
+    if (x > 10) {
+        print(1);
+    } else if (x > 5) {
+        print(2);
+    } else if (x > 0) {
+        print(3);
+    } else {
+        print(4);
+    }
+
+    // Loops: Ranges and Iteration (Exclusive and Inclusive)
+    for i in 0..10 {
+        print(i);
+    }
+    for j in 0..=10 {
+        print(j);
+    }
+
+    // Loops: While and Infinite loops with break/continue
+    var i: int = 0;
+    while i < 10 {
+        i = i + 1;
+        if (i == 5) {
+            continue;
+        }
+        if (i == 9) {
+            break;
+        }
+    }
+
+    loop {
+        break;
+    }
+
+    // Pattern Matching
+    match x {
+        5 => print("five"),
+        _ => print("other"),
+    }
+
+    // Function Calling
+    greet();
+    let result: int = add(1, 2);
+    print(result);
+}

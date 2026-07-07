@@ -27,7 +27,7 @@ export type FunctionEntry = {
 export type StructEntry = {
     kind: 'struct';
     name: string;
-    fields: { name: string | null; type: OrbType; mutable: boolean }[];
+    fields: { name: string; type: OrbType; mutable: boolean }[];
     methods: FunctionEntry[];
 };
 
@@ -44,10 +44,12 @@ export type LoopEntry = {
 export class SymbolTable {
     private table: Map<string, SymbolEntry>;
     private parent: SymbolTable | null;
+    private child: SymbolTable | null;
 
     constructor(parent: SymbolTable | null = null) {
         this.table = new Map();
         this.parent = parent;
+        this.child = null;
     }
 
     define(name: string, entry: SymbolEntry): boolean {
@@ -79,7 +81,9 @@ export class SymbolTable {
     }
 
     enterScope(): SymbolTable {
-        return new SymbolTable(this);
+        const newScope = new SymbolTable(this);
+        this.child = newScope;
+        return newScope;
     }
 
     exitScope(): SymbolTable {
@@ -88,6 +92,7 @@ export class SymbolTable {
 
     logMap(): void {
         console.log(JSON.stringify([...this.table], null, 2));
+        if (this.child) this.child.logMap();
     }
 }
 

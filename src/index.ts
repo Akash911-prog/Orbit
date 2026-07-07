@@ -40,6 +40,6 @@ try {
     console.error(error);
 } finally {
     // after things finished / temp sol for errors
-    writeFile('./temp.json', JSON.stringify(program, null, 4));
+    await writeFile('./temp.json', JSON.stringify(program, null, 4));
     globalErrorBucket.showAll();
 }

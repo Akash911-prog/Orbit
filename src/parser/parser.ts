@@ -131,6 +131,21 @@ export class Parser {
             this.expect([TokenType.Colon]);
             type = this.parseType();
         }
+        if (
+            this.current.type !== TokenType.Equals &&
+            this.current.type === TokenType.Semicolon
+        ) {
+            this.expect([TokenType.Semicolon]);
+            return {
+                type: 'VariableDecl',
+                kind: kind,
+                name: name,
+                varType: type,
+                initializer: null,
+                line,
+                col,
+            };
+        }
         this.expect([TokenType.Equals]);
         const expression: Expression = this.parseExpression();
         this.expect([TokenType.Semicolon]);

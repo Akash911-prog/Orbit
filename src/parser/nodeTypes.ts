@@ -57,7 +57,7 @@ export interface VariableDecl extends NodeBase {
     kind: 'let' | 'var';
     name: string;
     varType: TypeNode | null;
-    initializer: Expression;
+    initializer: Expression | null;
 }
 
 export interface Assignment extends NodeBase {

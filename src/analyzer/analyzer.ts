@@ -10,6 +10,7 @@ import type {
 import { OrbTypes, type OrbType } from '../types';
 import type { AnalyzerContext } from './context';
 import { handleExpression } from './handlers/expression';
+import { isAssignable } from './helper';
 import { HandlerRegistry } from './registery';
 
 export class SemanticAnalyzer {
@@ -40,7 +41,7 @@ export class SemanticAnalyzer {
             }
         }
 
-        // this.ctx.visit(this.ast, this.ctx);
+        this.ctx.visit(this.ast, this.ctx);
 
         return this.ast;
     }
@@ -70,16 +71,51 @@ export class SemanticAnalyzer {
         node: VariableDecl,
         ctx: AnalyzerContext
     ): OrbType {
-        const varType = handleExpression(node.initializer, ctx);
+        if (!node.initializer) {
+            if (!node.varType) {
+                ctx.globalScope.update(node.name, {
+                    kind: 'variable',
+                    name: node.name,
+                    type: OrbTypes.unknown(),
+                    mutable: node.kind === 'var',
+                });
+                return OrbTypes.unknown();
+            }
+            ctx.globalScope.update(node.name, {
+                kind: 'variable',
+                name: node.name,
+                type: ctx.typenodeToOrbType(node.varType, ctx),
+                mutable: node.kind === 'var',
+            });
+            return ctx.typenodeToOrbType(node.varType, ctx);
+        }
 
-        const entry: VariableEntry = {
+        if (node.varType && node.initializer) {
+            const varType = handleExpression(node.initializer, ctx);
+            if (
+                !isAssignable(ctx.typenodeToOrbType(node.varType, ctx), varType)
+            ) {
+                ctx.reportError(
+                    `Cannot assign type ${varType.kind} to type ${ctx.typenodeToOrbType(node.varType, ctx).kind}`,
+                    node
+                );
+            }
+            ctx.globalScope.update(node.name, {
+                kind: 'variable',
+                name: node.name,
+                type: varType,
+                mutable: node.kind === 'var',
+            });
+            return varType;
+        }
+
+        const varType = handleExpression(node.initializer, ctx);
+        ctx.globalScope.update(node.name, {
             kind: 'variable',
             name: node.name,
             type: varType,
             mutable: node.kind === 'var',
-        };
-
-        ctx.globalScope.update(node.name, entry);
+        });
         return varType;
     }
 

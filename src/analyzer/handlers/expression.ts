@@ -12,7 +12,7 @@ import type {
 } from '../../parser/nodeTypes';
 import { OrbTypes, type OrbType } from '../../types';
 import type { AnalyzerContext } from '../context';
-import { expectNumeric, expectType, typesEqual } from '../helper';
+import { expectNumeric, expectType, isAssignable, typesEqual } from '../helper';
 
 export function handleExpression(
     node: Expression,
@@ -200,17 +200,164 @@ function handleRangeExpr(node: RangeExpr, ctx: AnalyzerContext): OrbType {
 }
 
 function handleMemberAccess(node: MemberAccess, ctx: AnalyzerContext): OrbType {
-    throw new Error('Function not implemented.');
+    const objType = ctx.visit(node.object, ctx);
+
+    if (objType.kind === 'unknown') return OrbTypes.unknown();
+
+    if (objType.kind !== 'struct') {
+        ctx.reportError(
+            `Cannot access field '${node.property}' of non-struct type`,
+            node
+        );
+        return OrbTypes.unknown();
+    }
+
+    const structEntry = ctx.scope.lookup(objType.name!);
+    if (!structEntry || structEntry.kind !== 'struct') {
+        ctx.reportError(`Undefined struct '${objType.name}'`, node);
+        return OrbTypes.unknown();
+    }
+
+    const field = structEntry.fields.find((f) => f.name === node.property);
+    if (!field) {
+        ctx.reportError(
+            `Struct '${objType.name}' does not have field '${node.property}'`,
+            node
+        );
+        return OrbTypes.unknown();
+    }
+    return field.type;
 }
 
 function handleMethodCall(node: MethodCall, ctx: AnalyzerContext): OrbType {
-    throw new Error('Function not implemented.');
+    const objType = ctx.visit(node.object, ctx);
+
+    if (objType.kind === 'unknown') return OrbTypes.unknown();
+
+    if (objType.kind !== 'struct') {
+        ctx.reportError(
+            `Cannot access field '${node.method}' of non-struct type`,
+            node
+        );
+        return OrbTypes.unknown();
+    }
+
+    const structEntry = ctx.scope.lookup(objType.name!);
+    if (!structEntry || structEntry.kind !== 'struct') {
+        ctx.reportError(`Undefined struct '${objType.name}'`, node);
+        return OrbTypes.unknown();
+    }
+
+    const method = structEntry.methods.find((m) => m.name === node.method);
+    if (!method) {
+        ctx.reportError(
+            `Struct '${objType.name}' does not have method '${node.method}'`,
+            node
+        );
+        return OrbTypes.unknown();
+    }
+
+    const expectedParams = method.params.slice(1);
+    if (node.args.length !== expectedParams.length) {
+        ctx.reportError(
+            `Method '${node.method}' expects ${expectedParams.length} arguments, got ${node.args.length}`,
+            node
+        );
+        return OrbTypes.unknown();
+    }
+
+    node.args.forEach((arg, i) => {
+        const paramType = expectedParams[i]!.type;
+        const argType = ctx.visit(arg, ctx);
+        if (!isAssignable(argType, paramType)) {
+            ctx.reportError(
+                `Cannot pass argument of type ${argType.kind} to parameter of type ${paramType.kind}`,
+                node
+            );
+        }
+    });
+
+    return method.returnType;
 }
 
 function handleFunctionCall(node: FunctionCall, ctx: AnalyzerContext): OrbType {
-    throw new Error('Function not implemented.');
+    const funcEntry = ctx.scope.lookup(node.name);
+    if (!funcEntry) {
+        ctx.reportError(`Undefined function '${node.name}'`, node);
+        return OrbTypes.unknown();
+    }
+
+    if (funcEntry.kind !== 'function') {
+        ctx.reportError(`'${node.name}' is not a function`, node);
+        return OrbTypes.unknown();
+    }
+
+    const expectedParams = funcEntry.params;
+    if (node.args.length !== expectedParams.length) {
+        ctx.reportError(
+            `Function '${node.name}' expects ${expectedParams.length} arguments, got ${node.args.length}`,
+            node
+        );
+        return OrbTypes.unknown();
+    }
+
+    node.args.forEach((arg, i) => {
+        const paramType = expectedParams[i]!.type;
+        const argType = ctx.visit(arg, ctx);
+        if (!isAssignable(argType, paramType)) {
+            ctx.reportError(
+                `Cannot pass argument of type ${argType.kind} to parameter of type ${paramType.kind}`,
+                node
+            );
+        }
+    });
+
+    return funcEntry.returnType;
 }
 
 function handleStructInit(node: StructInit, ctx: AnalyzerContext): OrbType {
-    throw new Error('Function not implemented.');
+    const structEntry = ctx.globalScope.lookup(node.name);
+
+    if (!structEntry || structEntry.kind !== 'struct') {
+        ctx.reportError(`Unknown struct '${node.name}'`, node);
+        return OrbTypes.unknown();
+    }
+
+    const providedNames = new Set<string>();
+
+    for (const fieldInit of node.fields) {
+        providedNames.add(fieldInit.name);
+
+        const field = structEntry.fields.find((f) => f.name === fieldInit.name);
+        if (!field) {
+            ctx.reportError(
+                `Struct '${node.name}' has no field '${fieldInit.name}'`,
+                node
+            );
+            continue;
+        }
+
+        const valueType = ctx.visit(fieldInit.value, ctx);
+        if (!isAssignable(valueType, field.type)) {
+            ctx.reportError(
+                `Cannot assign value of type ${valueType.kind} to field of type ${field.type.kind}`,
+                node
+            );
+        }
+    }
+
+    // catch missing required fields
+    const requiredFields = structEntry.fields.filter(
+        (f) => f.type.kind !== 'nullable'
+    );
+    for (const field of requiredFields) {
+        if (!providedNames.has(field.name)) {
+            ctx.reportError(
+                `Struct '${node.name}' requires field '${field.name}'`,
+                node
+            );
+        }
+    }
+
+    return OrbTypes.struct(node.name);
 }
