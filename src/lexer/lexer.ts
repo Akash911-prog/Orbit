@@ -85,7 +85,7 @@ export class Lexer {
         return this.cursor < this.source.length ? false : true;
     }
 
-    nextToken(): Token {
+    public nextToken(): Token {
         // skip whitespace before every token, same as before
         while (!this.isEnd() && whitespace.test(this.peek())) {
             this.next();
@@ -114,6 +114,10 @@ export class Lexer {
             return this.readNumber();
         }
 
+        if (char === '/' && this.peekNext() === '/') {
+            return this.readSingleLineComment();
+        }
+
         if (symbolStart.test(char)) {
             return this.readSymbols();
         }
@@ -121,6 +125,12 @@ export class Lexer {
         throw new Error(
             `Unexpected character '${char}' at line ${this.line}, col ${this.col}`
         );
+    }
+    private readSingleLineComment(): Token {
+        while (!this.isEnd() && this.peek() !== '\n') {
+            this.next();
+        }
+        return this.nextToken();
     }
 
     private readLiteralString(): Token {

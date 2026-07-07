@@ -4,8 +4,10 @@ import { handleAssignment } from './handlers/assignment';
 import { handleBlock } from './handlers/block';
 import { handleExpression } from './handlers/expression';
 import { handleExpressionStatement } from './handlers/expressionStatement';
+import { handleForStatement } from './handlers/for';
 import { handleFunctionDecl } from './handlers/functionDecl';
 import { handleIfStatement } from './handlers/ifStatement';
+import { handleLoopStatement } from './handlers/loop';
 import { handleProgram } from './handlers/program';
 import { handleReturnStatement } from './handlers/returnStatement';
 import { handleStructDecl } from './handlers/structDecl';
@@ -27,6 +29,8 @@ export const HandlerRegistry: Record<string, HandlerFn> = {
     ReturnStatement: handleReturnStatement,
     Assignment: handleAssignment,
     ExpressionStatement: handleExpressionStatement,
+    LoopStatement: handleLoopStatement,
+    ForStatement: handleForStatement,
 
     // Expressions — all fold into the single recursive dispatcher
     IntLiteral: handleExpression,

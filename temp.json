@@ -1,0 +1,1926 @@
+{
+    "type": "Program",
+    "declarations": [
+        {
+            "type": "StructDecl",
+            "name": "Point",
+            "generic": null,
+            "members": [
+                {
+                    "type": "VariableDecl",
+                    "kind": "let",
+                    "name": "x",
+                    "varType": {
+                        "type": "BaseType",
+                        "name": "int",
+                        "line": 3,
+                        "col": 12
+                    },
+                    "initializer": {
+                        "type": "IntLiteral",
+                        "value": "0",
+                        "line": 3,
+                        "col": 18
+                    },
+                    "line": 3,
+                    "col": 5
+                },
+                {
+                    "type": "VariableDecl",
+                    "kind": "let",
+                    "name": "y",
+                    "varType": {
+                        "type": "BaseType",
+                        "name": "int",
+                        "line": 4,
+                        "col": 12
+                    },
+                    "initializer": {
+                        "type": "IntLiteral",
+                        "value": "0",
+                        "line": 4,
+                        "col": 18
+                    },
+                    "line": 4,
+                    "col": 5
+                }
+            ],
+            "line": 2,
+            "col": 1
+        },
+        {
+            "type": "StructDecl",
+            "name": "PlayerStats",
+            "generic": null,
+            "members": [
+                {
+                    "type": "VariableDecl",
+                    "kind": "var",
+                    "name": "armor",
+                    "varType": {
+                        "type": "BaseType",
+                        "name": "int",
+                        "line": 8,
+                        "col": 16
+                    },
+                    "initializer": {
+                        "type": "IntLiteral",
+                        "value": "5",
+                        "line": 8,
+                        "col": 22
+                    },
+                    "line": 8,
+                    "col": 5
+                }
+            ],
+            "line": 7,
+            "col": 1
+        },
+        {
+            "type": "StructDecl",
+            "name": "Player",
+            "generic": null,
+            "members": [
+                {
+                    "type": "VariableDecl",
+                    "kind": "let",
+                    "name": "name",
+                    "varType": {
+                        "type": "BaseType",
+                        "name": "str",
+                        "line": 12,
+                        "col": 15
+                    },
+                    "initializer": {
+                        "type": "StrLiteral",
+                        "value": "unknown",
+                        "line": 12,
+                        "col": 21
+                    },
+                    "line": 12,
+                    "col": 5
+                },
+                {
+                    "type": "VariableDecl",
+                    "kind": "let",
+                    "name": "health",
+                    "varType": {
+                        "type": "BaseType",
+                        "name": "int",
+                        "line": 13,
+                        "col": 17
+                    },
+                    "initializer": {
+                        "type": "IntLiteral",
+                        "value": "100",
+                        "line": 13,
+                        "col": 23
+                    },
+                    "line": 13,
+                    "col": 5
+                },
+                {
+                    "type": "VariableDecl",
+                    "kind": "let",
+                    "name": "stats",
+                    "varType": {
+                        "type": "GenericType",
+                        "name": "PlayerStats",
+                        "typeArg": null,
+                        "line": 14,
+                        "col": 16
+                    },
+                    "initializer": {
+                        "type": "StructInit",
+                        "name": "PlayerStats",
+                        "fields": [],
+                        "line": 14,
+                        "col": 42
+                    },
+                    "line": 14,
+                    "col": 5
+                },
+                {
+                    "type": "FunctionDecl",
+                    "name": "isAlive",
+                    "body": {
+                        "type": "Block",
+                        "statements": [
+                            {
+                                "type": "ReturnStatement",
+                                "value": {
+                                    "type": "BinaryExpr",
+                                    "operator": ">",
+                                    "left": {
+                                        "type": "Identifier",
+                                        "name": "health",
+                                        "line": 17,
+                                        "col": 16
+                                    },
+                                    "right": {
+                                        "type": "IntLiteral",
+                                        "value": "0",
+                                        "line": 17,
+                                        "col": 25
+                                    },
+                                    "line": 17,
+                                    "col": 16
+                                },
+                                "line": 17,
+                                "col": 9
+                            }
+                        ],
+                        "line": 16,
+                        "col": 24
+                    },
+                    "generic": null,
+                    "parameters": [],
+                    "returnType": {
+                        "type": "BaseType",
+                        "name": "bool",
+                        "line": 16,
+                        "col": 19
+                    },
+                    "line": 16,
+                    "col": 5
+                }
+            ],
+            "line": 11,
+            "col": 1
+        },
+        {
+            "type": "StructDecl",
+            "name": "Stack",
+            "generic": "T",
+            "members": [
+                {
+                    "type": "VariableDecl",
+                    "kind": "let",
+                    "name": "size",
+                    "varType": {
+                        "type": "BaseType",
+                        "name": "int",
+                        "line": 22,
+                        "col": 15
+                    },
+                    "initializer": {
+                        "type": "IntLiteral",
+                        "value": "0",
+                        "line": 22,
+                        "col": 21
+                    },
+                    "line": 22,
+                    "col": 5
+                }
+            ],
+            "line": 21,
+            "col": 1
+        },
+        {
+            "type": "StructDecl",
+            "name": "ManagedResource",
+            "generic": null,
+            "members": [
+                {
+                    "type": "VariableDecl",
+                    "kind": "let",
+                    "name": "handle",
+                    "varType": {
+                        "type": "BaseType",
+                        "name": "int",
+                        "line": 26,
+                        "col": 17
+                    },
+                    "initializer": {
+                        "type": "IntLiteral",
+                        "value": "0",
+                        "line": 26,
+                        "col": 23
+                    },
+                    "line": 26,
+                    "col": 5
+                },
+                {
+                    "type": "ResponsibleBlock",
+                    "owns": [
+                        "handle"
+                    ],
+                    "cleanup": {
+                        "type": "Block",
+                        "statements": [
+                            {
+                                "type": "ExpressionStatement",
+                                "expression": {
+                                    "type": "FunctionCall",
+                                    "name": "print",
+                                    "args": [
+                                        {
+                                            "type": "StrLiteral",
+                                            "value": "cleaning up",
+                                            "line": 28,
+                                            "col": 15
+                                        }
+                                    ],
+                                    "line": 28,
+                                    "col": 9
+                                },
+                                "line": 28,
+                                "col": 9
+                            }
+                        ],
+                        "line": 27,
+                        "col": 24
+                    },
+                    "line": 27,
+                    "col": 5
+                }
+            ],
+            "line": 25,
+            "col": 1
+        },
+        {
+            "type": "StructDecl",
+            "name": "SimpleOwner",
+            "generic": null,
+            "members": [
+                {
+                    "type": "VariableDecl",
+                    "kind": "let",
+                    "name": "buffer",
+                    "varType": {
+                        "type": "BaseType",
+                        "name": "int",
+                        "line": 33,
+                        "col": 17
+                    },
+                    "initializer": {
+                        "type": "IntLiteral",
+                        "value": "0",
+                        "line": 33,
+                        "col": 23
+                    },
+                    "line": 33,
+                    "col": 5
+                },
+                {
+                    "type": "ResponsibleBlock",
+                    "owns": [
+                        "buffer"
+                    ],
+                    "cleanup": null,
+                    "line": 34,
+                    "col": 5
+                }
+            ],
+            "line": 32,
+            "col": 1
+        },
+        {
+            "type": "FunctionDecl",
+            "name": "greet",
+            "body": {
+                "type": "Block",
+                "statements": [
+                    {
+                        "type": "ExpressionStatement",
+                        "expression": {
+                            "type": "FunctionCall",
+                            "name": "print",
+                            "args": [
+                                {
+                                    "type": "StrLiteral",
+                                    "value": "hello",
+                                    "line": 39,
+                                    "col": 11
+                                }
+                            ],
+                            "line": 39,
+                            "col": 5
+                        },
+                        "line": 39,
+                        "col": 5
+                    }
+                ],
+                "line": 38,
+                "col": 12
+            },
+            "generic": null,
+            "parameters": [],
+            "returnType": null,
+            "line": 38,
+            "col": 1
+        },
+        {
+            "type": "FunctionDecl",
+            "name": "add",
+            "body": {
+                "type": "Block",
+                "statements": [
+                    {
+                        "type": "ReturnStatement",
+                        "value": {
+                            "type": "BinaryExpr",
+                            "operator": "+",
+                            "left": {
+                                "type": "Identifier",
+                                "name": "a",
+                                "line": 43,
+                                "col": 12
+                            },
+                            "right": {
+                                "type": "Identifier",
+                                "name": "b",
+                                "line": 43,
+                                "col": 16
+                            },
+                            "line": 43,
+                            "col": 12
+                        },
+                        "line": 43,
+                        "col": 5
+                    }
+                ],
+                "line": 42,
+                "col": 29
+            },
+            "generic": null,
+            "parameters": [
+                {
+                    "type": "Parameter",
+                    "name": "a",
+                    "paramType": {
+                        "type": "BaseType",
+                        "name": "int",
+                        "line": 42,
+                        "col": 11
+                    },
+                    "line": 42,
+                    "col": 8
+                },
+                {
+                    "type": "Parameter",
+                    "name": "b",
+                    "paramType": {
+                        "type": "BaseType",
+                        "name": "int",
+                        "line": 42,
+                        "col": 19
+                    },
+                    "line": 42,
+                    "col": 16
+                }
+            ],
+            "returnType": {
+                "type": "BaseType",
+                "name": "int",
+                "line": 42,
+                "col": 25
+            },
+            "line": 42,
+            "col": 1
+        },
+        {
+            "type": "FunctionDecl",
+            "name": "identity",
+            "body": {
+                "type": "Block",
+                "statements": [
+                    {
+                        "type": "ReturnStatement",
+                        "value": {
+                            "type": "Identifier",
+                            "name": "x",
+                            "line": 47,
+                            "col": 12
+                        },
+                        "line": 47,
+                        "col": 5
+                    }
+                ],
+                "line": 46,
+                "col": 25
+            },
+            "generic": "T",
+            "parameters": [
+                {
+                    "type": "Parameter",
+                    "name": "x",
+                    "paramType": {
+                        "type": "GenericType",
+                        "name": "T",
+                        "typeArg": null,
+                        "line": 46,
+                        "col": 19
+                    },
+                    "line": 46,
+                    "col": 16
+                }
+            ],
+            "returnType": {
+                "type": "GenericType",
+                "name": "T",
+                "typeArg": null,
+                "line": 46,
+                "col": 23
+            },
+            "line": 46,
+            "col": 1
+        },
+        {
+            "type": "FunctionDecl",
+            "name": "noReturn",
+            "body": {
+                "type": "Block",
+                "statements": [
+                    {
+                        "type": "ReturnStatement",
+                        "value": null,
+                        "line": 51,
+                        "col": 5
+                    }
+                ],
+                "line": 50,
+                "col": 21
+            },
+            "generic": null,
+            "parameters": [
+                {
+                    "type": "Parameter",
+                    "name": "x",
+                    "paramType": {
+                        "type": "BaseType",
+                        "name": "int",
+                        "line": 50,
+                        "col": 16
+                    },
+                    "line": 50,
+                    "col": 13
+                }
+            ],
+            "returnType": null,
+            "line": 50,
+            "col": 1
+        },
+        {
+            "type": "FunctionDecl",
+            "name": "classify",
+            "body": {
+                "type": "Block",
+                "statements": [
+                    {
+                        "type": "MatchStatement",
+                        "subject": {
+                            "type": "Identifier",
+                            "name": "n",
+                            "line": 55,
+                            "col": 11
+                        },
+                        "arms": [
+                            {
+                                "type": "MatchArm",
+                                "pattern": {
+                                    "type": "LiteralPattern",
+                                    "value": {
+                                        "type": "IntLiteral",
+                                        "value": "0",
+                                        "line": 56,
+                                        "col": 9
+                                    },
+                                    "line": 56,
+                                    "col": 9
+                                },
+                                "body": {
+                                    "type": "StrLiteral",
+                                    "value": "zero",
+                                    "line": 56,
+                                    "col": 14
+                                },
+                                "line": 56,
+                                "col": 9
+                            },
+                            {
+                                "type": "MatchArm",
+                                "pattern": {
+                                    "type": "LiteralPattern",
+                                    "value": {
+                                        "type": "IntLiteral",
+                                        "value": "1",
+                                        "line": 57,
+                                        "col": 9
+                                    },
+                                    "line": 57,
+                                    "col": 9
+                                },
+                                "body": {
+                                    "type": "StrLiteral",
+                                    "value": "one",
+                                    "line": 57,
+                                    "col": 14
+                                },
+                                "line": 57,
+                                "col": 9
+                            },
+                            {
+                                "type": "MatchArm",
+                                "pattern": {
+                                    "type": "WildcardPattern",
+                                    "line": 58,
+                                    "col": 9
+                                },
+                                "body": {
+                                    "type": "StrLiteral",
+                                    "value": "many",
+                                    "line": 58,
+                                    "col": 14
+                                },
+                                "line": 58,
+                                "col": 9
+                            }
+                        ],
+                        "line": 55,
+                        "col": 5
+                    }
+                ],
+                "line": 54,
+                "col": 26
+            },
+            "generic": null,
+            "parameters": [
+                {
+                    "type": "Parameter",
+                    "name": "n",
+                    "paramType": {
+                        "type": "BaseType",
+                        "name": "int",
+                        "line": 54,
+                        "col": 16
+                    },
+                    "line": 54,
+                    "col": 13
+                }
+            ],
+            "returnType": {
+                "type": "BaseType",
+                "name": "str",
+                "line": 54,
+                "col": 22
+            },
+            "line": 54,
+            "col": 1
+        },
+        {
+            "type": "RootOrbitDecl",
+            "body": {
+                "type": "Block",
+                "statements": [
+                    {
+                        "type": "VariableDecl",
+                        "kind": "let",
+                        "name": "score",
+                        "varType": {
+                            "type": "BaseType",
+                            "name": "int",
+                            "line": 65,
+                            "col": 16
+                        },
+                        "initializer": {
+                            "type": "IntLiteral",
+                            "value": "10",
+                            "line": 65,
+                            "col": 22
+                        },
+                        "line": 65,
+                        "col": 5
+                    },
+                    {
+                        "type": "VariableDecl",
+                        "kind": "let",
+                        "name": "a",
+                        "varType": {
+                            "type": "BaseType",
+                            "name": "int",
+                            "line": 66,
+                            "col": 12
+                        },
+                        "initializer": {
+                            "type": "IntLiteral",
+                            "value": "1",
+                            "line": 66,
+                            "col": 18
+                        },
+                        "line": 66,
+                        "col": 5
+                    },
+                    {
+                        "type": "VariableDecl",
+                        "kind": "var",
+                        "name": "b",
+                        "varType": {
+                            "type": "BaseType",
+                            "name": "float",
+                            "line": 67,
+                            "col": 12
+                        },
+                        "initializer": {
+                            "type": "FloatLiteral",
+                            "value": "2.5",
+                            "line": 67,
+                            "col": 20
+                        },
+                        "line": 67,
+                        "col": 5
+                    },
+                    {
+                        "type": "VariableDecl",
+                        "kind": "let",
+                        "name": "c",
+                        "varType": {
+                            "type": "BaseType",
+                            "name": "str",
+                            "line": 68,
+                            "col": 12
+                        },
+                        "initializer": {
+                            "type": "StrLiteral",
+                            "value": "hello",
+                            "line": 68,
+                            "col": 18
+                        },
+                        "line": 68,
+                        "col": 5
+                    },
+                    {
+                        "type": "VariableDecl",
+                        "kind": "let",
+                        "name": "d",
+                        "varType": {
+                            "type": "BaseType",
+                            "name": "bool",
+                            "line": 69,
+                            "col": 12
+                        },
+                        "initializer": {
+                            "type": "BoolLiteral",
+                            "value": true,
+                            "line": 69,
+                            "col": 19
+                        },
+                        "line": 69,
+                        "col": 5
+                    },
+                    {
+                        "type": "VariableDecl",
+                        "kind": "let",
+                        "name": "e",
+                        "varType": {
+                            "type": "BaseType",
+                            "name": "bool",
+                            "line": 70,
+                            "col": 12
+                        },
+                        "initializer": {
+                            "type": "BoolLiteral",
+                            "value": false,
+                            "line": 70,
+                            "col": 19
+                        },
+                        "line": 70,
+                        "col": 5
+                    },
+                    {
+                        "type": "VariableDecl",
+                        "kind": "let",
+                        "name": "math1",
+                        "varType": {
+                            "type": "BaseType",
+                            "name": "int",
+                            "line": 73,
+                            "col": 16
+                        },
+                        "initializer": {
+                            "type": "BinaryExpr",
+                            "operator": "+",
+                            "left": {
+                                "type": "IntLiteral",
+                                "value": "1",
+                                "line": 73,
+                                "col": 22
+                            },
+                            "right": {
+                                "type": "BinaryExpr",
+                                "operator": "*",
+                                "left": {
+                                    "type": "IntLiteral",
+                                    "value": "2",
+                                    "line": 73,
+                                    "col": 26
+                                },
+                                "right": {
+                                    "type": "IntLiteral",
+                                    "value": "3",
+                                    "line": 73,
+                                    "col": 30
+                                },
+                                "line": 73,
+                                "col": 26
+                            },
+                            "line": 73,
+                            "col": 22
+                        },
+                        "line": 73,
+                        "col": 5
+                    },
+                    {
+                        "type": "VariableDecl",
+                        "kind": "let",
+                        "name": "math2",
+                        "varType": {
+                            "type": "BaseType",
+                            "name": "int",
+                            "line": 74,
+                            "col": 16
+                        },
+                        "initializer": {
+                            "type": "BinaryExpr",
+                            "operator": "*",
+                            "left": {
+                                "type": "BinaryExpr",
+                                "operator": "+",
+                                "left": {
+                                    "type": "IntLiteral",
+                                    "value": "1",
+                                    "line": 74,
+                                    "col": 23
+                                },
+                                "right": {
+                                    "type": "IntLiteral",
+                                    "value": "2",
+                                    "line": 74,
+                                    "col": 27
+                                },
+                                "line": 74,
+                                "col": 23
+                            },
+                            "right": {
+                                "type": "IntLiteral",
+                                "value": "3",
+                                "line": 74,
+                                "col": 32
+                            },
+                            "line": 74,
+                            "col": 22
+                        },
+                        "line": 74,
+                        "col": 5
+                    },
+                    {
+                        "type": "VariableDecl",
+                        "kind": "let",
+                        "name": "math3",
+                        "varType": {
+                            "type": "BaseType",
+                            "name": "int",
+                            "line": 75,
+                            "col": 16
+                        },
+                        "initializer": {
+                            "type": "BinaryExpr",
+                            "operator": "%",
+                            "left": {
+                                "type": "IntLiteral",
+                                "value": "10",
+                                "line": 75,
+                                "col": 22
+                            },
+                            "right": {
+                                "type": "IntLiteral",
+                                "value": "3",
+                                "line": 75,
+                                "col": 27
+                            },
+                            "line": 75,
+                            "col": 22
+                        },
+                        "line": 75,
+                        "col": 5
+                    },
+                    {
+                        "type": "VariableDecl",
+                        "kind": "let",
+                        "name": "math4",
+                        "varType": {
+                            "type": "BaseType",
+                            "name": "int",
+                            "line": 76,
+                            "col": 16
+                        },
+                        "initializer": {
+                            "type": "BinaryExpr",
+                            "operator": "/",
+                            "left": {
+                                "type": "IntLiteral",
+                                "value": "10",
+                                "line": 76,
+                                "col": 22
+                            },
+                            "right": {
+                                "type": "IntLiteral",
+                                "value": "3",
+                                "line": 76,
+                                "col": 27
+                            },
+                            "line": 76,
+                            "col": 22
+                        },
+                        "line": 76,
+                        "col": 5
+                    },
+                    {
+                        "type": "VariableDecl",
+                        "kind": "let",
+                        "name": "negative",
+                        "varType": {
+                            "type": "BaseType",
+                            "name": "int",
+                            "line": 77,
+                            "col": 19
+                        },
+                        "initializer": {
+                            "type": "UnaryExpr",
+                            "operator": "-",
+                            "operand": {
+                                "type": "IntLiteral",
+                                "value": "5",
+                                "line": 77,
+                                "col": 26
+                            },
+                            "line": 77,
+                            "col": 25
+                        },
+                        "line": 77,
+                        "col": 5
+                    },
+                    {
+                        "type": "VariableDecl",
+                        "kind": "let",
+                        "name": "mixed",
+                        "varType": {
+                            "type": "BaseType",
+                            "name": "int",
+                            "line": 78,
+                            "col": 16
+                        },
+                        "initializer": {
+                            "type": "BinaryExpr",
+                            "operator": "+",
+                            "left": {
+                                "type": "IntLiteral",
+                                "value": "1",
+                                "line": 78,
+                                "col": 22
+                            },
+                            "right": {
+                                "type": "UnaryExpr",
+                                "operator": "-",
+                                "operand": {
+                                    "type": "IntLiteral",
+                                    "value": "2",
+                                    "line": 78,
+                                    "col": 27
+                                },
+                                "line": 78,
+                                "col": 26
+                            },
+                            "line": 78,
+                            "col": 22
+                        },
+                        "line": 78,
+                        "col": 5
+                    },
+                    {
+                        "type": "VariableDecl",
+                        "kind": "let",
+                        "name": "comp1",
+                        "varType": {
+                            "type": "BaseType",
+                            "name": "bool",
+                            "line": 81,
+                            "col": 16
+                        },
+                        "initializer": {
+                            "type": "BinaryExpr",
+                            "operator": "||",
+                            "left": {
+                                "type": "BinaryExpr",
+                                "operator": "&&",
+                                "left": {
+                                    "type": "BinaryExpr",
+                                    "operator": "<",
+                                    "left": {
+                                        "type": "IntLiteral",
+                                        "value": "1",
+                                        "line": 81,
+                                        "col": 23
+                                    },
+                                    "right": {
+                                        "type": "IntLiteral",
+                                        "value": "2",
+                                        "line": 81,
+                                        "col": 27
+                                    },
+                                    "line": 81,
+                                    "col": 23
+                                },
+                                "right": {
+                                    "type": "BinaryExpr",
+                                    "operator": ">=",
+                                    "left": {
+                                        "type": "IntLiteral",
+                                        "value": "3",
+                                        "line": 81,
+                                        "col": 32
+                                    },
+                                    "right": {
+                                        "type": "IntLiteral",
+                                        "value": "4",
+                                        "line": 81,
+                                        "col": 37
+                                    },
+                                    "line": 81,
+                                    "col": 32
+                                },
+                                "line": 81,
+                                "col": 23
+                            },
+                            "right": {
+                                "type": "BinaryExpr",
+                                "operator": "==",
+                                "left": {
+                                    "type": "IntLiteral",
+                                    "value": "5",
+                                    "line": 81,
+                                    "col": 42
+                                },
+                                "right": {
+                                    "type": "IntLiteral",
+                                    "value": "5",
+                                    "line": 81,
+                                    "col": 47
+                                },
+                                "line": 81,
+                                "col": 42
+                            },
+                            "line": 81,
+                            "col": 23
+                        },
+                        "line": 81,
+                        "col": 5
+                    },
+                    {
+                        "type": "VariableDecl",
+                        "kind": "let",
+                        "name": "comp2",
+                        "varType": {
+                            "type": "BaseType",
+                            "name": "bool",
+                            "line": 82,
+                            "col": 16
+                        },
+                        "initializer": {
+                            "type": "UnaryExpr",
+                            "operator": "!",
+                            "operand": {
+                                "type": "BoolLiteral",
+                                "value": true,
+                                "line": 82,
+                                "col": 24
+                            },
+                            "line": 82,
+                            "col": 23
+                        },
+                        "line": 82,
+                        "col": 5
+                    },
+                    {
+                        "type": "VariableDecl",
+                        "kind": "let",
+                        "name": "comp3",
+                        "varType": {
+                            "type": "BaseType",
+                            "name": "bool",
+                            "line": 83,
+                            "col": 16
+                        },
+                        "initializer": {
+                            "type": "UnaryExpr",
+                            "operator": "!",
+                            "operand": {
+                                "type": "BinaryExpr",
+                                "operator": "==",
+                                "left": {
+                                    "type": "IntLiteral",
+                                    "value": "1",
+                                    "line": 83,
+                                    "col": 25
+                                },
+                                "right": {
+                                    "type": "IntLiteral",
+                                    "value": "2",
+                                    "line": 83,
+                                    "col": 30
+                                },
+                                "line": 83,
+                                "col": 25
+                            },
+                            "line": 83,
+                            "col": 23
+                        },
+                        "line": 83,
+                        "col": 5
+                    },
+                    {
+                        "type": "VariableDecl",
+                        "kind": "let",
+                        "name": "comp4",
+                        "varType": {
+                            "type": "BaseType",
+                            "name": "bool",
+                            "line": 84,
+                            "col": 16
+                        },
+                        "initializer": {
+                            "type": "BinaryExpr",
+                            "operator": "<=",
+                            "left": {
+                                "type": "IntLiteral",
+                                "value": "1",
+                                "line": 84,
+                                "col": 23
+                            },
+                            "right": {
+                                "type": "IntLiteral",
+                                "value": "2",
+                                "line": 84,
+                                "col": 28
+                            },
+                            "line": 84,
+                            "col": 23
+                        },
+                        "line": 84,
+                        "col": 5
+                    },
+                    {
+                        "type": "VariableDecl",
+                        "kind": "let",
+                        "name": "comp5",
+                        "varType": {
+                            "type": "BaseType",
+                            "name": "bool",
+                            "line": 85,
+                            "col": 16
+                        },
+                        "initializer": {
+                            "type": "BinaryExpr",
+                            "operator": ">",
+                            "left": {
+                                "type": "IntLiteral",
+                                "value": "1",
+                                "line": 85,
+                                "col": 23
+                            },
+                            "right": {
+                                "type": "IntLiteral",
+                                "value": "2",
+                                "line": 85,
+                                "col": 27
+                            },
+                            "line": 85,
+                            "col": 23
+                        },
+                        "line": 85,
+                        "col": 5
+                    },
+                    {
+                        "type": "VariableDecl",
+                        "kind": "let",
+                        "name": "comp6",
+                        "varType": {
+                            "type": "BaseType",
+                            "name": "bool",
+                            "line": 86,
+                            "col": 16
+                        },
+                        "initializer": {
+                            "type": "BinaryExpr",
+                            "operator": "!=",
+                            "left": {
+                                "type": "IntLiteral",
+                                "value": "1",
+                                "line": 86,
+                                "col": 23
+                            },
+                            "right": {
+                                "type": "IntLiteral",
+                                "value": "2",
+                                "line": 86,
+                                "col": 28
+                            },
+                            "line": 86,
+                            "col": 23
+                        },
+                        "line": 86,
+                        "col": 5
+                    },
+                    {
+                        "type": "VariableDecl",
+                        "kind": "var",
+                        "name": "p",
+                        "varType": {
+                            "type": "GenericType",
+                            "name": "Point",
+                            "typeArg": null,
+                            "line": 89,
+                            "col": 12
+                        },
+                        "initializer": {
+                            "type": "StructInit",
+                            "name": "Point",
+                            "fields": [
+                                {
+                                    "type": "FieldInit",
+                                    "name": "x",
+                                    "value": {
+                                        "type": "IntLiteral",
+                                        "value": "1",
+                                        "line": 89,
+                                        "col": 31
+                                    },
+                                    "line": 89,
+                                    "col": 28
+                                },
+                                {
+                                    "type": "FieldInit",
+                                    "name": "y",
+                                    "value": {
+                                        "type": "IntLiteral",
+                                        "value": "2",
+                                        "line": 89,
+                                        "col": 37
+                                    },
+                                    "line": 89,
+                                    "col": 34
+                                }
+                            ],
+                            "line": 89,
+                            "col": 26
+                        },
+                        "line": 89,
+                        "col": 5
+                    },
+                    {
+                        "type": "ExpressionStatement",
+                        "expression": {
+                            "type": "FunctionCall",
+                            "name": "print",
+                            "args": [
+                                {
+                                    "type": "MemberAccess",
+                                    "object": {
+                                        "type": "Identifier",
+                                        "name": "p",
+                                        "line": 90,
+                                        "col": 11
+                                    },
+                                    "property": "x",
+                                    "line": 90,
+                                    "col": 11
+                                }
+                            ],
+                            "line": 90,
+                            "col": 5
+                        },
+                        "line": 90,
+                        "col": 5
+                    },
+                    {
+                        "type": "VariableDecl",
+                        "kind": "var",
+                        "name": "player",
+                        "varType": {
+                            "type": "GenericType",
+                            "name": "Player",
+                            "typeArg": null,
+                            "line": 92,
+                            "col": 17
+                        },
+                        "initializer": {
+                            "type": "StructInit",
+                            "name": "Player",
+                            "fields": [
+                                {
+                                    "type": "FieldInit",
+                                    "name": "name",
+                                    "value": {
+                                        "type": "StrLiteral",
+                                        "value": "Hero",
+                                        "line": 92,
+                                        "col": 41
+                                    },
+                                    "line": 92,
+                                    "col": 35
+                                },
+                                {
+                                    "type": "FieldInit",
+                                    "name": "health",
+                                    "value": {
+                                        "type": "IntLiteral",
+                                        "value": "100",
+                                        "line": 92,
+                                        "col": 57
+                                    },
+                                    "line": 92,
+                                    "col": 49
+                                }
+                            ],
+                            "line": 92,
+                            "col": 33
+                        },
+                        "line": 92,
+                        "col": 5
+                    },
+                    {
+                        "type": "Assignment",
+                        "target": [
+                            "player",
+                            "health"
+                        ],
+                        "value": {
+                            "type": "IntLiteral",
+                            "value": "80",
+                            "line": 93,
+                            "col": 21
+                        },
+                        "line": 93,
+                        "col": 5
+                    },
+                    {
+                        "type": "Assignment",
+                        "target": [
+                            "player",
+                            "stats",
+                            "armor"
+                        ],
+                        "value": {
+                            "type": "IntLiteral",
+                            "value": "10",
+                            "line": 94,
+                            "col": 26
+                        },
+                        "line": 94,
+                        "col": 5
+                    },
+                    {
+                        "type": "VariableDecl",
+                        "kind": "let",
+                        "name": "x",
+                        "varType": {
+                            "type": "BaseType",
+                            "name": "int",
+                            "line": 97,
+                            "col": 12
+                        },
+                        "initializer": {
+                            "type": "IntLiteral",
+                            "value": "5",
+                            "line": 97,
+                            "col": 18
+                        },
+                        "line": 97,
+                        "col": 5
+                    },
+                    {
+                        "type": "IfStatement",
+                        "condition": {
+                            "type": "BinaryExpr",
+                            "operator": ">",
+                            "left": {
+                                "type": "Identifier",
+                                "name": "x",
+                                "line": 98,
+                                "col": 9
+                            },
+                            "right": {
+                                "type": "IntLiteral",
+                                "value": "10",
+                                "line": 98,
+                                "col": 13
+                            },
+                            "line": 98,
+                            "col": 9
+                        },
+                        "thenBranch": {
+                            "type": "Block",
+                            "statements": [
+                                {
+                                    "type": "ExpressionStatement",
+                                    "expression": {
+                                        "type": "FunctionCall",
+                                        "name": "print",
+                                        "args": [
+                                            {
+                                                "type": "IntLiteral",
+                                                "value": "1",
+                                                "line": 99,
+                                                "col": 15
+                                            }
+                                        ],
+                                        "line": 99,
+                                        "col": 9
+                                    },
+                                    "line": 99,
+                                    "col": 9
+                                }
+                            ],
+                            "line": 98,
+                            "col": 17
+                        },
+                        "elseBranch": {
+                            "type": "IfStatement",
+                            "condition": {
+                                "type": "BinaryExpr",
+                                "operator": ">",
+                                "left": {
+                                    "type": "Identifier",
+                                    "name": "x",
+                                    "line": 100,
+                                    "col": 16
+                                },
+                                "right": {
+                                    "type": "IntLiteral",
+                                    "value": "5",
+                                    "line": 100,
+                                    "col": 20
+                                },
+                                "line": 100,
+                                "col": 16
+                            },
+                            "thenBranch": {
+                                "type": "Block",
+                                "statements": [
+                                    {
+                                        "type": "ExpressionStatement",
+                                        "expression": {
+                                            "type": "FunctionCall",
+                                            "name": "print",
+                                            "args": [
+                                                {
+                                                    "type": "IntLiteral",
+                                                    "value": "2",
+                                                    "line": 101,
+                                                    "col": 15
+                                                }
+                                            ],
+                                            "line": 101,
+                                            "col": 9
+                                        },
+                                        "line": 101,
+                                        "col": 9
+                                    }
+                                ],
+                                "line": 100,
+                                "col": 23
+                            },
+                            "elseBranch": {
+                                "type": "IfStatement",
+                                "condition": {
+                                    "type": "BinaryExpr",
+                                    "operator": ">",
+                                    "left": {
+                                        "type": "Identifier",
+                                        "name": "x",
+                                        "line": 102,
+                                        "col": 16
+                                    },
+                                    "right": {
+                                        "type": "IntLiteral",
+                                        "value": "0",
+                                        "line": 102,
+                                        "col": 20
+                                    },
+                                    "line": 102,
+                                    "col": 16
+                                },
+                                "thenBranch": {
+                                    "type": "Block",
+                                    "statements": [
+                                        {
+                                            "type": "ExpressionStatement",
+                                            "expression": {
+                                                "type": "FunctionCall",
+                                                "name": "print",
+                                                "args": [
+                                                    {
+                                                        "type": "IntLiteral",
+                                                        "value": "3",
+                                                        "line": 103,
+                                                        "col": 15
+                                                    }
+                                                ],
+                                                "line": 103,
+                                                "col": 9
+                                            },
+                                            "line": 103,
+                                            "col": 9
+                                        }
+                                    ],
+                                    "line": 102,
+                                    "col": 23
+                                },
+                                "elseBranch": {
+                                    "type": "Block",
+                                    "statements": [
+                                        {
+                                            "type": "ExpressionStatement",
+                                            "expression": {
+                                                "type": "FunctionCall",
+                                                "name": "print",
+                                                "args": [
+                                                    {
+                                                        "type": "IntLiteral",
+                                                        "value": "4",
+                                                        "line": 105,
+                                                        "col": 15
+                                                    }
+                                                ],
+                                                "line": 105,
+                                                "col": 9
+                                            },
+                                            "line": 105,
+                                            "col": 9
+                                        }
+                                    ],
+                                    "line": 104,
+                                    "col": 12
+                                },
+                                "line": 102,
+                                "col": 12
+                            },
+                            "line": 100,
+                            "col": 12
+                        },
+                        "line": 98,
+                        "col": 5
+                    },
+                    {
+                        "type": "ForStatement",
+                        "iterable": {
+                            "type": "RangeExpr",
+                            "inclusive": false,
+                            "start": {
+                                "type": "IntLiteral",
+                                "value": "0",
+                                "line": 109,
+                                "col": 14
+                            },
+                            "end": {
+                                "type": "IntLiteral",
+                                "value": "10",
+                                "line": 109,
+                                "col": 17
+                            },
+                            "line": 109,
+                            "col": 14
+                        },
+                        "body": {
+                            "type": "Block",
+                            "statements": [
+                                {
+                                    "type": "ExpressionStatement",
+                                    "expression": {
+                                        "type": "FunctionCall",
+                                        "name": "print",
+                                        "args": [
+                                            {
+                                                "type": "Identifier",
+                                                "name": "i",
+                                                "line": 110,
+                                                "col": 15
+                                            }
+                                        ],
+                                        "line": 110,
+                                        "col": 9
+                                    },
+                                    "line": 110,
+                                    "col": 9
+                                }
+                            ],
+                            "line": 109,
+                            "col": 20
+                        },
+                        "variable": "i",
+                        "line": 109,
+                        "col": 5
+                    },
+                    {
+                        "type": "ForStatement",
+                        "iterable": {
+                            "type": "RangeExpr",
+                            "inclusive": true,
+                            "start": {
+                                "type": "IntLiteral",
+                                "value": "0",
+                                "line": 112,
+                                "col": 14
+                            },
+                            "end": {
+                                "type": "IntLiteral",
+                                "value": "10",
+                                "line": 112,
+                                "col": 18
+                            },
+                            "line": 112,
+                            "col": 14
+                        },
+                        "body": {
+                            "type": "Block",
+                            "statements": [
+                                {
+                                    "type": "ExpressionStatement",
+                                    "expression": {
+                                        "type": "FunctionCall",
+                                        "name": "print",
+                                        "args": [
+                                            {
+                                                "type": "Identifier",
+                                                "name": "j",
+                                                "line": 113,
+                                                "col": 15
+                                            }
+                                        ],
+                                        "line": 113,
+                                        "col": 9
+                                    },
+                                    "line": 113,
+                                    "col": 9
+                                }
+                            ],
+                            "line": 112,
+                            "col": 21
+                        },
+                        "variable": "j",
+                        "line": 112,
+                        "col": 5
+                    },
+                    {
+                        "type": "VariableDecl",
+                        "kind": "var",
+                        "name": "i",
+                        "varType": {
+                            "type": "BaseType",
+                            "name": "int",
+                            "line": 117,
+                            "col": 12
+                        },
+                        "initializer": {
+                            "type": "IntLiteral",
+                            "value": "0",
+                            "line": 117,
+                            "col": 18
+                        },
+                        "line": 117,
+                        "col": 5
+                    },
+                    {
+                        "type": "WhileStatement",
+                        "condition": {
+                            "type": "BinaryExpr",
+                            "operator": "<",
+                            "left": {
+                                "type": "Identifier",
+                                "name": "i",
+                                "line": 118,
+                                "col": 11
+                            },
+                            "right": {
+                                "type": "IntLiteral",
+                                "value": "10",
+                                "line": 118,
+                                "col": 15
+                            },
+                            "line": 118,
+                            "col": 11
+                        },
+                        "body": {
+                            "type": "Block",
+                            "statements": [
+                                {
+                                    "type": "Assignment",
+                                    "target": [
+                                        "i"
+                                    ],
+                                    "value": {
+                                        "type": "BinaryExpr",
+                                        "operator": "+",
+                                        "left": {
+                                            "type": "Identifier",
+                                            "name": "i",
+                                            "line": 119,
+                                            "col": 13
+                                        },
+                                        "right": {
+                                            "type": "IntLiteral",
+                                            "value": "1",
+                                            "line": 119,
+                                            "col": 17
+                                        },
+                                        "line": 119,
+                                        "col": 13
+                                    },
+                                    "line": 119,
+                                    "col": 9
+                                },
+                                {
+                                    "type": "IfStatement",
+                                    "condition": {
+                                        "type": "BinaryExpr",
+                                        "operator": "==",
+                                        "left": {
+                                            "type": "Identifier",
+                                            "name": "i",
+                                            "line": 120,
+                                            "col": 13
+                                        },
+                                        "right": {
+                                            "type": "IntLiteral",
+                                            "value": "5",
+                                            "line": 120,
+                                            "col": 18
+                                        },
+                                        "line": 120,
+                                        "col": 13
+                                    },
+                                    "thenBranch": {
+                                        "type": "Block",
+                                        "statements": [
+                                            {
+                                                "type": "ExpressionStatement",
+                                                "expression": {
+                                                    "type": "Identifier",
+                                                    "name": "continue",
+                                                    "line": 121,
+                                                    "col": 13
+                                                },
+                                                "line": 121,
+                                                "col": 13
+                                            }
+                                        ],
+                                        "line": 120,
+                                        "col": 21
+                                    },
+                                    "elseBranch": null,
+                                    "line": 120,
+                                    "col": 9
+                                },
+                                {
+                                    "type": "IfStatement",
+                                    "condition": {
+                                        "type": "BinaryExpr",
+                                        "operator": "==",
+                                        "left": {
+                                            "type": "Identifier",
+                                            "name": "i",
+                                            "line": 123,
+                                            "col": 13
+                                        },
+                                        "right": {
+                                            "type": "IntLiteral",
+                                            "value": "9",
+                                            "line": 123,
+                                            "col": 18
+                                        },
+                                        "line": 123,
+                                        "col": 13
+                                    },
+                                    "thenBranch": {
+                                        "type": "Block",
+                                        "statements": [
+                                            {
+                                                "type": "BreakStatement",
+                                                "label": null,
+                                                "line": 124,
+                                                "col": 13
+                                            }
+                                        ],
+                                        "line": 123,
+                                        "col": 21
+                                    },
+                                    "elseBranch": null,
+                                    "line": 123,
+                                    "col": 9
+                                }
+                            ],
+                            "line": 118,
+                            "col": 18
+                        },
+                        "line": 118,
+                        "col": 5
+                    },
+                    {
+                        "type": "LoopStatement",
+                        "name": null,
+                        "body": {
+                            "type": "Block",
+                            "statements": [
+                                {
+                                    "type": "BreakStatement",
+                                    "label": null,
+                                    "line": 129,
+                                    "col": 9
+                                }
+                            ],
+                            "line": 128,
+                            "col": 10
+                        },
+                        "line": 128,
+                        "col": 5
+                    },
+                    {
+                        "type": "MatchStatement",
+                        "subject": {
+                            "type": "Identifier",
+                            "name": "x",
+                            "line": 133,
+                            "col": 11
+                        },
+                        "arms": [
+                            {
+                                "type": "MatchArm",
+                                "pattern": {
+                                    "type": "LiteralPattern",
+                                    "value": {
+                                        "type": "IntLiteral",
+                                        "value": "5",
+                                        "line": 134,
+                                        "col": 9
+                                    },
+                                    "line": 134,
+                                    "col": 9
+                                },
+                                "body": {
+                                    "type": "FunctionCall",
+                                    "name": "print",
+                                    "args": [
+                                        {
+                                            "type": "StrLiteral",
+                                            "value": "five",
+                                            "line": 134,
+                                            "col": 20
+                                        }
+                                    ],
+                                    "line": 134,
+                                    "col": 14
+                                },
+                                "line": 134,
+                                "col": 9
+                            },
+                            {
+                                "type": "MatchArm",
+                                "pattern": {
+                                    "type": "WildcardPattern",
+                                    "line": 135,
+                                    "col": 9
+                                },
+                                "body": {
+                                    "type": "FunctionCall",
+                                    "name": "print",
+                                    "args": [
+                                        {
+                                            "type": "StrLiteral",
+                                            "value": "other",
+                                            "line": 135,
+                                            "col": 20
+                                        }
+                                    ],
+                                    "line": 135,
+                                    "col": 14
+                                },
+                                "line": 135,
+                                "col": 9
+                            }
+                        ],
+                        "line": 133,
+                        "col": 5
+                    },
+                    {
+                        "type": "ExpressionStatement",
+                        "expression": {
+                            "type": "FunctionCall",
+                            "name": "greet",
+                            "args": [],
+                            "line": 139,
+                            "col": 5
+                        },
+                        "line": 139,
+                        "col": 5
+                    },
+                    {
+                        "type": "VariableDecl",
+                        "kind": "let",
+                        "name": "result",
+                        "varType": {
+                            "type": "BaseType",
+                            "name": "int",
+                            "line": 140,
+                            "col": 17
+                        },
+                        "initializer": {
+                            "type": "FunctionCall",
+                            "name": "add",
+                            "args": [
+                                {
+                                    "type": "IntLiteral",
+                                    "value": "1",
+                                    "line": 140,
+                                    "col": 27
+                                },
+                                {
+                                    "type": "IntLiteral",
+                                    "value": "2",
+                                    "line": 140,
+                                    "col": 30
+                                }
+                            ],
+                            "line": 140,
+                            "col": 23
+                        },
+                        "line": 140,
+                        "col": 5
+                    },
+                    {
+                        "type": "ExpressionStatement",
+                        "expression": {
+                            "type": "FunctionCall",
+                            "name": "print",
+                            "args": [
+                                {
+                                    "type": "Identifier",
+                                    "name": "result",
+                                    "line": 141,
+                                    "col": 11
+                                }
+                            ],
+                            "line": 141,
+                            "col": 5
+                        },
+                        "line": 141,
+                        "col": 5
+                    }
+                ],
+                "line": 63,
+                "col": 12
+            },
+            "line": 63,
+            "col": 1
+        }
+    ]
+}

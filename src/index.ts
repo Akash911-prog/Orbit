@@ -1,3 +1,4 @@
+import { writeFile } from 'node:fs/promises';
 import { SemanticAnalyzer } from './analyzer/analyzer';
 import { globalErrorBucket, globalTable, initiateGlobals } from './globals';
 import { Lexer } from './lexer/lexer';
@@ -31,14 +32,14 @@ try {
 
     program = parser.parseProgram();
 
-    // const analyzer = new SemanticAnalyzer(program);
-    // const decoratedAst = analyzer.analyze();
+    const analyzer = new SemanticAnalyzer(program);
+    program = analyzer.analyze();
 
-    // globalTable.logMap();
+    globalTable.logMap();
 } catch (error) {
     console.error(error);
 } finally {
     // after things finished / temp sol for errors
-    console.log(JSON.stringify(program, null, 4));
+    writeFile('./temp.json', JSON.stringify(program, null, 4));
     globalErrorBucket.showAll();
 }
