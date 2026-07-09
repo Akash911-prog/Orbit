@@ -1,5 +1,7 @@
-import type { OrbType } from '../types';
+import type { VariableDecl } from '../parser/nodeTypes';
+import { OrbTypes, type OrbType } from '../types';
 import type { AnalyzerContext } from './context';
+import { handleExpression } from './handlers/expression';
 
 export function expectType(
     expected: OrbType,
@@ -97,4 +99,39 @@ export function isAssignable(from: OrbType, to: OrbType): boolean {
         return typesEqual(from, to.inner) || isAssignable(from, to.inner);
     }
     return typesEqual(from, to);
+}
+
+export function resolveVariableType(
+    node: VariableDecl,
+    ctx: AnalyzerContext
+): OrbType {
+    if (!node.initializer) {
+        if (!node.varType) {
+            ctx.reportError(
+                `'${node.name}' needs a type annotation or an initializer`,
+                node
+            );
+            return OrbTypes.unknown();
+        }
+        return ctx.typenodeToOrbType(node.varType, ctx);
+    }
+
+    const initType = handleExpression(node.initializer, ctx);
+    if (!node.varType) return initType;
+
+    const declaredType = ctx.typenodeToOrbType(node.varType, ctx);
+    const isEmptyCollectionLiteral =
+        (declaredType.kind === 'array' ||
+            declaredType.kind === 'tuple' ||
+            declaredType.kind === 'map') &&
+        initType.kind === declaredType.kind &&
+        ('element' in initType ? initType.element.kind === 'unknown' : false);
+
+    if (!isEmptyCollectionLiteral && !isAssignable(initType, declaredType)) {
+        ctx.reportError(
+            `Cannot assign type ${initType.kind} to '${node.name}' of type ${declaredType.kind}`,
+            node
+        );
+    }
+    return declaredType;
 }

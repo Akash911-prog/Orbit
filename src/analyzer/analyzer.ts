@@ -10,7 +10,7 @@ import type {
 import { OrbTypes, type OrbType } from '../types';
 import type { AnalyzerContext } from './context';
 import { handleExpression } from './handlers/expression';
-import { isAssignable } from './helper';
+import { isAssignable, resolveVariableType } from './helper';
 import { HandlerRegistry } from './registery';
 
 export class SemanticAnalyzer {
@@ -71,74 +71,15 @@ export class SemanticAnalyzer {
         node: VariableDecl,
         ctx: AnalyzerContext
     ): OrbType {
-        // Case 1: no initializer — type comes from annotation, or stays unknown
-        if (!node.initializer) {
-            const declaredType = node.varType
-                ? ctx.typenodeToOrbType(node.varType, ctx)
-                : OrbTypes.unknown();
-
-            if (!node.varType) {
-                ctx.reportError(
-                    `'${node.name}' needs a type annotation or an initializer`,
-                    node
-                );
-            }
-
-            ctx.globalScope.update(node.name, {
-                kind: 'variable',
-                name: node.name,
-                type: declaredType,
-                mutable: node.kind === 'var',
-            });
-            node.resolvedType = declaredType;
-            return declaredType;
-        }
-
-        // Case 2: has an initializer — always resolve it first
-        const initType = handleExpression(node.initializer, ctx);
-
-        // No annotation — infer entirely from the initializer
-        if (!node.varType) {
-            ctx.globalScope.update(node.name, {
-                kind: 'variable',
-                name: node.name,
-                type: initType,
-                mutable: node.kind === 'var',
-            });
-            node.resolvedType = initType;
-            return initType;
-        }
-
-        // Both present — declared type wins as the stored type
-        const declaredType = ctx.typenodeToOrbType(node.varType, ctx);
-
-        const isEmptyCollectionLiteral =
-            (declaredType.kind === 'array' ||
-                declaredType.kind === 'tuple' ||
-                declaredType.kind === 'map') &&
-            initType.kind === declaredType.kind &&
-            ('element' in initType
-                ? initType.element.kind === 'unknown'
-                : false);
-
-        if (
-            !isEmptyCollectionLiteral &&
-            !isAssignable(initType, declaredType)
-        ) {
-            ctx.reportError(
-                `Cannot assign type ${initType.kind} to '${node.name}' of type ${declaredType.kind}`,
-                node
-            );
-        }
-
+        const type = resolveVariableType(node, ctx);
         ctx.globalScope.update(node.name, {
             kind: 'variable',
             name: node.name,
-            type: declaredType,
+            type,
             mutable: node.kind === 'var',
         });
-        node.resolvedType = declaredType;
-        return declaredType;
+        node.resolvedType = type;
+        return type;
     }
 
     private hoistSignatures(ast: Program, ctx: AnalyzerContext): void {
@@ -236,43 +177,10 @@ export class SemanticAnalyzer {
                             }
 
                             case 'VariableDecl': {
-                                let fieldType: OrbType;
-
-                                if (member.varType && member.initializer) {
-                                    const declaredType = this.typeNodeToOrbType(
-                                        member.varType,
-                                        ctx
-                                    );
-                                    const initType = handleExpression(
-                                        member.initializer,
-                                        ctx
-                                    );
-                                    if (!isAssignable(initType, declaredType)) {
-                                        ctx.reportError(
-                                            `Cannot assign type ${initType.kind} to field '${member.name}' of type ${declaredType.kind}`,
-                                            member
-                                        );
-                                    }
-                                    fieldType = declaredType;
-                                } else if (member.varType) {
-                                    // the normal case: struct field with just a type annotation, no default value
-                                    fieldType = this.typeNodeToOrbType(
-                                        member.varType,
-                                        ctx
-                                    );
-                                } else if (member.initializer) {
-                                    fieldType = handleExpression(
-                                        member.initializer,
-                                        ctx
-                                    );
-                                } else {
-                                    ctx.reportError(
-                                        `Field '${member.name}' needs a type annotation or default value`,
-                                        member
-                                    );
-                                    fieldType = OrbTypes.unknown();
-                                }
-
+                                const fieldType = resolveVariableType(
+                                    member,
+                                    ctx
+                                );
                                 fields.push({
                                     kind: 'variable',
                                     name: member.name,

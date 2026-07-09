@@ -8,11 +8,4 @@ struct A {
 }
 
 orbit main {
-
-    var a = {
-        name: 2345,
-        age: 23
-    };
-
-    let name: str[] = [];
 }
