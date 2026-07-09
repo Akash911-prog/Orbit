@@ -9,10 +9,14 @@ import type {
     MethodCall,
     FunctionCall,
     StructInit,
+    ArrayLiteral,
+    MapLiteral,
+    TupleLiteral,
 } from '../../parser/nodeTypes';
 import { OrbTypes, type OrbType } from '../../types';
 import type { AnalyzerContext } from '../context';
 import { expectNumeric, expectType, isAssignable, typesEqual } from '../helper';
+import { BuiltinMethods } from '../registery';
 
 export function handleExpression(
     node: Expression,
@@ -71,6 +75,18 @@ export function handleExpression(
 
         case 'StructInit':
             resolvedType = handleStructInit(node, ctx);
+            break;
+
+        case 'ArrayLiteral':
+            resolvedType = handleArrayLiteral(node, ctx);
+            break;
+
+        case 'MapLiteral':
+            resolvedType = handleMapLiteral(node, ctx);
+            break;
+
+        case 'TupleLiteral':
+            resolvedType = handleTupleLiteral(node, ctx);
             break;
 
         default:
@@ -234,6 +250,38 @@ function handleMethodCall(node: MethodCall, ctx: AnalyzerContext): OrbType {
 
     if (objType.kind === 'unknown') return OrbTypes.unknown();
 
+    const methodTable = BuiltinMethods[objType.kind];
+    if (methodTable) {
+        const sig = methodTable[node.method];
+        if (!sig) {
+            ctx.reportError(
+                `Struct '${objType.kind}' does not have method '${node.method}'`,
+                node
+            );
+            return OrbTypes.unknown();
+        }
+        const expectedParams = sig.params(objType, node.args.length);
+        if (!expectedParams) {
+            ctx.reportError(
+                `Method '${node.method}' does not expects ${node.args.length} arguments`,
+                node
+            );
+            return OrbTypes.unknown();
+        }
+        node.args.forEach((arg, i) => {
+            const paramType = expectedParams[i]!;
+            const argType = ctx.visit(arg, ctx);
+            if (!isAssignable(argType, paramType)) {
+                ctx.reportError(
+                    `Cannot pass argument of type ${argType.kind} to parameter of type ${paramType.kind}`,
+                    node
+                );
+            }
+        });
+
+        return sig.returnType(objType);
+    }
+
     if (objType.kind !== 'struct') {
         ctx.reportError(
             `Cannot access field '${node.method}' of non-struct type`,
@@ -360,4 +408,67 @@ function handleStructInit(node: StructInit, ctx: AnalyzerContext): OrbType {
     }
 
     return OrbTypes.struct(node.name);
+}
+function handleArrayLiteral(node: ArrayLiteral, ctx: AnalyzerContext): OrbType {
+    let type: OrbType | null = null;
+    for (const elements of node.elements) {
+        if (type === null) {
+            type = ctx.visit(elements, ctx);
+            continue;
+        }
+
+        const elementType = ctx.visit(elements, ctx);
+        if (!isAssignable(elementType, type)) {
+            ctx.reportError(
+                `Cannot assign value of type ${elementType.kind} to array of type ${type.kind}`,
+                node
+            );
+        }
+    }
+    if (type === null) return OrbTypes.array(OrbTypes.unknown());
+
+    return OrbTypes.array(type);
+}
+
+function handleMapLiteral(node: MapLiteral, ctx: AnalyzerContext): OrbType {
+    let type: OrbType | null = null;
+    for (const elements of node.elements) {
+        if (type === null) {
+            type = ctx.visit(elements.value, ctx);
+            continue;
+        }
+
+        const elementType = ctx.visit(elements.value, ctx);
+        if (!isAssignable(elementType, type)) {
+            ctx.reportError(
+                `Cannot assign value of type ${elementType.kind} to map value of type ${type.kind}`,
+                node
+            );
+        }
+    }
+    if (type === null)
+        return OrbTypes.map(OrbTypes.unknown(), OrbTypes.unknown());
+
+    return OrbTypes.map(OrbTypes.str(), type);
+}
+
+function handleTupleLiteral(node: TupleLiteral, ctx: AnalyzerContext): OrbType {
+    let type: OrbType | null = null;
+    for (const elements of node.elements) {
+        if (type === null) {
+            type = ctx.visit(elements, ctx);
+            continue;
+        }
+
+        const elementType = ctx.visit(elements, ctx);
+        if (!isAssignable(elementType, type)) {
+            ctx.reportError(
+                `Cannot assign value of type ${elementType.kind} to array of type ${type.kind}`,
+                node
+            );
+        }
+    }
+    if (type === null) return OrbTypes.array(OrbTypes.unknown());
+
+    return OrbTypes.array(type);
 }

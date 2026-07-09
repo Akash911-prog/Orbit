@@ -71,52 +71,74 @@ export class SemanticAnalyzer {
         node: VariableDecl,
         ctx: AnalyzerContext
     ): OrbType {
+        // Case 1: no initializer — type comes from annotation, or stays unknown
         if (!node.initializer) {
-            if (!node.varType) {
-                ctx.globalScope.update(node.name, {
-                    kind: 'variable',
-                    name: node.name,
-                    type: OrbTypes.unknown(),
-                    mutable: node.kind === 'var',
-                });
-                return OrbTypes.unknown();
-            }
-            ctx.globalScope.update(node.name, {
-                kind: 'variable',
-                name: node.name,
-                type: ctx.typenodeToOrbType(node.varType, ctx),
-                mutable: node.kind === 'var',
-            });
-            return ctx.typenodeToOrbType(node.varType, ctx);
-        }
+            const declaredType = node.varType
+                ? ctx.typenodeToOrbType(node.varType, ctx)
+                : OrbTypes.unknown();
 
-        if (node.varType && node.initializer) {
-            const varType = handleExpression(node.initializer, ctx);
-            if (
-                !isAssignable(ctx.typenodeToOrbType(node.varType, ctx), varType)
-            ) {
+            if (!node.varType) {
                 ctx.reportError(
-                    `Cannot assign type ${varType.kind} to type ${ctx.typenodeToOrbType(node.varType, ctx).kind}`,
+                    `'${node.name}' needs a type annotation or an initializer`,
                     node
                 );
             }
+
             ctx.globalScope.update(node.name, {
                 kind: 'variable',
                 name: node.name,
-                type: varType,
+                type: declaredType,
                 mutable: node.kind === 'var',
             });
-            return varType;
+            node.resolvedType = declaredType;
+            return declaredType;
         }
 
-        const varType = handleExpression(node.initializer, ctx);
+        // Case 2: has an initializer — always resolve it first
+        const initType = handleExpression(node.initializer, ctx);
+
+        // No annotation — infer entirely from the initializer
+        if (!node.varType) {
+            ctx.globalScope.update(node.name, {
+                kind: 'variable',
+                name: node.name,
+                type: initType,
+                mutable: node.kind === 'var',
+            });
+            node.resolvedType = initType;
+            return initType;
+        }
+
+        // Both present — declared type wins as the stored type
+        const declaredType = ctx.typenodeToOrbType(node.varType, ctx);
+
+        const isEmptyCollectionLiteral =
+            (declaredType.kind === 'array' ||
+                declaredType.kind === 'tuple' ||
+                declaredType.kind === 'map') &&
+            initType.kind === declaredType.kind &&
+            ('element' in initType
+                ? initType.element.kind === 'unknown'
+                : false);
+
+        if (
+            !isEmptyCollectionLiteral &&
+            !isAssignable(initType, declaredType)
+        ) {
+            ctx.reportError(
+                `Cannot assign type ${initType.kind} to '${node.name}' of type ${declaredType.kind}`,
+                node
+            );
+        }
+
         ctx.globalScope.update(node.name, {
             kind: 'variable',
             name: node.name,
-            type: varType,
+            type: declaredType,
             mutable: node.kind === 'var',
         });
-        return varType;
+        node.resolvedType = declaredType;
+        return declaredType;
     }
 
     private hoistSignatures(ast: Program, ctx: AnalyzerContext): void {
@@ -184,13 +206,13 @@ export class SemanticAnalyzer {
 
                 //TODO: add case for Nova declaration
 
-                case 'StructDecl':
+                case 'StructDecl': {
                     const methods: FunctionEntry[] = [];
                     const fields: VariableEntry[] = [];
 
                     for (const member of node.members) {
                         switch (member.type) {
-                            case 'FunctionDecl':
+                            case 'FunctionDecl': {
                                 const funcEntry: FunctionEntry = {
                                     kind: 'function',
                                     name: member.name,
@@ -209,46 +231,113 @@ export class SemanticAnalyzer {
                                         : OrbTypes.void(),
                                     builtin: false,
                                 };
-
                                 methods.push(funcEntry);
                                 break;
+                            }
 
-                            case 'VariableDecl':
-                                const fieldEntry: VariableEntry = {
+                            case 'VariableDecl': {
+                                let fieldType: OrbType;
+
+                                if (member.varType && member.initializer) {
+                                    const declaredType = this.typeNodeToOrbType(
+                                        member.varType,
+                                        ctx
+                                    );
+                                    const initType = handleExpression(
+                                        member.initializer,
+                                        ctx
+                                    );
+                                    if (!isAssignable(initType, declaredType)) {
+                                        ctx.reportError(
+                                            `Cannot assign type ${initType.kind} to field '${member.name}' of type ${declaredType.kind}`,
+                                            member
+                                        );
+                                    }
+                                    fieldType = declaredType;
+                                } else if (member.varType) {
+                                    // the normal case: struct field with just a type annotation, no default value
+                                    fieldType = this.typeNodeToOrbType(
+                                        member.varType,
+                                        ctx
+                                    );
+                                } else if (member.initializer) {
+                                    fieldType = handleExpression(
+                                        member.initializer,
+                                        ctx
+                                    );
+                                } else {
+                                    ctx.reportError(
+                                        `Field '${member.name}' needs a type annotation or default value`,
+                                        member
+                                    );
+                                    fieldType = OrbTypes.unknown();
+                                }
+
+                                fields.push({
                                     kind: 'variable',
                                     name: member.name,
-                                    type: member.varType
-                                        ? this.typeNodeToOrbType(
-                                              member.varType,
-                                              ctx
-                                          )
-                                        : OrbTypes.unknown(),
+                                    type: fieldType,
                                     mutable: member.kind === 'var',
-                                };
-
-                                fields.push(fieldEntry);
+                                });
                                 break;
+                            }
+                        }
+                    }
+
+                    for (const field of fields) {
+                        if (field.type.kind !== 'struct') continue;
+
+                        if (field.type.name === node.name) {
+                            ctx.reportError(
+                                `Struct '${node.name}' cannot contain itself by value (field '${field.name}')`,
+                                node
+                            );
+                            continue;
+                        }
+
+                        const referenced = ctx.globalScope.lookup(
+                            field.type.name
+                        );
+                        if (!referenced || referenced.kind !== 'struct') {
+                            ctx.reportError(
+                                `Undefined struct '${field.type.name}'`,
+                                node
+                            );
+                            continue;
+                        }
+
+                        const isMutualCycle = referenced.fields.some(
+                            (f) =>
+                                f.type.kind === 'struct' &&
+                                f.type.name === node.name
+                        );
+                        if (isMutualCycle) {
+                            ctx.reportError(
+                                `Cycle detected: '${node.name}' and '${field.type.name}' embed each other by value`,
+                                node
+                            );
                         }
                     }
 
                     const structEntry: StructEntry = {
                         kind: 'struct',
                         name: node.name,
-                        fields: fields,
-                        methods: methods,
+                        fields,
+                        methods,
                     };
 
-                    let notdefined = ctx.globalScope.define(
+                    const defined = ctx.globalScope.define(
                         node.name,
                         structEntry
                     );
-                    if (!notdefined) {
+                    if (!defined) {
                         ctx.reportError(
                             `${node.name} is already defined`,
                             node
                         );
                     }
                     break;
+                }
                 default:
                     break;
             }

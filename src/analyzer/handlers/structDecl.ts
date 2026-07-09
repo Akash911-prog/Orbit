@@ -53,6 +53,29 @@ export function handleStructDecl(
         }
     }
 
+    for (const field of fields) {
+        if (field.type.kind === 'struct') {
+            const structEntry = ctx.globalScope.lookup(field.type.name!);
+            if (!structEntry || structEntry.kind !== 'struct') {
+                ctx.reportError(`Undefined struct '${field.type.name}'`, node);
+                return OrbTypes.unknown();
+            }
+            const isCycle = structEntry.fields.some((f) => {
+                if (f.type.kind === 'struct') {
+                    return f.type.name === node.name;
+                }
+                return false;
+            });
+            if (isCycle) {
+                ctx.reportError(
+                    `Cycle detected in struct '${node.name}'`,
+                    node
+                );
+            }
+            ctx.reportError(`Unknown type for field '${field.name}'`, node);
+        }
+    }
+
     const structEntry: StructEntry = {
         kind: 'struct',
         name: node.name,

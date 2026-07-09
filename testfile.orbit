@@ -1,10 +1,18 @@
 struct Point {
-    let x;
+    let x: Point;
     let y: int;
 }
 
-orbit main {
-    let p = Point {x: 10, y: 30};
+struct A {
+    let p: Point;
+}
 
-    let y: int;
+orbit main {
+
+    var a = {
+        name: 2345,
+        age: 23
+    };
+
+    let name: str[] = [];
 }

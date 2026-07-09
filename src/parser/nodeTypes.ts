@@ -219,7 +219,10 @@ export type Expression =
     | StructInit
     | Identifier
     | Literal
-    | NullLiteral;
+    | NullLiteral
+    | TupleLiteral
+    | ArrayLiteral
+    | MapLiteral;
 
 export interface RangeExpr extends NodeBase {
     type: 'RangeExpr';
@@ -312,4 +315,19 @@ export interface BoolLiteral extends NodeBase {
 }
 export interface NullLiteral extends NodeBase {
     type: 'NullLiteral';
+}
+
+export interface ArrayLiteral extends NodeBase {
+    type: 'ArrayLiteral';
+    elements: Expression[];
+}
+
+export interface MapLiteral extends NodeBase {
+    type: 'MapLiteral';
+    elements: { key: string; value: Expression }[];
+}
+
+export interface TupleLiteral extends NodeBase {
+    type: 'TupleLiteral';
+    elements: Expression[];
 }

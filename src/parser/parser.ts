@@ -3,6 +3,7 @@ import { globalErrorBucket } from '../globals';
 import type { Lexer } from '../lexer/lexer';
 import { TokenType, type Token } from '../lexer/token';
 import type {
+    ArrayLiteral,
     Assignment,
     Block,
     BreakStatement,
@@ -18,6 +19,7 @@ import type {
     IfStatement,
     Literal,
     LoopStatement,
+    MapLiteral,
     MatchArm,
     MatchPattern,
     MatchStatement,
@@ -32,6 +34,7 @@ import type {
     StructDecl,
     StructMember,
     TopLevelDeclaration,
+    TupleLiteral,
     TypeNode,
     VariableDecl,
     WhileStatement,
@@ -1147,16 +1150,25 @@ export class Parser {
                     col,
                 };
 
+            case TokenType.OpenBracket:
+                return this.parseArrayLiteral();
+
             case TokenType.KeywordNull:
                 this.consume();
                 return { type: 'NullLiteral', line, col };
 
             case TokenType.OpenParen: {
+                if (this.peek(1).type === TokenType.Comma) {
+                    return this.parseTupleLiteral();
+                }
                 this.consume(); // eat "("
                 const inner = this.parseExpression();
                 this.expect([TokenType.CloseParen]);
                 return inner;
             }
+
+            case TokenType.OpenBrace:
+                return this.parseMapLiteral();
 
             case TokenType.Identifier: {
                 const name = this.consume().value;
@@ -1190,6 +1202,56 @@ export class Parser {
                 });
                 throw new Error('Unexpected token in expression');
         }
+    }
+    private parseMapLiteral(): MapLiteral {
+        this.log('parseMapLiteral');
+        const { line, col, ..._ } = this.current;
+        this.expect([TokenType.OpenBrace]);
+        const elements: { key: string; value: Expression }[] = [];
+        const key = this.expect([TokenType.Identifier]).value;
+        this.expect([TokenType.Colon]);
+        const value = this.parseExpression();
+        elements.push({ key, value });
+        while (this.current.type === TokenType.Comma) {
+            this.consume();
+            const key = this.expect([TokenType.Identifier]).value;
+            this.expect([TokenType.Colon]);
+            const value = this.parseExpression();
+            elements.push({ key, value });
+        }
+        this.expect([TokenType.CloseBrace]);
+        return { type: 'MapLiteral', elements, line, col };
+    }
+
+    private parseArrayLiteral(): ArrayLiteral {
+        this.log('parseArrayLiteral');
+        const { line, col, ..._ } = this.current;
+        this.expect([TokenType.OpenBracket]);
+        const elements: Expression[] = [];
+        if (this.current.type === TokenType.CloseBracket) {
+            this.consume();
+            return { type: 'ArrayLiteral', elements, line, col };
+        }
+        elements.push(this.parseExpression());
+        while (this.current.type === TokenType.Comma) {
+            this.consume();
+            elements.push(this.parseExpression());
+        }
+        this.expect([TokenType.CloseBracket]);
+        return { type: 'ArrayLiteral', elements, line, col };
+    }
+
+    private parseTupleLiteral(): TupleLiteral {
+        this.log('parseTupleLiteral');
+        const { line, col, ..._ } = this.current;
+        this.expect([TokenType.OpenParen]);
+        const elements: Expression[] = [this.parseExpression()];
+        while (this.current.type === TokenType.Comma) {
+            this.consume();
+            elements.push(this.parseExpression());
+        }
+        this.expect([TokenType.CloseParen]);
+        return { type: 'TupleLiteral', elements, line, col };
     }
 
     private parseArgumentList(): Expression[] {

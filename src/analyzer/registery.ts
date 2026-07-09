@@ -1,4 +1,4 @@
-import type { OrbType } from '../types';
+import { OrbTypes, type OrbType } from '../types';
 import type { AnalyzerContext } from './context';
 import { handleAssignment } from './handlers/assignment';
 import { handleBlock } from './handlers/block';
@@ -51,4 +51,52 @@ export const HandlerRegistry: Record<string, HandlerFn> = {
 
     RootOrbitDecl: handleOrbit,
     OrbitDecl: handleOrbit,
+};
+
+export type BuiltinMethodSig = {
+    // computes expected param types given the concrete receiver (e.g. array<int> vs array<str>)
+    params: (receiver: OrbType, argCount: number) => OrbType[] | null;
+    returnType: (receiver: OrbType) => OrbType;
+};
+
+export const BuiltinMethods: Partial<
+    Record<OrbType['kind'], Record<string, BuiltinMethodSig>>
+> = {
+    array: {
+        push: {
+            params: (recv, argCount) => [
+                recv.kind === 'array' ? recv.element : OrbTypes.unknown(),
+            ],
+            returnType: () => OrbTypes.void(),
+        },
+        length: {
+            params: (recv, argCount) => [],
+            returnType: () => OrbTypes.int(),
+        },
+        pop: {
+            params: (reciever, argCount) => {
+                if (argCount === 0) return [];
+                if (argCount === 1) return [OrbTypes.int()];
+                return null;
+            },
+            returnType: (receiver) => {
+                if (receiver.kind === 'array') return receiver.element;
+                return OrbTypes.unknown();
+            },
+        },
+    },
+
+    tuple: {
+        length: {
+            params: () => [],
+            returnType: () => OrbTypes.int(),
+        },
+        copy: {
+            params: () => [],
+            returnType: (reciever) =>
+                reciever.kind === 'tuple'
+                    ? OrbTypes.tuple(reciever.elements)
+                    : OrbTypes.unknown(),
+        },
+    },
 };

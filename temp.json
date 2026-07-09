@@ -10,7 +10,13 @@
                     "type": "VariableDecl",
                     "kind": "let",
                     "name": "x",
-                    "varType": null,
+                    "varType": {
+                        "type": "GenericType",
+                        "name": "Point",
+                        "typeArg": null,
+                        "line": 2,
+                        "col": 12
+                    },
                     "initializer": null,
                     "line": 2,
                     "col": 5
@@ -34,6 +40,30 @@
             "col": 1
         },
         {
+            "type": "StructDecl",
+            "name": "A",
+            "generic": null,
+            "members": [
+                {
+                    "type": "VariableDecl",
+                    "kind": "let",
+                    "name": "p",
+                    "varType": {
+                        "type": "GenericType",
+                        "name": "Point",
+                        "typeArg": null,
+                        "line": 7,
+                        "col": 12
+                    },
+                    "initializer": null,
+                    "line": 7,
+                    "col": 5
+                }
+            ],
+            "line": 6,
+            "col": 1
+        },
+        {
             "type": "RootOrbitDecl",
             "body": {
                 "type": "Block",
@@ -53,13 +83,13 @@
                                     "value": {
                                         "type": "IntLiteral",
                                         "value": "10",
-                                        "line": 7,
+                                        "line": 11,
                                         "col": 23,
                                         "resolvedType": {
                                             "kind": "int"
                                         }
                                     },
-                                    "line": 7,
+                                    "line": 11,
                                     "col": 20
                                 },
                                 {
@@ -68,24 +98,24 @@
                                     "value": {
                                         "type": "IntLiteral",
                                         "value": "30",
-                                        "line": 7,
+                                        "line": 11,
                                         "col": 30,
                                         "resolvedType": {
                                             "kind": "int"
                                         }
                                     },
-                                    "line": 7,
+                                    "line": 11,
                                     "col": 27
                                 }
                             ],
-                            "line": 7,
+                            "line": 11,
                             "col": 19,
                             "resolvedType": {
                                 "kind": "struct",
                                 "name": "Point"
                             }
                         },
-                        "line": 7,
+                        "line": 11,
                         "col": 5,
                         "resolvedType": {
                             "kind": "struct",
@@ -99,21 +129,21 @@
                         "varType": {
                             "type": "BaseType",
                             "name": "int",
-                            "line": 9,
+                            "line": 13,
                             "col": 12
                         },
                         "initializer": null,
-                        "line": 9,
+                        "line": 13,
                         "col": 5,
                         "resolvedType": {
                             "kind": "int"
                         }
                     }
                 ],
-                "line": 6,
+                "line": 10,
                 "col": 12
             },
-            "line": 6,
+            "line": 10,
             "col": 1
         }
     ]
