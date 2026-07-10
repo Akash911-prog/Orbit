@@ -253,6 +253,7 @@ function handleMethodCall(node: MethodCall, ctx: AnalyzerContext): OrbType {
     const methodTable = BuiltinMethods[objType.kind];
     if (methodTable) {
         const sig = methodTable[node.method];
+        node.builtInReciever = objType.kind;
         if (!sig) {
             ctx.reportError(
                 `Struct '${objType.kind}' does not have method '${node.method}'`,
@@ -453,22 +454,9 @@ function handleMapLiteral(node: MapLiteral, ctx: AnalyzerContext): OrbType {
 }
 
 function handleTupleLiteral(node: TupleLiteral, ctx: AnalyzerContext): OrbType {
-    let type: OrbType | null = null;
-    for (const elements of node.elements) {
-        if (type === null) {
-            type = ctx.visit(elements, ctx);
-            continue;
-        }
-
-        const elementType = ctx.visit(elements, ctx);
-        if (!isAssignable(elementType, type)) {
-            ctx.reportError(
-                `Cannot assign value of type ${elementType.kind} to array of type ${type.kind}`,
-                node
-            );
-        }
+    const elements: OrbType[] = [];
+    for (const element of node.elements) {
+        elements.push(ctx.visit(element, ctx));
     }
-    if (type === null) return OrbTypes.array(OrbTypes.unknown());
-
-    return OrbTypes.array(type);
+    return OrbTypes.tuple(elements);
 }

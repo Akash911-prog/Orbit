@@ -272,6 +272,7 @@ export interface MethodCall extends NodeBase {
     object: Expression;
     method: string;
     args: Expression[];
+    builtInReciever?: string;
 }
 
 export interface FunctionCall extends NodeBase {

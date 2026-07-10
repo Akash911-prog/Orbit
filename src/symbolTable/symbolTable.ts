@@ -42,14 +42,14 @@ export type LoopEntry = {
 };
 
 export class SymbolTable {
-    private table: Map<string, SymbolEntry>;
+    private _table: Map<string, SymbolEntry>;
     private parent: SymbolTable | null;
-    private child: SymbolTable | null;
+    private _child: SymbolTable | null;
 
     constructor(parent: SymbolTable | null = null) {
-        this.table = new Map();
+        this._table = new Map();
         this.parent = parent;
-        this.child = null;
+        this._child = null;
     }
 
     define(name: string, entry: SymbolEntry): boolean {
@@ -72,8 +72,7 @@ export class SymbolTable {
     }
 
     update(name: string, entry: SymbolEntry): boolean {
-        const isRemoved = this.table.delete(name);
-        if (isRemoved) {
+        if (this.table.has(name)) {
             this.table.set(name, entry);
             return true;
         }
@@ -82,17 +81,28 @@ export class SymbolTable {
 
     enterScope(): SymbolTable {
         const newScope = new SymbolTable(this);
-        this.child = newScope;
+        this._child = newScope;
         return newScope;
     }
 
     exitScope(): SymbolTable {
-        return this.parent!;
+        if (this.parent) {
+            return this.parent;
+        }
+        return this;
     }
 
     logMap(): void {
         console.log(JSON.stringify([...this.table], null, 2));
         if (this.child) this.child.logMap();
+    }
+
+    get child(): SymbolTable | null {
+        return this._child;
+    }
+
+    get table(): Map<string, SymbolEntry> {
+        return this._table;
     }
 }
 

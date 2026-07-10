@@ -22,6 +22,7 @@ export const OrbTypes = {
     float: (): OrbType => ({ kind: 'float' }),
     bool: (): OrbType => ({ kind: 'bool' }),
     str: (): OrbType => ({ kind: 'str' }),
+    String: (): OrbType => ({ kind: 'String' }),
     void: (): OrbType => ({ kind: 'void' }),
     unknown: (): OrbType => ({ kind: 'unknown' }),
     array: (element: OrbType): OrbType => ({ kind: 'array', element }),

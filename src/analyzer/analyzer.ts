@@ -265,7 +265,7 @@ export class SemanticAnalyzer {
                     case 'str':
                         return OrbTypes.str();
                     case 'String':
-                        return { kind: 'String' };
+                        return OrbTypes.String();
                     case 'char':
                         return OrbTypes.char();
                     case 'byte':
