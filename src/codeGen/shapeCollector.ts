@@ -2,6 +2,7 @@ import { globalTable } from '../globals';
 import type { Program } from '../parser/nodeTypes';
 import type { SymbolEntry, SymbolTable } from '../symbolTable/symbolTable';
 import type { OrbType } from '../types';
+import { directlyDependsOn, getShapeKey, isCompositeOrString } from './helper';
 
 export interface ShapeInfo {
     key: string;
@@ -13,50 +14,6 @@ export interface MethodInfo {
     key: string;
     reciever: ShapeInfo;
     method: string;
-}
-
-export function isCompositeOrString(t: OrbType) {
-    return (
-        t.kind === 'array' ||
-        t.kind === 'map' ||
-        t.kind === 'tuple' ||
-        t.kind === 'struct' ||
-        t.kind === 'nullable'
-    );
-}
-
-export function getShapeKey(t: OrbType): string {
-    switch (t.kind) {
-        case 'array':
-            return `array_${getShapeKey(t.element)}`;
-        case 'struct':
-            return `struct_${t.name}`;
-        case 'tuple':
-            return `tuple_${t.elements.map(getShapeKey).join('_')}`;
-        case 'map':
-            return `map_${getShapeKey(t.key)}_${getShapeKey(t.value)}`;
-        case 'nullable':
-            return `nullable_${getShapeKey(t.inner)}`;
-        default:
-            return t.kind;
-    }
-}
-
-export function directlyDependsOn(t: OrbType): OrbType[] {
-    switch (t.kind) {
-        case 'array':
-            return [t.element];
-        case 'struct':
-            return [];
-        case 'tuple':
-            return t.elements;
-        case 'map':
-            return [t.key, t.value];
-        case 'nullable':
-            return [t.inner];
-        default:
-            return [];
-    }
 }
 
 export class ShapeCollector {

@@ -222,13 +222,20 @@ export type Expression =
     | NullLiteral
     | TupleLiteral
     | ArrayLiteral
-    | MapLiteral;
+    | MapLiteral
+    | IndexExpr;
 
 export interface RangeExpr extends NodeBase {
     type: 'RangeExpr';
     inclusive: boolean; // false = .. , true = ..=
     start: Expression;
     end: Expression;
+}
+
+export interface IndexExpr extends NodeBase {
+    type: 'IndexExpr';
+    object: Expression;
+    index: Expression;
 }
 
 export interface BinaryExpr extends NodeBase {

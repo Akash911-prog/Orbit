@@ -7,7 +7,7 @@ export const BUILTIN_FUNCTIONS_MAP: Record<string, SymbolEntry> = {
     print: {
         kind: 'function',
         name: 'print',
-        params: [{ name: 'str', type: OrbTypes.str() }],
+        params: [{ name: 'unkown', type: OrbTypes.unknown() }],
         returnType: OrbTypes.void(),
         builtin: true,
     },

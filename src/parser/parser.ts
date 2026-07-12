@@ -1111,6 +1111,13 @@ export class Parser {
             }
         }
 
+        if (this.current.type === TokenType.OpenBracket) {
+            this.consume(); // eat "["
+            const index = this.parseExpression();
+            this.expect([TokenType.CloseBracket]); // eat "]"
+            expr = { type: 'IndexExpr', object: expr, index, line, col };
+        }
+
         return expr;
     }
 

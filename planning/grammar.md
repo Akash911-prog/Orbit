@@ -183,7 +183,7 @@ UnaryExpr           = ( "!" | "-" ) UnaryExpr
 NullCheckExpr       = PrimaryExpr [ "?" ] ;
                     (* if y? {} — nullable check/unwrap *)
 
-PrimaryExpr         = Atom { "." Identifier [ "(" [ ArgumentList ] ")" ] } ;
+PrimaryExpr         = Atom { "." Identifier [ "(" [ ArgumentList ] ")" ] | "["Expression"]" } ;
                     (* chains member access and method calls left to right *)
 
 Atom                = Literal

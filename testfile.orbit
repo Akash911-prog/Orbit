@@ -1,6 +1,6 @@
 struct Point {
-    let x: Point;
-    let y: int;
+    let x = "hello";
+    let y: int = 5;
 }
 
 struct A {
@@ -8,4 +8,5 @@ struct A {
 }
 
 orbit main {
+    let hello = (24, 'hello', true);
 }

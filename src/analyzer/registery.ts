@@ -51,6 +51,7 @@ export const HandlerRegistry: Record<string, HandlerFn> = {
 
     RootOrbitDecl: handleOrbit,
     OrbitDecl: handleOrbit,
+    IndexExpr: handleExpression,
 };
 
 export type BuiltinMethodSig = {

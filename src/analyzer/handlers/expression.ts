@@ -17,6 +17,7 @@ import { OrbTypes, type OrbType } from '../../types';
 import type { AnalyzerContext } from '../context';
 import { expectNumeric, expectType, isAssignable, typesEqual } from '../helper';
 import { BuiltinMethods } from '../registery';
+import { handleIndexExpr } from './indexExpr';
 
 export function handleExpression(
     node: Expression,
@@ -87,6 +88,10 @@ export function handleExpression(
 
         case 'TupleLiteral':
             resolvedType = handleTupleLiteral(node, ctx);
+            break;
+
+        case 'IndexExpr':
+            resolvedType = handleIndexExpr(node, ctx);
             break;
 
         default:

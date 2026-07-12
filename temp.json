@@ -10,14 +10,16 @@
                     "type": "VariableDecl",
                     "kind": "let",
                     "name": "x",
-                    "varType": {
-                        "type": "GenericType",
-                        "name": "Point",
-                        "typeArg": null,
+                    "varType": null,
+                    "initializer": {
+                        "type": "StrLiteral",
+                        "value": "hello",
                         "line": 2,
-                        "col": 12
+                        "col": 13,
+                        "resolvedType": {
+                            "kind": "str"
+                        }
                     },
-                    "initializer": null,
                     "line": 2,
                     "col": 5
                 },
@@ -31,7 +33,15 @@
                         "line": 3,
                         "col": 12
                     },
-                    "initializer": null,
+                    "initializer": {
+                        "type": "IntLiteral",
+                        "value": "5",
+                        "line": 3,
+                        "col": 18,
+                        "resolvedType": {
+                            "kind": "int"
+                        }
+                    },
                     "line": 3,
                     "col": 5
                 }
@@ -71,72 +81,71 @@
                     {
                         "type": "VariableDecl",
                         "kind": "let",
-                        "name": "p",
+                        "name": "hello",
                         "varType": null,
                         "initializer": {
-                            "type": "StructInit",
-                            "name": "Point",
-                            "fields": [
+                            "type": "TupleLiteral",
+                            "elements": [
                                 {
-                                    "type": "FieldInit",
-                                    "name": "x",
-                                    "value": {
-                                        "type": "IntLiteral",
-                                        "value": "10",
-                                        "line": 11,
-                                        "col": 23,
-                                        "resolvedType": {
-                                            "kind": "int"
-                                        }
-                                    },
+                                    "type": "IntLiteral",
+                                    "value": "24",
                                     "line": 11,
-                                    "col": 20
+                                    "col": 18,
+                                    "resolvedType": {
+                                        "kind": "int"
+                                    }
                                 },
                                 {
-                                    "type": "FieldInit",
-                                    "name": "y",
-                                    "value": {
-                                        "type": "IntLiteral",
-                                        "value": "30",
-                                        "line": 11,
-                                        "col": 30,
-                                        "resolvedType": {
-                                            "kind": "int"
-                                        }
-                                    },
+                                    "type": "StrLiteral",
+                                    "value": "hello",
                                     "line": 11,
-                                    "col": 27
+                                    "col": 22,
+                                    "resolvedType": {
+                                        "kind": "str"
+                                    }
+                                },
+                                {
+                                    "type": "BoolLiteral",
+                                    "value": true,
+                                    "line": 11,
+                                    "col": 31,
+                                    "resolvedType": {
+                                        "kind": "bool"
+                                    }
                                 }
                             ],
                             "line": 11,
-                            "col": 19,
+                            "col": 17,
                             "resolvedType": {
-                                "kind": "struct",
-                                "name": "Point"
+                                "kind": "tuple",
+                                "elements": [
+                                    {
+                                        "kind": "int"
+                                    },
+                                    {
+                                        "kind": "str"
+                                    },
+                                    {
+                                        "kind": "bool"
+                                    }
+                                ]
                             }
                         },
                         "line": 11,
                         "col": 5,
                         "resolvedType": {
-                            "kind": "struct",
-                            "name": "Point"
-                        }
-                    },
-                    {
-                        "type": "VariableDecl",
-                        "kind": "let",
-                        "name": "y",
-                        "varType": {
-                            "type": "BaseType",
-                            "name": "int",
-                            "line": 13,
-                            "col": 12
-                        },
-                        "initializer": null,
-                        "line": 13,
-                        "col": 5,
-                        "resolvedType": {
-                            "kind": "int"
+                            "kind": "tuple",
+                            "elements": [
+                                {
+                                    "kind": "int"
+                                },
+                                {
+                                    "kind": "str"
+                                },
+                                {
+                                    "kind": "bool"
+                                }
+                            ]
                         }
                     }
                 ],

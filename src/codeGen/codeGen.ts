@@ -1,6 +1,7 @@
 import { globalTable } from '../globals';
-import type { Program } from '../parser/nodeTypes';
+import type { Expression, Program } from '../parser/nodeTypes';
 import type { ShapeCollector, ShapeInfo } from './shapeCollector';
+import fs from 'node:fs';
 
 export class CodeGen {
     private collector: ShapeCollector;
