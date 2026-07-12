@@ -5,6 +5,8 @@ import { Lexer } from './lexer/lexer';
 import { TokenType } from './lexer/token';
 import { Parser } from './parser/parser';
 import { appendFile } from 'node:fs/promises';
+import { CodeGen } from './codeGen/codeGen';
+import { ShapeCollector } from './codeGen/shapeCollector';
 
 // src/index.ts
 const filePath = process.argv[2];
@@ -34,8 +36,9 @@ try {
 
     const analyzer = new SemanticAnalyzer(program);
     program = analyzer.analyze();
-
-    globalTable.logMap();
+    const shapeCollector = new ShapeCollector();
+    const generator = new CodeGen(shapeCollector, program);
+    generator.generateCode();
 } catch (error) {
     console.error(error);
 } finally {

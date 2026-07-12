@@ -258,7 +258,7 @@ function handleMethodCall(node: MethodCall, ctx: AnalyzerContext): OrbType {
     const methodTable = BuiltinMethods[objType.kind];
     if (methodTable) {
         const sig = methodTable[node.method];
-        node.builtInReciever = objType.kind;
+        node.builtInReciever = objType;
         if (!sig) {
             ctx.reportError(
                 `Struct '${objType.kind}' does not have method '${node.method}'`,

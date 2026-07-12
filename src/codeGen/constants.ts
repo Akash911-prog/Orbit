@@ -1,3 +1,5 @@
+import { cleanTemplate } from './helper';
+
 export const OUTPUT_PATH = './build/__temp_c_out.c';
 
 export const IncludeStatements = `
@@ -86,3 +88,165 @@ typedef struct __orbit_nullable_${type} {
     bool is_null;
 } __orbit_nullable_${type};
 `;
+
+export const BuiltInMethodTemplate = {
+    array: {
+        create: {
+            open: (key: string) => `create_${key}(`,
+            sep: () => `, `,
+            close: () => `)`,
+            impl: (type: string, key: string) => cleanTemplate`
+                ${key} create_${key}(size_t capacity, const ${type} *initial_values, size_t initial_size) {
+                    ${key} array = {0};
+                    size_t max_elements = SIZE_MAX / sizeof(${type});
+
+                    if (initial_size > capacity || capacity == 0 || capacity > max_elements) {
+                        return array;
+                    }
+
+                    array.array = (${type} *)malloc(sizeof(${type}) * capacity);
+                    if (!array.array) {
+                        return array;
+                    }
+
+                    array.capacity = capacity;
+                    array.size = 0;
+
+                    if (initial_values && initial_size > 0) {
+                        memcpy(array.array, initial_values, sizeof(${type}) * initial_size);
+                        array.size = initial_size;
+                    }
+
+                    return array;
+                }
+            `,
+        },
+        free: {
+            open: (key: string) => `free_${key}(&`,
+            close: () => `)`,
+            impl: (type: string, key: string) => cleanTemplate`
+                void free_${key}(${key} *array) {
+                    if (!array) return;
+                    free(array->array);
+                    array->array = NULL;
+                    array->size = 0;
+                    array->capacity = 0;
+                }
+            `,
+        },
+        grow: {
+            open: (key: string) => `${key}_grow(&`,
+            close: () => `)`,
+            impl: (type: string, key: string) => cleanTemplate`
+                void ${key}_grow(${key} *array) {
+                    size_t max_elements = SIZE_MAX / sizeof(${type});
+                    if (array->capacity >= max_elements) return;
+
+                    size_t newCapacity;
+                    if (array->capacity < max_elements / 2) {
+                        newCapacity = (array->capacity == 0) ? 4 : array->capacity * 2;
+                    } else {
+                        if (max_elements - array->capacity < 65536) {
+                            newCapacity = max_elements;
+                        } else {
+                            newCapacity = array->capacity + 65536;
+                        }
+                    }
+
+                    ${type} *temp = (${type} *)realloc(array->array, sizeof(${type}) * newCapacity);
+                    if (!temp) return;
+
+                    array->array = temp;
+                    array->capacity = newCapacity;
+                }
+            `,
+        },
+        push: {
+            open: (key: string) => `push_${key}(&`,
+            sep: () => `, `,
+            close: () => `)`,
+            impl: (type: string, key: string) => cleanTemplate`
+                void ${key}_push(${key} *array, ${type} value) {
+                    if (!array) return;
+                    if (array->size == array->capacity) {
+                        ${key}_grow(array);
+                    }
+                    array->array[array->size++] = value;
+                }
+            `,
+        },
+        extend: {
+            open: (key: string) => `extend_${key}(&`,
+            sep: () => `, `,
+            close: () => `)`,
+            impl: (type: string, key: string) => cleanTemplate`
+                void ${key}_extend(${key} *array, ${key} array2) {
+                    if (!array || array2.size == 0 || !array2.array) return;
+                    
+                    size_t max_elements = SIZE_MAX / sizeof(${type});
+                    if (array2.size > max_elements - array->size) return;
+
+                    while ((array->capacity - array->size) < array2.size) {
+                        ${key}_grow(array);
+                    }
+
+                    memmove(array->array + array->size, array2.array, sizeof(${type}) * array2.size);
+                    array->size += array2.size;
+                }
+            `,
+        },
+        concat: {
+            open: (key: string) => `concat_${key}(`,
+            sep: () => `, `,
+            close: () => `)`,
+            impl: (type: string, key: string) => cleanTemplate`
+                ${key} ${key}_concat(${key} array1, ${key} array2) {
+                    size_t combined_size = array1.size + array2.size;
+                    ${key} result = create_${key}(combined_size, NULL, 0);
+                    extend_${key}(&result, array1);
+                    extend_${key}(&result, array2);
+                    return result;
+                }
+            `,
+        },
+        print: {
+            open: (key: string) => `${key}_print(&`,
+            close: () => `)`,
+            impl: (type: string, key: string) => {
+                let formatSpecifier = '%d';
+                if (type.includes('uint64') || type === 'size_t')
+                    formatSpecifier = '%llu';
+                else if (type.includes('int64')) formatSpecifier = '%lld';
+                else if (type.includes('uint')) formatSpecifier = '%u';
+                else if (type === 'float' || type === 'double')
+                    formatSpecifier = '%f';
+                else if (type === 'char') formatSpecifier = '%c';
+
+                return cleanTemplate`
+                    void ${key}_print(const ${key} *arr) {
+                        if (!arr) {
+                            printf("Array: [NULL STRUCT]\\n");
+                            return;
+                        }
+
+                        printf("Array [size: %zu, capacity: %zu]\\n", arr->size, arr->capacity);
+
+                        if (!arr->array || arr->size == 0) {
+                            printf("  Data: []\\n");
+                            return;
+                        }
+
+                        printf("  Data: [");
+                        for (size_t i = 0; i < arr->size; i++) {
+                            printf("${formatSpecifier}", arr->array[i]);
+                            if (i < arr->size - 1) {
+                                printf(", ");
+                            }
+                        }
+                        printf("]\\n");
+                    }
+                `;
+            },
+        },
+    },
+};

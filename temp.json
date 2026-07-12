@@ -11,15 +11,17 @@
                     "kind": "let",
                     "name": "x",
                     "varType": {
-                        "type": "GenericType",
-                        "name": "Point",
-                        "typeArg": null,
+                        "type": "BaseType",
+                        "name": "String",
                         "line": 2,
                         "col": 12
                     },
                     "initializer": null,
                     "line": 2,
-                    "col": 5
+                    "col": 5,
+                    "resolvedType": {
+                        "kind": "String"
+                    }
                 },
                 {
                     "type": "VariableDecl",
@@ -41,7 +43,10 @@
                         }
                     },
                     "line": 3,
-                    "col": 5
+                    "col": 5,
+                    "resolvedType": {
+                        "kind": "int"
+                    }
                 }
             ],
             "line": 1,
@@ -65,7 +70,11 @@
                     },
                     "initializer": null,
                     "line": 7,
-                    "col": 5
+                    "col": 5,
+                    "resolvedType": {
+                        "kind": "struct",
+                        "name": "Point"
+                    }
                 }
             ],
             "line": 6,
@@ -82,11 +91,11 @@
                         "name": "hello",
                         "varType": null,
                         "initializer": {
-                            "type": "TupleLiteral",
+                            "type": "ArrayLiteral",
                             "elements": [
                                 {
                                     "type": "IntLiteral",
-                                    "value": "24",
+                                    "value": "1",
                                     "line": 11,
                                     "col": 18,
                                     "resolvedType": {
@@ -94,57 +103,102 @@
                                     }
                                 },
                                 {
-                                    "type": "StrLiteral",
-                                    "value": "hello",
+                                    "type": "IntLiteral",
+                                    "value": "2",
                                     "line": 11,
-                                    "col": 22,
+                                    "col": 20,
                                     "resolvedType": {
-                                        "kind": "str"
+                                        "kind": "int"
                                     }
                                 },
                                 {
-                                    "type": "BoolLiteral",
-                                    "value": true,
+                                    "type": "IntLiteral",
+                                    "value": "3",
                                     "line": 11,
-                                    "col": 31,
+                                    "col": 22,
                                     "resolvedType": {
-                                        "kind": "bool"
+                                        "kind": "int"
+                                    }
+                                },
+                                {
+                                    "type": "IntLiteral",
+                                    "value": "4",
+                                    "line": 11,
+                                    "col": 24,
+                                    "resolvedType": {
+                                        "kind": "int"
+                                    }
+                                },
+                                {
+                                    "type": "IntLiteral",
+                                    "value": "5",
+                                    "line": 11,
+                                    "col": 26,
+                                    "resolvedType": {
+                                        "kind": "int"
                                     }
                                 }
                             ],
                             "line": 11,
                             "col": 17,
                             "resolvedType": {
-                                "kind": "tuple",
-                                "elements": [
-                                    {
-                                        "kind": "int"
-                                    },
-                                    {
-                                        "kind": "str"
-                                    },
-                                    {
-                                        "kind": "bool"
-                                    }
-                                ]
+                                "kind": "array",
+                                "element": {
+                                    "kind": "int"
+                                }
                             }
                         },
                         "line": 11,
                         "col": 5,
                         "resolvedType": {
-                            "kind": "tuple",
-                            "elements": [
-                                {
-                                    "kind": "int"
-                                },
-                                {
-                                    "kind": "str"
-                                },
-                                {
-                                    "kind": "bool"
-                                }
-                            ]
+                            "kind": "array",
+                            "element": {
+                                "kind": "int"
+                            }
                         }
+                    },
+                    {
+                        "type": "ExpressionStatement",
+                        "expression": {
+                            "type": "MethodCall",
+                            "object": {
+                                "type": "Identifier",
+                                "name": "hello",
+                                "line": 12,
+                                "col": 5,
+                                "resolvedType": {
+                                    "kind": "array",
+                                    "element": {
+                                        "kind": "int"
+                                    }
+                                }
+                            },
+                            "method": "push",
+                            "args": [
+                                {
+                                    "type": "IntLiteral",
+                                    "value": "5",
+                                    "line": 12,
+                                    "col": 16,
+                                    "resolvedType": {
+                                        "kind": "int"
+                                    }
+                                }
+                            ],
+                            "line": 12,
+                            "col": 5,
+                            "builtInReciever": {
+                                "kind": "array",
+                                "element": {
+                                    "kind": "int"
+                                }
+                            },
+                            "resolvedType": {
+                                "kind": "void"
+                            }
+                        },
+                        "line": 12,
+                        "col": 5
                     }
                 ],
                 "line": 10,

@@ -1,10 +1,18 @@
 import { globalTable } from '../globals';
 import type { Expression, Program } from '../parser/nodeTypes';
-import { OUTPUT_PATH } from './constants';
+import {
+    BuiltInMethodTemplate,
+    IncludeStatements,
+    OUTPUT_PATH,
+    StringStruct,
+} from './constants';
 import type { ShapeCollector, ShapeInfo } from './shapeCollector';
 import fs from 'node:fs';
 import { typeGen } from './typeGen';
 import type { CodeGenContext } from './context';
+import { BuiltinMethods } from '../analyzer/registery';
+import { CodeGenBuiltInMethods } from './builtInMethods';
+import path from 'node:path';
 
 export class CodeGen {
     private collector: ShapeCollector;
@@ -32,15 +40,38 @@ export class CodeGen {
     }
 
     private startStream() {
-        fs.mkdirSync(OUTPUT_PATH, { recursive: true });
+        const dir = path.dirname(OUTPUT_PATH);
+        fs.mkdirSync(dir, { recursive: true });
         this.stream = fs.createWriteStream(OUTPUT_PATH, { encoding: 'utf8' });
     }
 
     public generateCode() {
         this.runPrePass();
+        this.stream.write(IncludeStatements);
+        this.stream.write('\n\n');
+        this.stream.write(StringStruct);
         typeGen(this.shapeInfoArray, this.ctx, this.ast);
-        this.generate(this.ast, this.ctx);
+        this.generateMethods();
+        // this.generate(this.ast, this.ctx);
+
+        this.stream.end();
+        this.stream.on('finish', () => {});
     }
 
     private generate(node: any, ctx: CodeGenContext) {}
+
+    private generateMethods() {
+        const methods = [...this.collector.getAllMethods().values()];
+        for (const method of methods) {
+            const reviever = CodeGenBuiltInMethods[method.reciever.type.kind];
+            if (!reviever) continue;
+            const sig = reviever[method.method];
+            if (!sig) continue;
+            sig.emitRuntimeFn(
+                method.reciever.key,
+                method.reciever.type.kind,
+                this.ctx
+            );
+        }
+    }
 }

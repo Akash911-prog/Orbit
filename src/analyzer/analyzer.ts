@@ -188,6 +188,7 @@ export class SemanticAnalyzer {
                                     member,
                                     ctx
                                 );
+                                member.resolvedType = fieldType;
                                 fields.push({
                                     kind: 'variable',
                                     name: member.name,

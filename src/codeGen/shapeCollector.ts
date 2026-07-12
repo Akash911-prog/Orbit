@@ -35,6 +35,7 @@ export class ShapeCollector {
 
         // Collect dependencies
         for (const dep of deps) {
+            if (!isCompositeOrString(dep)) continue;
             const depKey = getShapeKey(dep);
             dependsOn.push(depKey);
             if (!this.shapes.has(depKey) && isCompositeOrString(dep))
@@ -46,6 +47,7 @@ export class ShapeCollector {
             const struct = table.lookup(t.name)!;
             if (!struct || struct.kind !== 'struct') return;
             for (const field of struct.fields) {
+                if (!isCompositeOrString(field.type)) continue;
                 const fieldKey = getShapeKey(field.type);
                 if (
                     !this.shapes.has(fieldKey) &&
@@ -135,7 +137,6 @@ export class ShapeCollector {
                 }
             }
         }
-
         // Optional: Cycle check
         if (sorted.length !== this.shapes.size) {
             throw new Error(

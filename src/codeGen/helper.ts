@@ -1,6 +1,6 @@
 import type { OrbType } from '../types';
 
-export function isCompositeOrString(t: OrbType) {
+export function isCompositeOrString(t: OrbType): boolean {
     return (
         t.kind === 'array' ||
         t.kind === 'map' ||
@@ -69,4 +69,26 @@ export function orbTypeToCType(type: OrbType): string {
         default:
             return type.kind;
     }
+}
+
+export function cleanTemplate(strings, ...values) {
+    let result = strings.reduce(
+        (acc, str, i) => acc + str + (values[i] || ''),
+        ''
+    );
+    // Split into lines, trim trailing space, remove common leading indentation
+    const lines = result.split('\n');
+
+    // Find the minimum indentation of non-empty lines
+    const minIndent = lines
+        .filter((line) => line.trim().length > 0)
+        .reduce((min, line) => {
+            const match = line.match(/^\s*/);
+            return match ? Math.min(min, match[0].length) : min;
+        }, Infinity);
+
+    return lines
+        .map((line) => line.slice(minIndent).trimEnd())
+        .join('\n')
+        .trim();
 }

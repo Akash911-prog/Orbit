@@ -1,5 +1,5 @@
 struct Point {
-    let x: Point;
+    let x: String;
     let y: int = 5;
 }
 
@@ -8,5 +8,6 @@ struct A {
 }
 
 orbit main {
-    let hello = (24, 'hello', true);
+    let hello = [1,2,3,4,5];
+    hello.push(5);
 }

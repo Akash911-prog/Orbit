@@ -279,7 +279,7 @@ export interface MethodCall extends NodeBase {
     object: Expression;
     method: string;
     args: Expression[];
-    builtInReciever?: string;
+    builtInReciever?: OrbType;
 }
 
 export interface FunctionCall extends NodeBase {
