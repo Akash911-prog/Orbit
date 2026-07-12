@@ -3,17 +3,18 @@ import fs from 'node:fs';
 import { variableDeclTemplate } from '../constants';
 import { orbTypeToCType } from '../helper';
 import { generateExpressionStream } from './expressions';
+import type { CodeGenContext } from '../context';
 
 export function generateVariableDeclStream(
     node: VariableDecl,
-    stream: fs.WriteStream
+    ctx: CodeGenContext
 ): void {
     if (!node.resolvedType) {
         throw new Error('Variable type not resolved');
     }
-    stream.write(
+    ctx.stream.write(
         variableDeclTemplate(node.name, orbTypeToCType(node.resolvedType))
     );
-    if (node.initializer) generateExpressionStream(node.initializer, stream);
-    stream.write(';\n');
+    if (node.initializer) generateExpressionStream(node.initializer, ctx);
+    ctx.stream.write(';\n');
 }

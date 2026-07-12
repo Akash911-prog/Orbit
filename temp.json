@@ -10,16 +10,14 @@
                     "type": "VariableDecl",
                     "kind": "let",
                     "name": "x",
-                    "varType": null,
-                    "initializer": {
-                        "type": "StrLiteral",
-                        "value": "hello",
+                    "varType": {
+                        "type": "GenericType",
+                        "name": "Point",
+                        "typeArg": null,
                         "line": 2,
-                        "col": 13,
-                        "resolvedType": {
-                            "kind": "str"
-                        }
+                        "col": 12
                     },
+                    "initializer": null,
                     "line": 2,
                     "col": 5
                 },

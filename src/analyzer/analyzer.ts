@@ -151,6 +151,13 @@ export class SemanticAnalyzer {
                     const methods: FunctionEntry[] = [];
                     const fields: VariableEntry[] = [];
 
+                    // ctx.globalScope.define(node.name, {
+                    //     kind: 'struct',
+                    //     name: node.name,
+                    //     methods,
+                    //     fields,
+                    // });
+
                     for (const member of node.members) {
                         switch (member.type) {
                             case 'FunctionDecl': {

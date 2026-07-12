@@ -1,3 +1,5 @@
+export const OUTPUT_PATH = './build/__temp_c_out.c';
+
 export const IncludeStatements = `
 #include <stdio.h>
 #include <stdlib.h>

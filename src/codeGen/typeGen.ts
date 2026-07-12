@@ -1,7 +1,6 @@
-import { globalTable } from '../globals';
-import type { Expression, Program, StructDecl } from '../parser/nodeTypes';
-import type { StructEntry } from '../symbolTable/symbolTable';
+import type { Program, StructDecl } from '../parser/nodeTypes';
 import { arrayTemplate, nullableTemplate, tupleTemplate } from './constants';
+import type { CodeGenContext } from './context';
 import { generateVariableDeclStream } from './handlers/variableDecl';
 import { orbTypeToCType } from './helper';
 import type { ShapeInfo } from './shapeCollector';
@@ -9,7 +8,7 @@ import fs from 'node:fs';
 
 export function typeGen(
     shapeInfoArray: ShapeInfo[],
-    stream: fs.WriteStream,
+    ctx: CodeGenContext,
     ast: Program
 ) {
     for (const shape of shapeInfoArray) {
@@ -39,15 +38,15 @@ export function typeGen(
                     throw new Error('Struct node not found');
                 }
 
-                stream.write(`typedef struct ${shape.key} {\n`);
+                ctx.stream.write(`typedef struct ${shape.key} {\n`);
 
                 structNode.members.forEach((member) => {
-                    stream.write('    ');
+                    ctx.stream.write('    ');
                     if (member.type === 'VariableDecl') {
-                        generateVariableDeclStream(member, stream);
+                        generateVariableDeclStream(member, ctx);
                     }
                 });
-                stream.write(`} ${shape.key};\n`);
+                ctx.stream.write(`} ${shape.key};\n`);
                 break;
             case 'nullable':
                 emitString = nullableTemplate(orbTypeToCType(shape.type.inner));
@@ -58,6 +57,6 @@ export function typeGen(
             default:
                 throw new Error('Unknown type');
         }
-        if (emitString) stream.write(emitString);
+        if (emitString) ctx.stream.write(emitString);
     }
 }

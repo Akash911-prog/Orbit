@@ -1,5 +1,5 @@
 struct Point {
-    let x = "hello";
+    let x: Point;
     let y: int = 5;
 }
 
