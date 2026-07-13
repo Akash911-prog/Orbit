@@ -1,7 +1,7 @@
 import { globalTable } from '../globals';
 import type { Program } from '../parser/nodeTypes';
 import type { SymbolEntry, SymbolTable } from '../symbolTable/symbolTable';
-import type { OrbType } from '../types';
+import { OrbTypes, type OrbType } from '../types';
 import { directlyDependsOn, getShapeKey, isCompositeOrString } from './helper';
 
 export interface ShapeInfo {
@@ -80,6 +80,14 @@ export class ShapeCollector {
                     this.collect(node.builtInReciever, globalTable);
                 }
                 const key = `${shapeKey}_${node.method}`;
+                if (node.builtInReciever.kind === 'array') {
+                    const key = `${shapeKey}_grow`;
+                    this.methods.set(key, {
+                        key,
+                        reciever: this.shapes.get(shapeKey)!,
+                        method: 'grow',
+                    });
+                }
                 if (!this.methods.has(key)) {
                     this.methods.set(key, {
                         key,
@@ -88,6 +96,8 @@ export class ShapeCollector {
                     });
                 }
             }
+        } else if (node.type === 'RangeExpr') {
+            this.collect(OrbTypes.array(OrbTypes.int()), globalTable);
         }
 
         for (const key of Object.keys(node)) {

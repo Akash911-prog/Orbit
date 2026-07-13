@@ -54,15 +54,6 @@ export function typesEqual(a: OrbType, b: OrbType): boolean {
             );
         }
 
-        case 'fn': {
-            const bFn = b as typeof a;
-            if (a.params.length !== bFn.params.length) return false;
-            return (
-                a.params.every((p, i) => typesEqual(p, bFn.params[i]!)) &&
-                typesEqual(a.returnType, bFn.returnType)
-            );
-        }
-
         case 'struct':
             return a.name === (b as typeof a).name;
 
@@ -103,8 +94,23 @@ export function isAssignable(from: OrbType, to: OrbType): boolean {
 
 export function resolveVariableType(
     node: VariableDecl,
-    ctx: AnalyzerContext
+    ctx: AnalyzerContext,
+    forStruct?: boolean
 ): OrbType {
+    if (forStruct) {
+        if (node.initializer) {
+            ctx.reportError(
+                `Struct fields cannot have initializers`,
+                node.initializer
+            );
+            return handleExpression(node.initializer, ctx);
+        }
+        if (!node.varType) {
+            ctx.reportError(`'${node.name}' needs a type annotation`, node);
+            return OrbTypes.unknown();
+        }
+        return ctx.typenodeToOrbType(node.varType, ctx);
+    }
     if (!node.initializer) {
         if (!node.varType) {
             ctx.reportError(

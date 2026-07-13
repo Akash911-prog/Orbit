@@ -48,6 +48,9 @@ export const HandlerRegistry: Record<string, HandlerFn> = {
     MethodCall: handleExpression,
     FunctionCall: handleExpression,
     StructInit: handleExpression,
+    ArrayLiteral: handleExpression,
+    MapLiteral: handleExpression,
+    TupleLiteral: handleExpression,
 
     RootOrbitDecl: handleOrbit,
     OrbitDecl: handleOrbit,

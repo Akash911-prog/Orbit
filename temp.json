@@ -11,8 +11,13 @@
                     "kind": "let",
                     "name": "x",
                     "varType": {
-                        "type": "BaseType",
-                        "name": "String",
+                        "type": "ArrayType",
+                        "element": {
+                            "type": "BaseType",
+                            "name": "int",
+                            "line": 2,
+                            "col": 12
+                        },
                         "line": 2,
                         "col": 12
                     },
@@ -20,32 +25,10 @@
                     "line": 2,
                     "col": 5,
                     "resolvedType": {
-                        "kind": "String"
-                    }
-                },
-                {
-                    "type": "VariableDecl",
-                    "kind": "let",
-                    "name": "y",
-                    "varType": {
-                        "type": "BaseType",
-                        "name": "int",
-                        "line": 3,
-                        "col": 12
-                    },
-                    "initializer": {
-                        "type": "IntLiteral",
-                        "value": "5",
-                        "line": 3,
-                        "col": 18,
-                        "resolvedType": {
+                        "kind": "array",
+                        "element": {
                             "kind": "int"
                         }
-                    },
-                    "line": 3,
-                    "col": 5,
-                    "resolvedType": {
-                        "kind": "int"
                     }
                 }
             ],
@@ -65,11 +48,11 @@
                         "type": "GenericType",
                         "name": "Point",
                         "typeArg": null,
-                        "line": 7,
+                        "line": 6,
                         "col": 12
                     },
                     "initializer": null,
-                    "line": 7,
+                    "line": 6,
                     "col": 5,
                     "resolvedType": {
                         "kind": "struct",
@@ -77,7 +60,7 @@
                     }
                 }
             ],
-            "line": 6,
+            "line": 5,
             "col": 1
         },
         {
@@ -96,7 +79,7 @@
                                 {
                                     "type": "IntLiteral",
                                     "value": "1",
-                                    "line": 11,
+                                    "line": 10,
                                     "col": 18,
                                     "resolvedType": {
                                         "kind": "int"
@@ -105,7 +88,7 @@
                                 {
                                     "type": "IntLiteral",
                                     "value": "2",
-                                    "line": 11,
+                                    "line": 10,
                                     "col": 20,
                                     "resolvedType": {
                                         "kind": "int"
@@ -114,7 +97,7 @@
                                 {
                                     "type": "IntLiteral",
                                     "value": "3",
-                                    "line": 11,
+                                    "line": 10,
                                     "col": 22,
                                     "resolvedType": {
                                         "kind": "int"
@@ -123,7 +106,7 @@
                                 {
                                     "type": "IntLiteral",
                                     "value": "4",
-                                    "line": 11,
+                                    "line": 10,
                                     "col": 24,
                                     "resolvedType": {
                                         "kind": "int"
@@ -132,14 +115,14 @@
                                 {
                                     "type": "IntLiteral",
                                     "value": "5",
-                                    "line": 11,
+                                    "line": 10,
                                     "col": 26,
                                     "resolvedType": {
                                         "kind": "int"
                                     }
                                 }
                             ],
-                            "line": 11,
+                            "line": 10,
                             "col": 17,
                             "resolvedType": {
                                 "kind": "array",
@@ -148,7 +131,7 @@
                                 }
                             }
                         },
-                        "line": 11,
+                        "line": 10,
                         "col": 5,
                         "resolvedType": {
                             "kind": "array",
@@ -164,7 +147,7 @@
                             "object": {
                                 "type": "Identifier",
                                 "name": "hello",
-                                "line": 12,
+                                "line": 11,
                                 "col": 5,
                                 "resolvedType": {
                                     "kind": "array",
@@ -178,14 +161,14 @@
                                 {
                                     "type": "IntLiteral",
                                     "value": "5",
-                                    "line": 12,
+                                    "line": 11,
                                     "col": 16,
                                     "resolvedType": {
                                         "kind": "int"
                                     }
                                 }
                             ],
-                            "line": 12,
+                            "line": 11,
                             "col": 5,
                             "builtInReciever": {
                                 "kind": "array",
@@ -197,14 +180,14 @@
                                 "kind": "void"
                             }
                         },
-                        "line": 12,
+                        "line": 11,
                         "col": 5
                     }
                 ],
-                "line": 10,
+                "line": 9,
                 "col": 12
             },
-            "line": 10,
+            "line": 9,
             "col": 1
         }
     ]

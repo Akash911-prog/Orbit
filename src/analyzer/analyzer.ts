@@ -186,7 +186,8 @@ export class SemanticAnalyzer {
                             case 'VariableDecl': {
                                 const fieldType = resolveVariableType(
                                     member,
-                                    ctx
+                                    ctx,
+                                    true
                                 );
                                 member.resolvedType = fieldType;
                                 fields.push({

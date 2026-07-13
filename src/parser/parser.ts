@@ -1242,6 +1242,9 @@ export class Parser {
         elements.push(this.parseExpression());
         while (this.current.type === TokenType.Comma) {
             this.consume();
+            if (this.current.type === TokenType.CloseBracket) {
+                break;
+            }
             elements.push(this.parseExpression());
         }
         this.expect([TokenType.CloseBracket]);

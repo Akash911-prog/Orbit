@@ -1,6 +1,5 @@
 struct Point {
-    let x: String;
-    let y: int = 5;
+    let x: int[];
 }
 
 struct A {

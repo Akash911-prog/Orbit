@@ -2,15 +2,25 @@ import type { MethodCall } from '../parser/nodeTypes';
 import type { OrbType } from '../types';
 import { BuiltInMethodTemplate } from './constants';
 import type { ShapeInfo } from './shapeCollector';
-import { generateExpressionStream } from './handlers/expressions';
 import type { CodeGenContext } from './context';
+import { orbTypeToCType } from './helper';
 
 export const StringMethods = {
-    concat: (left: string, right: string) =>
-        `__orbit_concat_strings(${left}, ${right})`,
-    create: (value: string) => `__orbit_create_string("${value}")`,
-    index: (index: number, string: string) =>
-        `__orbit_string_index(${index}, ${string})`,
+    concat: {
+        open: () => `__orbit_concat_strings(`,
+        sep: () => `, `,
+        close: () => `)`,
+    },
+    create: {
+        open: (value: string) => `__orbit_create_string("${value}"`,
+        sep: () => `, `, // Keep this in case you add memory arenas later
+        close: () => `)`,
+    },
+    index: {
+        open: (index: number) => `__orbit_string_index(${index}`,
+        sep: () => `, `,
+        close: () => `)`,
+    },
 };
 
 export type BuiltinCodegenEntry = {
@@ -19,7 +29,7 @@ export type BuiltinCodegenEntry = {
     // emits the backing function definition once per concrete shape, e.g. Arr_int32_t
     emitRuntimeFn: (
         shapeKey: string,
-        elementCType: string,
+        shapeType: OrbType,
         ctx: CodeGenContext
     ) => void;
 };
@@ -39,21 +49,21 @@ export const CodeGenBuiltInMethods: Partial<
                 const tmpl = BuiltInMethodTemplate.array.create;
 
                 ctx.stream.write(tmpl.open(key));
-                generateExpressionStream(node.args[0]!, ctx); // capacity
+                ctx.generate(node.args[0]!, ctx); // capacity
                 ctx.stream.write(tmpl.sep());
-                generateExpressionStream(node.args[1]!, ctx); // initialValues
+                ctx.generate(node.args[1]!, ctx); // initialValues
                 ctx.stream.write(tmpl.sep());
-                generateExpressionStream(node.args[2]!, ctx); // initialSize
+                ctx.generate(node.args[2]!, ctx); // initialSize
                 ctx.stream.write(tmpl.close());
             },
             emitRuntimeFn: (
                 shapeKey: string,
-                elementCType: string,
+                shapeType: OrbType,
                 ctx: CodeGenContext
             ) => {
                 ctx.stream.write(
                     BuiltInMethodTemplate.array.create.impl(
-                        elementCType,
+                        orbTypeToCType(shapeType.element),
                         shapeKey
                     ) + '\n\n'
                 );
@@ -70,19 +80,16 @@ export const CodeGenBuiltInMethods: Partial<
                 const tmpl = BuiltInMethodTemplate.array.free;
 
                 ctx.stream.write(tmpl.open(key));
-                generateExpressionStream(node.object, ctx);
+                ctx.generate(node.object, ctx);
                 ctx.stream.write(tmpl.close());
             },
             emitRuntimeFn: (
                 shapeKey: string,
-                elementCType: string,
+                shapeType: OrbType,
                 ctx: CodeGenContext
             ) => {
                 ctx.stream.write(
-                    BuiltInMethodTemplate.array.free.impl(
-                        elementCType,
-                        shapeKey
-                    ) + '\n\n'
+                    BuiltInMethodTemplate.array.free.impl(shapeKey) + '\n\n'
                 );
             },
         },
@@ -97,17 +104,17 @@ export const CodeGenBuiltInMethods: Partial<
                 const tmpl = BuiltInMethodTemplate.array.grow;
 
                 ctx.stream.write(tmpl.open(key));
-                generateExpressionStream(node.object, ctx);
+                ctx.generate(node.object, ctx);
                 ctx.stream.write(tmpl.close());
             },
             emitRuntimeFn: (
                 shapeKey: string,
-                elementCType: string,
+                shapeType: OrbType,
                 ctx: CodeGenContext
             ) => {
                 ctx.stream.write(
                     BuiltInMethodTemplate.array.grow.impl(
-                        elementCType,
+                        orbTypeToCType(shapeType.element),
                         shapeKey
                     ) + '\n\n'
                 );
@@ -124,19 +131,19 @@ export const CodeGenBuiltInMethods: Partial<
                 const tmpl = BuiltInMethodTemplate.array.push;
 
                 ctx.stream.write(tmpl.open(key));
-                generateExpressionStream(node.object, ctx); // writing target array
+                ctx.generate(node.object, ctx); // writing target array
                 ctx.stream.write(tmpl.sep());
-                generateExpressionStream(node.args[0]!, ctx); // writing pushed value
+                ctx.generate(node.args[0]!, ctx); // writing pushed value
                 ctx.stream.write(tmpl.close());
             },
             emitRuntimeFn: (
                 shapeKey: string,
-                elementCType: string,
+                shapeType: OrbType,
                 ctx: CodeGenContext
             ) => {
                 ctx.stream.write(
                     BuiltInMethodTemplate.array.push.impl(
-                        elementCType,
+                        orbTypeToCType(shapeType.element),
                         shapeKey
                     ) + '\n\n'
                 );
@@ -153,19 +160,19 @@ export const CodeGenBuiltInMethods: Partial<
                 const tmpl = BuiltInMethodTemplate.array.extend;
 
                 ctx.stream.write(tmpl.open(key));
-                generateExpressionStream(node.object, ctx);
+                ctx.generate(node.object, ctx);
                 ctx.stream.write(tmpl.sep());
-                generateExpressionStream(node.args[0]!, ctx);
+                ctx.generate(node.args[0]!, ctx);
                 ctx.stream.write(tmpl.close());
             },
             emitRuntimeFn: (
                 shapeKey: string,
-                elementCType: string,
+                shapeType: OrbType,
                 ctx: CodeGenContext
             ) => {
                 ctx.stream.write(
                     BuiltInMethodTemplate.array.extend.impl(
-                        elementCType,
+                        orbTypeToCType(shapeType.element),
                         shapeKey
                     ) + '\n\n'
                 );
@@ -182,21 +189,18 @@ export const CodeGenBuiltInMethods: Partial<
                 const tmpl = BuiltInMethodTemplate.array.concat;
 
                 ctx.stream.write(tmpl.open(key));
-                generateExpressionStream(node.object, ctx);
+                ctx.generate(node.object, ctx);
                 ctx.stream.write(tmpl.sep());
-                generateExpressionStream(node.args[0]!, ctx);
+                ctx.generate(node.args[0]!, ctx);
                 ctx.stream.write(tmpl.close());
             },
             emitRuntimeFn: (
                 shapeKey: string,
-                elementCType: string,
+                shapeType: OrbType,
                 ctx: CodeGenContext
             ) => {
                 ctx.stream.write(
-                    BuiltInMethodTemplate.array.concat.impl(
-                        elementCType,
-                        shapeKey
-                    ) + '\n\n'
+                    BuiltInMethodTemplate.array.concat.impl(shapeKey) + '\n\n'
                 );
             },
         },
@@ -211,17 +215,17 @@ export const CodeGenBuiltInMethods: Partial<
                 const tmpl = BuiltInMethodTemplate.array.print;
 
                 ctx.stream.write(tmpl.open(key));
-                generateExpressionStream(node.object, ctx);
+                ctx.generate(node.object, ctx);
                 ctx.stream.write(tmpl.close());
             },
             emitRuntimeFn: (
                 shapeKey: string,
-                elementCType: string,
+                shapeType: OrbType,
                 ctx: CodeGenContext
             ) => {
                 ctx.stream.write(
                     BuiltInMethodTemplate.array.print.impl(
-                        elementCType,
+                        orbTypeToCType(shapeType.element),
                         shapeKey
                     ) + '\n\n'
                 );

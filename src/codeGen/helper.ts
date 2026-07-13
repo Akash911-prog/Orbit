@@ -29,6 +29,10 @@ export function getShapeKey(t: OrbType): string {
     }
 }
 
+export function addPrefixToFnName(fnName: string) {
+    return `__orbit_${fnName}`;
+}
+
 export function directlyDependsOn(t: OrbType): OrbType[] {
     switch (t.kind) {
         case 'array':

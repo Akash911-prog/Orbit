@@ -15,6 +15,9 @@ export function generateVariableDeclStream(
     ctx.stream.write(
         variableDeclTemplate(node.name, orbTypeToCType(node.resolvedType))
     );
-    if (node.initializer) generateExpressionStream(node.initializer, ctx);
+    if (node.initializer) {
+        ctx.stream.write(' = ');
+        ctx.generate(node.initializer, ctx);
+    }
     ctx.stream.write(';\n');
 }

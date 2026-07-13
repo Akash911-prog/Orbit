@@ -146,9 +146,9 @@ function handleBinaryExpr(node: BinaryExpr, ctx: AnalyzerContext): OrbType {
 
         case '+':
             // string concat vs arithmetic fork — decorate for codegen
-            if (leftType.kind === 'str' && rightType.kind === 'str') {
+            if (leftType.kind === 'String' && rightType.kind === 'String') {
                 (node as any).isStringConcat = true;
-                return OrbTypes.str();
+                return OrbTypes.String();
             }
             if (
                 expectNumeric(leftType, node, ctx) &&
@@ -330,6 +330,7 @@ function handleMethodCall(node: MethodCall, ctx: AnalyzerContext): OrbType {
             );
         }
     });
+    node.struct = objType;
 
     return method.returnType;
 }
@@ -431,9 +432,14 @@ function handleArrayLiteral(node: ArrayLiteral, ctx: AnalyzerContext): OrbType {
             );
         }
     }
-    if (type === null) return OrbTypes.array(OrbTypes.unknown());
+    if (type === null) {
+        node.resolvedType = OrbTypes.array(OrbTypes.unknown());
+        return OrbTypes.array(OrbTypes.unknown());
+    }
+    const returnType = OrbTypes.array(type);
+    node.resolvedType = returnType;
 
-    return OrbTypes.array(type);
+    return returnType;
 }
 
 function handleMapLiteral(node: MapLiteral, ctx: AnalyzerContext): OrbType {

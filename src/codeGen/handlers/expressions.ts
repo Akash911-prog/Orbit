@@ -1,6 +1,12 @@
-import type { Expression } from '../../parser/nodeTypes';
-import fs from 'node:fs';
+import type { Expression, ExpressionStatement } from '../../parser/nodeTypes';
+import { CodeGenBuiltInMethods, StringMethods } from '../builtInMethods';
+import {
+    BuiltInMethodTemplate,
+    RangeMethods,
+    structMethodNameTemplate,
+} from '../constants';
 import type { CodeGenContext } from '../context';
+import { addPrefixToFnName, getShapeKey, orbTypeToCType } from '../helper';
 
 export function generateExpressionStream(
     node: Expression,
@@ -8,64 +14,146 @@ export function generateExpressionStream(
 ): void {
     switch (node.type) {
         case 'IntLiteral':
-            // TODO: stream.write(node.value)
+            ctx.stream.write(`${node.value}`);
             break;
 
         case 'FloatLiteral':
-            // TODO: stream.write(node.value) — check for 'f' suffix if using float vs double
+            ctx.stream.write(`${node.value}`);
             break;
 
         case 'StrLiteral':
-            // TODO: emit as a C string literal, escape quotes/backslashes
+            ctx.stream.write(`"${node.value}"`);
             break;
 
         case 'BoolLiteral':
-            // TODO: stream.write(node.value ? 'true' : 'false')
+            ctx.stream.write(`${node.value ? 'true' : 'false'}`);
             break;
 
         case 'NullLiteral':
-            // TODO: depends on nullable representation — e.g. { .has_value = false }
+            ctx.stream.write('NULL');
             break;
 
         case 'Identifier':
-            // TODO: stream.write(node.name)
+            ctx.stream.write(node.name);
             break;
 
         case 'BinaryExpr':
-            // TODO: check node.isStringConcat -> orb_string_concat(...) vs `(left OP right)`
+            if (node.isStringConcat) {
+                ctx.stream.write(StringMethods.concat.open());
+                ctx.generate(node.left, ctx);
+                ctx.stream.write(StringMethods.concat.sep());
+                ctx.generate(node.right, ctx);
+                ctx.stream.write(StringMethods.concat.close());
+            } else {
+                ctx.generate(node.left, ctx);
+                ctx.stream.write(` ${node.operator} `);
+                ctx.generate(node.right, ctx);
+            }
             break;
 
         case 'UnaryExpr':
-            // TODO: stream.write(node.operator), then recurse into node.operand
+            ctx.stream.write(`${node.operator}`);
+            ctx.generate(node.operand, ctx);
             break;
 
         case 'NullCheckExpr':
-            // TODO: emit nullable's .has_value check, e.g. `(expr.has_value)`
+            ctx.stream.write('(');
+            ctx.generate(node.expression, ctx);
+            ctx.stream.write(')');
+            ctx.stream.write('.');
+            ctx.stream.write('has_value');
             break;
 
         case 'RangeExpr':
-            // TODO: ranges probably don't emit standalone — likely only valid inside a ForStatement's iterable
+            ctx.stream.write(RangeMethods.emitCall.open());
+            ctx.generate(node.start, ctx);
+            ctx.stream.write(RangeMethods.emitCall.sep());
+            ctx.generate(node.end, ctx);
+            ctx.stream.write(RangeMethods.emitCall.sep());
+            ctx.stream.write(`${node.inclusive ? 'true' : 'false'}`);
+            ctx.stream.write(RangeMethods.emitCall.close());
             break;
 
         case 'MemberAccess':
-            // TODO: recurse into node.object, then `.` + node.property (or `->` if self is ever a pointer)
+            ctx.generate(node.object, ctx);
+            ctx.stream.write('.');
+            ctx.stream.write(node.property);
             break;
 
         case 'MethodCall':
-            // TODO: check node.builtinReceiverType -> BUILTIN_CODEGEN[...].emitCall(...)
-            //       else -> StructName_methodName(object, ...args) using node.object's resolvedType
+            if (node.builtInReciever) {
+                const methodTable =
+                    CodeGenBuiltInMethods[node.builtInReciever.kind];
+                if (methodTable) {
+                    const entry = methodTable[node.method];
+                    if (entry) {
+                        const shapeInfo = ctx.shapeInfo.get(
+                            getShapeKey(node.builtInReciever)
+                        );
+                        if (!shapeInfo) throw new Error('no shape info');
+                        entry.emitCall(shapeInfo, node, ctx);
+                    }
+                }
+            } else if (node.struct) {
+                ctx.stream.write(
+                    structMethodNameTemplate.open(node.struct.name, node.method)
+                );
+                ctx.generate(node.object, ctx);
+                for (const arg of node.args) {
+                    ctx.generate(arg, ctx);
+                    ctx.stream.write(', ');
+                }
+                ctx.stream.write(structMethodNameTemplate.close());
+            }
             break;
 
         case 'FunctionCall':
-            // TODO: stream.write(node.name + '('), comma-separated args, ')'
+            ctx.stream.write(addPrefixToFnName(node.name));
+            ctx.stream.write('(');
+            for (const arg of node.args) {
+                ctx.generate(arg, ctx);
+                ctx.stream.write(', ');
+            }
+            ctx.stream.write(')');
             break;
 
         case 'StructInit':
-            // TODO: emit C compound literal, e.g. (Point){ .x = 1, .y = 2 }
+            ctx.stream.write('(');
+            ctx.stream.write(`__orbit_struct_${node.name}`);
+            ctx.stream.write(')');
+            ctx.stream.write('{ ');
+            for (const field of node.fields) {
+                if (field.name === '_') continue;
+                ctx.stream.write('.');
+                ctx.stream.write(field.name);
+                ctx.stream.write(' = ');
+                ctx.generate(field.value, ctx);
+                ctx.stream.write(', ');
+            }
+            ctx.stream.write('}');
             break;
 
         case 'ArrayLiteral':
-            // TODO: emit constructor call building the Arr_X struct, or a helper like orb_Arr_X_from(...)
+            if (!node.resolvedType || node.resolvedType.kind !== 'array')
+                throw new Error('Array type not resolved');
+            ctx.stream.write(
+                BuiltInMethodTemplate.array.create.open(
+                    getShapeKey(node.resolvedType)
+                )
+            );
+            const size = node.elements.length;
+            ctx.stream.write(`${size}, `);
+            ctx.stream.write(
+                `(${orbTypeToCType(node.resolvedType.element)}[])`
+            );
+            ctx.stream.write('{ ');
+            for (const element of node.elements) {
+                ctx.generate(element, ctx);
+                ctx.stream.write(', ');
+            }
+            ctx.stream.write('}, ');
+            ctx.stream.write(`${size}`);
+            ctx.stream.write(BuiltInMethodTemplate.array.create.close());
             break;
 
         case 'TupleLiteral':
@@ -77,7 +165,10 @@ export function generateExpressionStream(
             break;
 
         case 'IndexExpr':
-            // TODO: recurse into node.object, then `[]` + node.index
+            ctx.generate(node.object, ctx);
+            ctx.stream.write('[');
+            ctx.generate(node.index, ctx);
+            ctx.stream.write(']');
             break;
 
         default: {

@@ -11,20 +11,20 @@ export const IncludeStatements = `
 #include <stdint.h>
 `;
 
-export const StringStruct = `
+export const StringStruct = cleanTemplate`
 typedef struct __orbit_String
 {
     char *string;
-    int length;
-    int capacity;
-} String;
+    size_t length;
+    size_t capacity;
+} __orbit_String;
 
-String __orbit_create_string(char *string);
-String __orbit_concat_strings(__orbit_String string1, __orbit_String string2);
+__orbit_String __orbit_create_string(char *string);
+__orbit_String __orbit_concat_strings(__orbit_String string1, __orbit_String string2);
 void __orbit_free_string(__orbit_String *string);
 char __orbit_string_index(int32_t index, __orbit_String string);
 
-String __orbit_create_string(char *string)
+__orbit_String __orbit_create_string(char *string)
 {
     __orbit_String s = {0};
     s.string = (char *)malloc(sizeof(char) * (strlen(string) + 1));
@@ -34,14 +34,14 @@ String __orbit_create_string(char *string)
     return s;
 }
 
-String __orbit_concat_strings(__orbit_String *string1, __orbit_String *string2)
+__orbit_String __orbit_concat_strings(__orbit_String string1, __orbit_String string2)
 {
-    size_t length = string1->length + string2->length + 1;
+    size_t length = string1.length + string2.length + 1;
     __orbit_String new_string = {0};
     new_string.string = (char *)malloc(sizeof(char) * length);
     new_string.length = length;
     new_string.capacity = length;
-    snprintf(new_string.string, length, "%s%s", string1->string, string2->string);
+    snprintf(new_string.string, length, "%s%s", string1.string, string2.string);
     return new_string;
 }
 
@@ -59,11 +59,41 @@ void __orbit_free_string(__orbit_String *string)
 }
 `;
 
+export const RangeMethods = {
+    emitCall: {
+        open: () => `__orbit_make_range(`,
+        sep: () => `, `,
+        close: () => `, )`,
+    },
+    emitRuntimeFn: () =>
+        `
+__orbit_array_int32_t __orbit_make_range(size_t start, size_t end, bool inclusive)
+{
+    int32_t count = inclusive ? (end - start + 1) : (end - start);
+    if (count < 0)
+        count = 0;
+
+    __orbit_array_int32_t result;
+    result.capacity = count > 0 ? count : 1;
+    result.array = (int32_t *)malloc(result.capacity * sizeof(int32_t));
+    result.size = count;
+
+    int32_t val = (int32_t)start;
+    for (int32_t i = 0; i < count; i++)
+    {
+        result.array[i] = val++;
+    }
+
+    return result;
+}
+`.trim(),
+};
+
 export const arrayTemplate = (name: string, type: string) => `
 typedef struct ${name} {
-    ${type} *data;
-    int32_t length;
-    int32_t capacity;
+    ${type} *array;
+    size_t size;
+    size_t capacity;
 } ${name};
 `;
 
@@ -78,9 +108,11 @@ typedef struct ${name} {
 `;
 };
 
-export const variableDeclTemplate = (name: string, type: string) => `
-${type} ${name} = 
-`;
+export const variableDeclTemplate = (
+    name: string,
+    type: string
+) => cleanTemplate`
+${type} ${name}`;
 
 export const nullableTemplate = (type: string) => `
 typedef struct __orbit_nullable_${type} {
@@ -92,11 +124,11 @@ typedef struct __orbit_nullable_${type} {
 export const BuiltInMethodTemplate = {
     array: {
         create: {
-            open: (key: string) => `create_${key}(`,
+            open: (key: string) => `${key}_create(`,
             sep: () => `, `,
             close: () => `)`,
             impl: (type: string, key: string) => cleanTemplate`
-                ${key} create_${key}(size_t capacity, const ${type} *initial_values, size_t initial_size) {
+                ${key} ${key}_create(size_t capacity, const ${type} *initial_values, size_t initial_size) {
                     ${key} array = {0};
                     size_t max_elements = SIZE_MAX / sizeof(${type});
 
@@ -124,7 +156,7 @@ export const BuiltInMethodTemplate = {
         free: {
             open: (key: string) => `free_${key}(&`,
             close: () => `)`,
-            impl: (type: string, key: string) => cleanTemplate`
+            impl: (key: string) => cleanTemplate`
                 void free_${key}(${key} *array) {
                     if (!array) return;
                     free(array->array);
@@ -199,7 +231,7 @@ export const BuiltInMethodTemplate = {
             open: (key: string) => `concat_${key}(`,
             sep: () => `, `,
             close: () => `)`,
-            impl: (type: string, key: string) => cleanTemplate`
+            impl: (key: string) => cleanTemplate`
                 ${key} ${key}_concat(${key} array1, ${key} array2) {
                     size_t combined_size = array1.size + array2.size;
                     ${key} result = create_${key}(combined_size, NULL, 0);
@@ -249,4 +281,11 @@ export const BuiltInMethodTemplate = {
             },
         },
     },
+};
+
+export const structMethodNameTemplate = {
+    open: (structName: string, methodName: string) =>
+        cleanTemplate`__orbit_struct_${structName}_${methodName}(&`,
+    sep: () => `, `,
+    close: () => `)`,
 };
