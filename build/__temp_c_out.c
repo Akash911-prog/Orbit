@@ -6,7 +6,6 @@
 #include <assert.h>
 #include <stdint.h>
 
-
 typedef struct __orbit_String
 {
     char *string;
@@ -53,16 +52,18 @@ void __orbit_free_string(__orbit_String *string)
     string->capacity = 0;
 }
 
-
-typedef struct __orbit_array_int32_t {
+typedef struct __orbit_array_int32_t
+{
     int32_t *array;
     size_t size;
     size_t capacity;
 } __orbit_array_int32_t;
-typedef struct __orbit_struct_Point {
+typedef struct __orbit_struct_Point
+{
     __orbit_array_int32_t x;
 } __orbit_struct_Point;
-typedef struct __orbit_struct_A {
+typedef struct __orbit_struct_A
+{
     __orbit_struct_Point p;
 } __orbit_struct_A;
 __orbit_array_int32_t __orbit_make_range(size_t start, size_t end, bool inclusive)
@@ -85,38 +86,49 @@ __orbit_array_int32_t __orbit_make_range(size_t start, size_t end, bool inclusiv
     return result;
 }
 
-
-
-void __orbit_array_int32_t_grow(__orbit_array_int32_t *array) {
+void __orbit_array_int32_t_grow(__orbit_array_int32_t *array)
+{
     size_t max_elements = SIZE_MAX / sizeof(int32_t);
-    if (array->capacity >= max_elements) return;
+    if (array->capacity >= max_elements)
+        return;
 
     size_t newCapacity;
-    if (array->capacity < max_elements / 2) {
+    if (array->capacity < max_elements / 2)
+    {
         newCapacity = (array->capacity == 0) ? 4 : array->capacity * 2;
-    } else {
-        if (max_elements - array->capacity < 65536) {
+    }
+    else
+    {
+        if (max_elements - array->capacity < 65536)
+        {
             newCapacity = max_elements;
-        } else {
+        }
+        else
+        {
             newCapacity = array->capacity + 65536;
         }
     }
 
     int32_t *temp = (int32_t *)realloc(array->array, sizeof(int32_t) * newCapacity);
-    if (!temp) return;
+    if (!temp)
+        return;
 
     array->array = temp;
     array->capacity = newCapacity;
 }
 
-void __orbit_array_int32_t_push(__orbit_array_int32_t *array, int32_t value) {
-    if (!array) return;
-    if (array->size == array->capacity) {
+void __orbit_array_int32_t_push(__orbit_array_int32_t *array, int32_t value)
+{
+    if (!array)
+        return;
+    if (array->size == array->capacity)
+    {
         __orbit_array_int32_t_grow(array);
     }
     array->array[array->size++] = value;
 }
 
-int main () {
-return 0;
+int main()
+{
+    return 0;
 }

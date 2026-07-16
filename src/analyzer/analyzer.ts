@@ -1,7 +1,12 @@
 import type { OrbitError } from '../errors/errorList';
 import { ErrorType } from '../errors/errorTypes';
 import { globalErrorBucket, globalTable } from '../globals';
-import type { Program, TypeNode, VariableDecl } from '../parser/nodeTypes';
+import type {
+    Program,
+    StructDecl,
+    TypeNode,
+    VariableDecl,
+} from '../parser/nodeTypes';
 import type {
     FunctionEntry,
     StructEntry,
@@ -41,9 +46,25 @@ export class SemanticAnalyzer {
             }
         }
 
+        for (const node of this.ast.declarations) {
+            if (node.type === 'StructDecl') {
+                this.resolveCopyability(node, this.ctx);
+            }
+        }
+
         this.ctx.visit(this.ast, this.ctx);
 
         return this.ast;
+    }
+
+    private resolveCopyability(node: StructDecl, ctx: AnalyzerContext) {
+        const entry = ctx.globalScope.lookup(node.name);
+        if (entry && entry.kind === 'struct') {
+            const isCopable = entry.fields.every(
+                (member) => member.type.copyable
+            );
+            entry.copyable = isCopable;
+        }
     }
 
     private reportError(msg: string, node: any): void {
@@ -241,6 +262,7 @@ export class SemanticAnalyzer {
                         name: node.name,
                         fields,
                         methods,
+                        copyable: true,
                     };
 
                     const defined = ctx.globalScope.define(
@@ -293,7 +315,7 @@ export class SemanticAnalyzer {
                             );
                             return OrbTypes.unknown();
                         }
-                        return OrbTypes.struct(node.name);
+                        return OrbTypes.struct(node.name, entry.copyable);
                     }
                 }
             }
@@ -330,7 +352,7 @@ export class SemanticAnalyzer {
                 if (!entry || entry.kind !== 'struct') {
                     return OrbTypes.generic(node.name);
                 }
-                return OrbTypes.struct(node.name);
+                return OrbTypes.struct(node.name, entry.copyable);
 
             default:
                 ctx.reportError(`Unhandled type node`, node);

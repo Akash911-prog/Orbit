@@ -8,6 +8,11 @@ export function handleBlock(node: Block, ctx: AnalyzerContext): OrbType {
     for (const stmt of node.statements) {
         ctx.visit(stmt, ctx);
     }
+    ctx.scope.table.forEach((entry) => {
+        if (entry.kind === 'variable' && !entry.moved && !entry.type.copyable) {
+            node.needFree.push(entry);
+        }
+    });
     ctx.scope = parentScope;
     return OrbTypes.void();
 }

@@ -61,7 +61,7 @@ export function generateExpressionStream(
             ctx.generate(node.expression, ctx);
             ctx.stream.write(')');
             ctx.stream.write('.');
-            ctx.stream.write('has_value');
+            ctx.stream.write('is_null');
             break;
 
         case 'RangeExpr':

@@ -1,3 +1,4 @@
+import type { SymbolEntry } from '../symbolTable/symbolTable';
 import type { OrbType } from '../types';
 
 export interface NodeBase {
@@ -5,6 +6,7 @@ export interface NodeBase {
     col: number;
     resolvedType?: OrbType;
     isStringConcat?: boolean;
+    moved?: boolean;
 }
 
 // ===== Program =======
@@ -29,6 +31,7 @@ export interface RootOrbitDecl extends NodeBase {
 export interface Block extends NodeBase {
     type: 'Block';
     statements: Statement[];
+    needFree: SymbolEntry[];
 }
 
 // ===== Statements =====

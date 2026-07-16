@@ -14,6 +14,7 @@ export type VariableEntry = {
     name: string;
     type: OrbType;
     mutable: boolean; // let vs var
+    moved?: boolean;
 };
 
 export type FunctionEntry = {
@@ -27,8 +28,10 @@ export type FunctionEntry = {
 export type StructEntry = {
     kind: 'struct';
     name: string;
-    fields: { name: string; type: OrbType; mutable: boolean }[];
+    fields: VariableEntry[];
     methods: FunctionEntry[];
+    moved?: boolean;
+    copyable: boolean;
 };
 
 export type OrbitEntry = {
@@ -43,12 +46,12 @@ export type LoopEntry = {
 
 export class SymbolTable {
     private _table: Map<string, SymbolEntry>;
-    private parent: SymbolTable | null;
+    private _parent: SymbolTable | null;
     private _child: SymbolTable | null;
 
     constructor(parent: SymbolTable | null = null) {
         this._table = new Map();
-        this.parent = parent;
+        this._parent = parent;
         this._child = null;
     }
 
@@ -103,6 +106,10 @@ export class SymbolTable {
 
     get table(): Map<string, SymbolEntry> {
         return this._table;
+    }
+
+    get parent(): SymbolTable | null {
+        return this._parent;
     }
 }
 
