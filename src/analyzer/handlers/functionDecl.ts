@@ -31,11 +31,8 @@ export function handleFunctionDecl(
     ctx.globalScope.define(node.name, entry);
 
     const previousFn = ctx.currentFunction;
-    const parentScope = ctx.scope;
     ctx.currentFunction = entry;
-    ctx.scope = ctx.scope.enterScope();
     ctx.visit(node.body, ctx);
     ctx.currentFunction = previousFn;
-    ctx.scope = parentScope;
     return OrbTypes.void();
 }

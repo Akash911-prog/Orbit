@@ -64,5 +64,8 @@ export function handleAssignment(
         );
         return OrbTypes.unknown();
     }
+    if (node.value.type === 'Identifier' && !valueType.copyable) {
+        ctx.scope.update(node.value.name, { ...entry, moved: true });
+    }
     return OrbTypes.void();
 }

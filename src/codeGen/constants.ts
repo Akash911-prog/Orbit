@@ -76,7 +76,7 @@ __orbit_array_int32_t __orbit_make_range(size_t start, size_t end, bool inclusiv
     __orbit_array_int32_t result;
     result.capacity = count > 0 ? count : 1;
     result.array = (int32_t *)malloc(result.capacity * sizeof(int32_t));
-    result.size = count;
+    result.length = count;
 
     int32_t val = (int32_t)start;
     for (int32_t i = 0; i < count; i++)
@@ -92,7 +92,7 @@ __orbit_array_int32_t __orbit_make_range(size_t start, size_t end, bool inclusiv
 export const arrayTemplate = (name: string, type: string) => `
 typedef struct ${name} {
     ${type} *array;
-    size_t size;
+    size_t length;
     size_t capacity;
 } ${name};
 `;
@@ -142,11 +142,11 @@ export const BuiltInMethodTemplate = {
                     }
 
                     array.capacity = capacity;
-                    array.size = 0;
+                    array.length = 0;
 
                     if (initial_values && initial_size > 0) {
                         memcpy(array.array, initial_values, sizeof(${type}) * initial_size);
-                        array.size = initial_size;
+                        array.length = initial_size;
                     }
 
                     return array;
@@ -161,7 +161,7 @@ export const BuiltInMethodTemplate = {
                     if (!array) return;
                     free(array->array);
                     array->array = NULL;
-                    array->size = 0;
+                    array->length = 0;
                     array->capacity = 0;
                 }
             `,
@@ -200,10 +200,10 @@ export const BuiltInMethodTemplate = {
             impl: (type: string, key: string) => cleanTemplate`
                 void ${key}_push(${key} *array, ${type} value) {
                     if (!array) return;
-                    if (array->size == array->capacity) {
+                    if (array->length == array->capacity) {
                         ${key}_grow(array);
                     }
-                    array->array[array->size++] = value;
+                    array->array[array->length++] = value;
                 }
             `,
         },
@@ -213,17 +213,17 @@ export const BuiltInMethodTemplate = {
             close: () => `)`,
             impl: (type: string, key: string) => cleanTemplate`
                 void ${key}_extend(${key} *array, ${key} array2) {
-                    if (!array || array2.size == 0 || !array2.array) return;
+                    if (!array || array2.length == 0 || !array2.array) return;
                     
                     size_t max_elements = SIZE_MAX / sizeof(${type});
-                    if (array2.size > max_elements - array->size) return;
+                    if (array2.length > max_elements - array->length) return;
 
-                    while ((array->capacity - array->size) < array2.size) {
+                    while ((array->capacity - array->length) < array2.length) {
                         ${key}_grow(array);
                     }
 
-                    memmove(array->array + array->size, array2.array, sizeof(${type}) * array2.size);
-                    array->size += array2.size;
+                    memmove(array->array + array->length, array2.array, sizeof(${type}) * array2.length);
+                    array->length += array2.length;
                 }
             `,
         },
@@ -233,7 +233,7 @@ export const BuiltInMethodTemplate = {
             close: () => `)`,
             impl: (key: string) => cleanTemplate`
                 ${key} ${key}_concat(${key} array1, ${key} array2) {
-                    size_t combined_size = array1.size + array2.size;
+                    size_t combined_size = array1.length + array2.length;
                     ${key} result = create_${key}(combined_size, NULL, 0);
                     extend_${key}(&result, array1);
                     extend_${key}(&result, array2);
@@ -261,17 +261,17 @@ export const BuiltInMethodTemplate = {
                             return;
                         }
 
-                        printf("Array [size: %zu, capacity: %zu]\\n", arr->size, arr->capacity);
+                        printf("Array [size: %zu, capacity: %zu]\\n", arr->length, arr->capacity);
 
-                        if (!arr->array || arr->size == 0) {
+                        if (!arr->array || arr->length == 0) {
                             printf("  Data: []\\n");
                             return;
                         }
 
                         printf("  Data: [");
-                        for (size_t i = 0; i < arr->size; i++) {
+                        for (size_t i = 0; i < arr->length; i++) {
                             printf("${formatSpecifier}", arr->array[i]);
-                            if (i < arr->size - 1) {
+                            if (i < arr->length - 1) {
                                 printf(", ");
                             }
                         }
@@ -289,3 +289,6 @@ export const structMethodNameTemplate = {
     sep: () => `, `,
     close: () => `)`,
 };
+
+export const ForLoopStarte = (start: string, end: string) =>
+    cleanTemplate`for (int32_t __i = ${start}; __i < ${end}; __i++) {\n`;

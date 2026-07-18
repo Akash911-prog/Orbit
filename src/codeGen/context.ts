@@ -6,5 +6,6 @@ export interface CodeGenContext {
     globalScope: SymbolTable;
     stream: fs.WriteStream;
     shapeInfo: Map<string, ShapeInfo>;
+    scope: SymbolTable;
     generate: (node: any, ctx: CodeGenContext) => void;
 }

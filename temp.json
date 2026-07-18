@@ -27,8 +27,10 @@
                     "resolvedType": {
                         "kind": "array",
                         "element": {
-                            "kind": "int"
-                        }
+                            "kind": "int",
+                            "copyable": true
+                        },
+                        "copyable": false
                     }
                 }
             ],
@@ -56,7 +58,8 @@
                     "col": 5,
                     "resolvedType": {
                         "kind": "struct",
-                        "name": "Point"
+                        "name": "Point",
+                        "copyable": true
                     }
                 }
             ],
@@ -82,7 +85,8 @@
                                     "line": 10,
                                     "col": 18,
                                     "resolvedType": {
-                                        "kind": "int"
+                                        "kind": "int",
+                                        "copyable": true
                                     }
                                 },
                                 {
@@ -91,7 +95,8 @@
                                     "line": 10,
                                     "col": 20,
                                     "resolvedType": {
-                                        "kind": "int"
+                                        "kind": "int",
+                                        "copyable": true
                                     }
                                 },
                                 {
@@ -100,7 +105,8 @@
                                     "line": 10,
                                     "col": 22,
                                     "resolvedType": {
-                                        "kind": "int"
+                                        "kind": "int",
+                                        "copyable": true
                                     }
                                 },
                                 {
@@ -109,7 +115,8 @@
                                     "line": 10,
                                     "col": 24,
                                     "resolvedType": {
-                                        "kind": "int"
+                                        "kind": "int",
+                                        "copyable": true
                                     }
                                 },
                                 {
@@ -118,7 +125,8 @@
                                     "line": 10,
                                     "col": 26,
                                     "resolvedType": {
-                                        "kind": "int"
+                                        "kind": "int",
+                                        "copyable": true
                                     }
                                 }
                             ],
@@ -127,8 +135,10 @@
                             "resolvedType": {
                                 "kind": "array",
                                 "element": {
-                                    "kind": "int"
-                                }
+                                    "kind": "int",
+                                    "copyable": true
+                                },
+                                "copyable": false
                             }
                         },
                         "line": 10,
@@ -136,8 +146,10 @@
                         "resolvedType": {
                             "kind": "array",
                             "element": {
-                                "kind": "int"
-                            }
+                                "kind": "int",
+                                "copyable": true
+                            },
+                            "copyable": false
                         }
                     },
                     {
@@ -152,8 +164,10 @@
                                 "resolvedType": {
                                     "kind": "array",
                                     "element": {
-                                        "kind": "int"
-                                    }
+                                        "kind": "int",
+                                        "copyable": true
+                                    },
+                                    "copyable": false
                                 }
                             },
                             "method": "push",
@@ -164,7 +178,8 @@
                                     "line": 11,
                                     "col": 16,
                                     "resolvedType": {
-                                        "kind": "int"
+                                        "kind": "int",
+                                        "copyable": true
                                     }
                                 }
                             ],
@@ -173,15 +188,33 @@
                             "builtInReciever": {
                                 "kind": "array",
                                 "element": {
-                                    "kind": "int"
-                                }
+                                    "kind": "int",
+                                    "copyable": true
+                                },
+                                "copyable": false
                             },
                             "resolvedType": {
-                                "kind": "void"
+                                "kind": "void",
+                                "copyable": true
                             }
                         },
                         "line": 11,
                         "col": 5
+                    }
+                ],
+                "needFree": [
+                    {
+                        "kind": "variable",
+                        "name": "hello",
+                        "type": {
+                            "kind": "array",
+                            "element": {
+                                "kind": "int",
+                                "copyable": true
+                            },
+                            "copyable": false
+                        },
+                        "mutable": false
                     }
                 ],
                 "line": 9,

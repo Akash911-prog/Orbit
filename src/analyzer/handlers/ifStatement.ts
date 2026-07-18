@@ -10,8 +10,6 @@ export function handleIfStatement(
 ): OrbType {
     const condType = ctx.visit(node.condition, ctx);
     expectType(OrbTypes.bool(), condType, node, ctx);
-    const parentScope = ctx.scope;
-    ctx.scope = ctx.scope.enterScope();
 
     if (
         node.condition.type === 'NullCheckExpr' &&
@@ -32,6 +30,5 @@ export function handleIfStatement(
         ctx.visit(node.elseBranch, ctx);
     }
 
-    ctx.scope = parentScope;
     return OrbTypes.void();
 }

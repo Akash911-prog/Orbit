@@ -113,6 +113,11 @@ function handleIdentifier(node: Identifier, ctx: AnalyzerContext): OrbType {
         ctx.reportError(`'${node.name}' is not a variable`, node);
         return OrbTypes.unknown();
     }
+    if (entry.moved) {
+        ctx.reportError(`Cannot access moved variable '${node.name}'`, node);
+        return OrbTypes.unknown();
+    }
+    node.resolvedType = entry.type;
     return entry.type;
 }
 
@@ -414,7 +419,9 @@ function handleStructInit(node: StructInit, ctx: AnalyzerContext): OrbType {
         }
     }
 
-    return OrbTypes.struct(node.name);
+    const isCopyable = structEntry.fields.every((f) => f.type.copyable);
+
+    return OrbTypes.struct(node.name, isCopyable);
 }
 function handleArrayLiteral(node: ArrayLiteral, ctx: AnalyzerContext): OrbType {
     let type: OrbType | null = null;

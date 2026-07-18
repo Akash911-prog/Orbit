@@ -34,5 +34,16 @@
 			"\tthrow new Error('Method not implemented.');",
 			"}$2"
 		]
+	},
+
+	"gen handler": {
+		"scope": "javascript, typescript",
+		"prefix": "genhandler",
+		"body": [
+			"export function generate$1stream(node: any, ctx: CodeGenContext): void {",
+			"\tthrow new Error('Method not implemented');",
+			"}"
+		]
 	}
+
 }

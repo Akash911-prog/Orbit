@@ -32,6 +32,7 @@ export class CodeGen {
         this.ctx = {
             stream: this.stream,
             globalScope: globalTable,
+            scope: globalTable,
             shapeInfo: new Map(),
             generate: (node: any, ctx: CodeGenContext) =>
                 this.generate(node, ctx),

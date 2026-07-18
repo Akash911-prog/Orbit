@@ -323,7 +323,8 @@ export class SemanticAnalyzer {
             case 'NullableType':
                 // No nullable wrapper in OrbType yet — flagging, see note below
                 return OrbTypes.nullable(
-                    this.typeNodeToOrbType(node.inner, ctx)
+                    this.typeNodeToOrbType(node.inner, ctx),
+                    this.typeNodeToOrbType(node.inner, ctx).copyable
                 );
 
             case 'ArrayType':

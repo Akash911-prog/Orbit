@@ -197,7 +197,14 @@ export class ShapeCollector {
 
                 case 'struct':
                     // Map the top-level struct type itself
-                    this.collect({ kind: 'struct', name: entry.name }, table);
+                    this.collect(
+                        {
+                            kind: 'struct',
+                            name: entry.name,
+                            copyable: entry.copyable,
+                        },
+                        table
+                    );
 
                     // Collect field types
                     for (const field of entry.fields) {

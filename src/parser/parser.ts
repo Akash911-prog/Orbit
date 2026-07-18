@@ -439,7 +439,13 @@ export class Parser {
             statements.push(this.parseStatement());
         }
         this.expect([TokenType.CloseBrace]);
-        return { type: 'Block', statements: statements, line, col };
+        return {
+            type: 'Block',
+            statements: statements,
+            needFree: [],
+            line,
+            col,
+        };
     }
 
     private parseStatement(): Statement {
