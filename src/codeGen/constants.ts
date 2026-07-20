@@ -105,18 +105,18 @@ export const RangeMethods = {
         `
 __orbit_array_int32_t* __orbit_make_range(int64_t start, int64_t end, bool inclusive)
 {
-    int64_t diff = end - start;
+    bool descending = start > end;
+    int64_t diff = descending ? ((int64_t)start - end) : ((int64_t)end - start);
     int64_t count_64 = inclusive ? (diff + 1) : diff;
 
     if (count_64 <= 0)
     {
-        // Return an empty valid dynamic array
         return __orbit_array_int32_t_create(4, NULL, 0);
     }
 
     if (count_64 > (int64_t)(SIZE_MAX / sizeof(int32_t)))
     {
-        return NULL; // Prevent size_t allocation overflow
+        return NULL;
     }
 
     size_t count = (size_t)count_64;
@@ -134,10 +134,12 @@ __orbit_array_int32_t* __orbit_make_range(int64_t start, int64_t end, bool inclu
     result->capacity = count;
     result->length = count;
 
-    int32_t val = (int32_t)start;
+    int32_t val = start;
+    int32_t step = descending ? -1 : 1;
     for (size_t i = 0; i < count; i++)
     {
-        result->array[i] = val++;
+        result->array[i] = val;
+        val += step;
     }
 
     return result;
@@ -147,7 +149,7 @@ __orbit_array_int32_t* __orbit_make_range(int64_t start, int64_t end, bool inclu
 
 export const arrayTemplate = (name: string, type: string) => `
 typedef struct ${name} {
-    ${type} *array;
+    ${type} ${type === '__orbit_String' ? '**' : '*'}array;
     size_t length;
     size_t capacity;
 } ${name};
@@ -186,15 +188,15 @@ export const BuiltInMethodTemplate = {
             sep: () => `, `,
             close: () => `)`,
             impl: (type: string, key: string) => cleanTemplate`
-                ${key}* ${key}_create(size_t capacity, const ${type} *initial_values, size_t initial_size) {
-                    if (initial_size > capacity || capacity == 0 || capacity > (SIZE_MAX / sizeof(${type}))) {
+                ${key}* ${key}_create(size_t capacity, ${type} ${type === '__orbit_String' ? '**' : '*'}initial_values, size_t initial_size) {
+                    if (initial_size > capacity || capacity == 0 || capacity > (SIZE_MAX / sizeof(${type}${type === '__orbit_String' ? '*' : ''}))) {
                         return NULL;
                     }
 
                     ${key} *array = (${key} *)malloc(sizeof(${key}));
                     if (!array) return NULL;
 
-                    array->array = (${type} *)malloc(sizeof(${type}) * capacity);
+                    array->array = (${type} ${type === '__orbit_String' ? '**' : '*'})malloc(sizeof(${type}${type === '__orbit_String' ? '*' : ''}) * capacity);
                     if (!array->array) {
                         free(array);
                         return NULL;
@@ -204,7 +206,7 @@ export const BuiltInMethodTemplate = {
                     array->length = 0;
 
                     if (initial_values && initial_size > 0) {
-                        memcpy(array->array, initial_values, sizeof(${type}) * initial_size);
+                        memcpy(array->array, initial_values, sizeof(${type}${type === '__orbit_String' ? '*' : ''}) * initial_size);
                         array->length = initial_size;
                     }
 
@@ -215,13 +217,27 @@ export const BuiltInMethodTemplate = {
         free: {
             open: (key: string) => `${key}_free(`,
             close: () => `)`,
-            impl: (key: string) => cleanTemplate`
+            impl: (key: string) => {
+                if (key === '__orbit_array_String') {
+                    return cleanTemplate`
+                        void ${key}_free(${key} *array) {
+                            if (!array) return;
+                            for (size_t i = 0; i < array->length; i++) {
+                                __orbit_free_string(array->array[i]);
+                            }
+                            free(array->array);
+                            free(array);
+                        }
+                    `;
+                }
+                return cleanTemplate`
                 void ${key}_free(${key} *array) {
                     if (!array) return;
                     free(array->array);
                     free(array);
                 }
-            `,
+            `;
+            },
         },
         grow: {
             open: (key: string) => `${key}_grow(`,

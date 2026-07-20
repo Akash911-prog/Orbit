@@ -22,7 +22,8 @@ export function generateExpressionStream(
             break;
 
         case 'StrLiteral':
-            ctx.stream.write(`"${node.value}"`);
+            ctx.stream.write(StringMethods.create.open(node.value));
+            ctx.stream.write(StringMethods.create.close());
             break;
 
         case 'BoolLiteral':
@@ -144,7 +145,7 @@ export function generateExpressionStream(
             const size = node.elements.length;
             ctx.stream.write(`${size}, `);
             ctx.stream.write(
-                `(${orbTypeToCType(node.resolvedType.element)}[])`
+                `(${orbTypeToCType(node.resolvedType.element)} ${node.resolvedType.element.copyable ? '[]' : '*[]'})`
             );
             ctx.stream.write('{ ');
             for (const element of node.elements) {

@@ -202,6 +202,7 @@ export class ShapeCollector {
                             kind: 'struct',
                             name: entry.name,
                             copyable: entry.copyable,
+                            iterable: false,
                         },
                         table
                     );

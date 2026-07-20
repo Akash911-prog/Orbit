@@ -95,13 +95,19 @@ typedef struct __orbit_array_int32_t {
     size_t length;
     size_t capacity;
 } __orbit_array_int32_t;
+
+typedef struct __orbit_array_String {
+    __orbit_String **array;
+    size_t length;
+    size_t capacity;
+} __orbit_array_String;
 typedef struct __orbit_struct_Point {
     __orbit_array_int32_t* x;
 } __orbit_struct_Point;
 typedef struct __orbit_struct_A {
     __orbit_struct_Point p;
 } __orbit_struct_A;
-__orbit_array_int32_t* __orbit_array_int32_t_create(size_t capacity, const int32_t *initial_values, size_t initial_size) {
+__orbit_array_int32_t* __orbit_array_int32_t_create(size_t capacity, int32_t *initial_values, size_t initial_size) {
     if (initial_size > capacity || capacity == 0 || capacity > (SIZE_MAX / sizeof(int32_t))) {
         return NULL;
     }
@@ -125,11 +131,51 @@ __orbit_array_int32_t* __orbit_array_int32_t_create(size_t capacity, const int32
 
     return array;
 }
+void __orbit_array_int32_t_free(__orbit_array_int32_t *array) {
+    if (!array) return;
+    free(array->array);
+    free(array);
+}
 
-__orbit_array_int32_t* __orbit_make_range(int64_t start, int64_t end, bool inclusive)
+__orbit_array_String* __orbit_array_String_create(size_t capacity, __orbit_String **initial_values, size_t initial_size) {
+    if (initial_size > capacity || capacity == 0 || capacity > (SIZE_MAX / sizeof(__orbit_String*))) {
+        return NULL;
+    }
+
+    __orbit_array_String *array = (__orbit_array_String *)malloc(sizeof(__orbit_array_String));
+    if (!array) return NULL;
+
+    array->array = (__orbit_String **)malloc(sizeof(__orbit_String*) * capacity);
+    if (!array->array) {
+        free(array);
+        return NULL;
+    }
+
+    array->capacity = capacity;
+    array->length = 0;
+
+    if (initial_values && initial_size > 0) {
+        memcpy(array->array, initial_values, sizeof(__orbit_String*) * initial_size);
+        array->length = initial_size;
+    }
+
+    return array;
+}
+void __orbit_array_String_free(__orbit_array_String *array) {
+    if (!array) return;
+    for (size_t i = 0; i < array->length; i++) {
+        __orbit_free_string(array->array[i]);
+    }
+    free(array->array);
+    free(array);
+}
+
+
+
+__orbit_array_int32_t* __orbit_make_range(long long start, size_t end, bool inclusive)
 {
-    int64_t diff = end - start;
-    int64_t count_64 = inclusive ? (diff + 1) : diff;
+    size_t diff = end - start;
+    size_t count_64 = inclusive ? (diff + 1) : diff;
 
     if (count_64 <= 0)
     {
@@ -137,7 +183,7 @@ __orbit_array_int32_t* __orbit_make_range(int64_t start, int64_t end, bool inclu
         return __orbit_array_int32_t_create(4, NULL, 0);
     }
 
-    if (count_64 > (int64_t)(SIZE_MAX / sizeof(int32_t)))
+    if (count_64 > (size_t)(SIZE_MAX / sizeof(int32_t)))
     {
         return NULL; // Prevent size_t allocation overflow
     }
@@ -166,13 +212,8 @@ __orbit_array_int32_t* __orbit_make_range(int64_t start, int64_t end, bool inclu
     return result;
 }
 
-void __orbit_array_int32_t_free(__orbit_array_int32_t *array) {
-    if (!array) return;
-    free(array->array);
-    free(array);
-}
-
 int main () {
-char * hello = "string";
+__orbit_array_String* hello = __orbit_array_String_create(2, (__orbit_String *[]){ __orbit_create_string("hello"), __orbit_create_string("world"), }, 2);
+__orbit_array_String_free(hello);
   return 0;
 }

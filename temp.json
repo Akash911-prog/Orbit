@@ -80,26 +80,75 @@
                         "name": "hello",
                         "varType": null,
                         "initializer": {
-                            "type": "StrLiteral",
-                            "value": "string",
+                            "type": "ArrayLiteral",
+                            "elements": [
+                                {
+                                    "type": "StrLiteral",
+                                    "value": "hello",
+                                    "line": 10,
+                                    "col": 18,
+                                    "resolvedType": {
+                                        "kind": "String",
+                                        "copyable": false,
+                                        "iterable": true
+                                    }
+                                },
+                                {
+                                    "type": "StrLiteral",
+                                    "value": "world",
+                                    "line": 10,
+                                    "col": 27,
+                                    "resolvedType": {
+                                        "kind": "String",
+                                        "copyable": false,
+                                        "iterable": true
+                                    }
+                                }
+                            ],
                             "line": 10,
                             "col": 17,
                             "resolvedType": {
-                                "kind": "str",
-                                "copyable": true,
-                                "iterable": false
+                                "kind": "array",
+                                "element": {
+                                    "kind": "String",
+                                    "copyable": false,
+                                    "iterable": true
+                                },
+                                "copyable": false,
+                                "iterable": true
                             }
                         },
                         "line": 10,
                         "col": 5,
                         "resolvedType": {
-                            "kind": "str",
-                            "copyable": true,
-                            "iterable": false
+                            "kind": "array",
+                            "element": {
+                                "kind": "String",
+                                "copyable": false,
+                                "iterable": true
+                            },
+                            "copyable": false,
+                            "iterable": true
                         }
                     }
                 ],
-                "needFree": [],
+                "needFree": [
+                    {
+                        "kind": "variable",
+                        "name": "hello",
+                        "type": {
+                            "kind": "array",
+                            "element": {
+                                "kind": "String",
+                                "copyable": false,
+                                "iterable": true
+                            },
+                            "copyable": false,
+                            "iterable": true
+                        },
+                        "mutable": false
+                    }
+                ],
                 "line": 9,
                 "col": 12
             },

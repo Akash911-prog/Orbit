@@ -40,7 +40,7 @@ export const OrbTypes = {
     String: (): OrbType => ({
         kind: 'String',
         copyable: false,
-        iterable: false,
+        iterable: true,
     }),
     void: (): OrbType => ({ kind: 'void', copyable: true, iterable: false }),
     unknown: (): OrbType => ({

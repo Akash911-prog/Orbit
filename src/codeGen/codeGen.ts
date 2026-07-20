@@ -15,7 +15,7 @@ import { CodeGenBuiltInMethods } from './builtInMethods';
 import path from 'node:path';
 import { HandlerRegistry } from './registry';
 import { execSync } from 'node:child_process';
-import { getShapeKey } from './helper';
+import { getShapeKey, orbTypeToCType } from './helper';
 
 export class CodeGen {
     private collector: ShapeCollector;
@@ -73,28 +73,109 @@ export class CodeGen {
                 shape.type.kind === 'array' && shape.type.element.kind === 'int'
         );
 
-        if (needsIntRange) {
-            this.stream.write(
-                BuiltInMethodTemplate.array.create.impl(
-                    'int32_t',
-                    '__orbit_array_int32_t'
-                )
-            );
-            this.stream.write('\n\n');
-            this.stream.write(RangeMethods.emitRuntimeFn());
-            this.stream.write('\n\n');
-        }
-
         this.shapeInfoArray.forEach((shape) => {
-            if (!shape.type.copyable && shape.type.kind !== 'struct') {
-                this.stream.write(
-                    BuiltInMethodTemplate[shape.type.kind]['free'].impl(
-                        getShapeKey(shape.type)
-                    )
-                );
+            // Only process types that are not copyable
+            if (shape.type.copyable) return;
+
+            switch (shape.type.kind) {
+                case 'array': {
+                    this.stream.write(
+                        BuiltInMethodTemplate['array']['create'].impl(
+                            orbTypeToCType(shape.type.element),
+                            shape.key
+                        )
+                    );
+                    this.stream.write('\n');
+                    this.stream.write(
+                        BuiltInMethodTemplate['array']['free'].impl(
+                            getShapeKey(shape.type)
+                        )
+                    );
+                    this.stream.write('\n\n');
+                    break;
+                }
+
+                case 'map': {
+                    this.stream.write(
+                        BuiltInMethodTemplate['map']['create'].impl(
+                            orbTypeToCType(shape.type.key),
+                            orbTypeToCType(shape.type.value),
+                            shape.key
+                        )
+                    );
+                    this.stream.write(
+                        BuiltInMethodTemplate['map']['free'].impl(
+                            getShapeKey(shape.type)
+                        )
+                    );
+                    break;
+                }
+
+                case 'tuple': {
+                    this.stream.write(
+                        BuiltInMethodTemplate['tuple']['create'].impl(
+                            shape.type.elements.map(orbTypeToCType),
+                            shape.key
+                        )
+                    );
+                    this.stream.write(
+                        BuiltInMethodTemplate['tuple']['free'].impl(
+                            getShapeKey(shape.type)
+                        )
+                    );
+                    break;
+                }
+
+                case 'String': {
+                    this.stream.write(
+                        BuiltInMethodTemplate['String']['create'].impl(
+                            shape.key
+                        )
+                    );
+                    this.stream.write(
+                        BuiltInMethodTemplate['String']['free'].impl(
+                            getShapeKey(shape.type)
+                        )
+                    );
+                    break;
+                }
+
+                case 'nullable': {
+                    this.stream.write(
+                        BuiltInMethodTemplate['nullable']['create'].impl(
+                            orbTypeToCType(shape.type.inner),
+                            shape.key
+                        )
+                    );
+                    this.stream.write(
+                        BuiltInMethodTemplate['nullable']['free'].impl(
+                            getShapeKey(shape.type)
+                        )
+                    );
+                    break;
+                }
+
+                // Primitive types (int, float, bool, char, byte, void, null, str),
+                // struct, generic, and unknown require no code emission or are handled elsewhere.
+                case 'int':
+                case 'float':
+                case 'bool':
+                case 'char':
+                case 'byte':
+                case 'str':
+                case 'void':
+                case 'null':
+                case 'struct':
+                case 'generic':
+                case 'unknown':
+                    break;
             }
         });
         this.stream.write('\n\n');
+        if (needsIntRange) {
+            this.stream.write(RangeMethods.emitRuntimeFn());
+            this.stream.write('\n\n');
+        }
 
         // 5. Output function bodies
         this.generateMethods();

@@ -33,7 +33,7 @@ export function handleExpression(
             resolvedType = OrbTypes.float();
             break;
         case 'StrLiteral':
-            resolvedType = OrbTypes.str();
+            resolvedType = OrbTypes.String();
             break;
         case 'BoolLiteral':
             resolvedType = OrbTypes.bool();
