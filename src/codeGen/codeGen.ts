@@ -16,6 +16,7 @@ import path from 'node:path';
 import { HandlerRegistry } from './registry';
 import { execSync } from 'node:child_process';
 import { getShapeKey, orbTypeToCType } from './helper';
+import { generatePrintRuntime } from './builtinFn/print';
 
 export class CodeGen {
     private collector: ShapeCollector;
@@ -43,9 +44,9 @@ export class CodeGen {
 
     private runPrePass() {
         this.collector.collectFromSymbolTable(globalTable);
+        this.collector.collectMethods(this.ast);
         this.ctx.shapeInfo = this.collector.getAllShapes();
         this.shapeInfoArray = this.collector.topoSort();
-        this.collector.collectMethods(this.ast);
     }
 
     private startStream() {
@@ -54,7 +55,7 @@ export class CodeGen {
         this.stream = fs.createWriteStream(OUTPUT_PATH, { encoding: 'utf8' });
     }
 
-    public generateCode() {
+    public async generateCode() {
         // 1. Collect all dependency profiles
         this.runPrePass();
 
@@ -180,7 +181,7 @@ export class CodeGen {
         // 5. Output function bodies
         this.generateMethods();
 
-        //TODO: Builtin Functions pass
+        generatePrintRuntime(this.shapeInfoArray, this.stream);
 
         this.generate(this.ast, this.ctx);
 
@@ -189,11 +190,22 @@ export class CodeGen {
         // If your main block generation code is async in the future,
         // you will want to make this method 'async' and 'await' them before ending.
         this.stream.end();
-        this.stream.on('finish', () => {
-            execSync(`gcc ${OUTPUT_PATH} -o ${this.OUTPUT_BINARY_NAME} -O2`, {
-                stdio: 'inherit',
+        await new Promise<void>((resolve, reject) => {
+            this.stream.on('finish', () => {
+                try {
+                    execSync(
+                        `gcc ${OUTPUT_PATH} -o build/${this.OUTPUT_BINARY_NAME} -O2`,
+                        {
+                            stdio: 'inherit',
+                        }
+                    );
+                    fs.unlinkSync(OUTPUT_PATH);
+                    resolve();
+                } catch (err) {
+                    reject(err);
+                }
             });
-            // fs.unlinkSync(OUTPUT_PATH); // Wipe temporary C file instantly to hide tracks
+            this.stream.on('error', reject);
         });
     }
 

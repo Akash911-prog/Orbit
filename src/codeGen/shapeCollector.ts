@@ -98,6 +98,8 @@ export class ShapeCollector {
             }
         } else if (node.type === 'RangeExpr') {
             this.collect(OrbTypes.array(OrbTypes.int()), globalTable);
+        } else if (node.type === 'ArrayLiteral') {
+            this.collect(node.resolvedType, globalTable);
         }
 
         for (const key of Object.keys(node)) {

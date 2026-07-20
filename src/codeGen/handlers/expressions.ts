@@ -111,11 +111,13 @@ export function generateExpressionStream(
         case 'FunctionCall':
             ctx.stream.write(addPrefix(node.name, node.builtin));
             ctx.stream.write('(');
-            for (const arg of node.args) {
-                ctx.generate(arg, ctx);
-                ctx.stream.write(', ');
+            for (let i = 0; i < node.args.length; i++) {
+                ctx.generate(node.args[i], ctx);
+                if (i < node.args.length - 1) {
+                    ctx.stream.write(', ');
+                }
             }
-            ctx.stream.write(')');
+            ctx.stream.write(');\n\n');
             break;
 
         case 'StructInit':

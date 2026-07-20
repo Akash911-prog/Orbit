@@ -1,0 +1,4 @@
+orbit main {
+    print("hello");
+    print(["hello", "world"]);
+}

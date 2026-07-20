@@ -2,102 +2,21 @@
     "type": "Program",
     "declarations": [
         {
-            "type": "StructDecl",
-            "name": "Point",
-            "generic": null,
-            "members": [
-                {
-                    "type": "VariableDecl",
-                    "kind": "let",
-                    "name": "x",
-                    "varType": {
-                        "type": "ArrayType",
-                        "element": {
-                            "type": "BaseType",
-                            "name": "int",
-                            "line": 2,
-                            "col": 12
-                        },
-                        "line": 2,
-                        "col": 12
-                    },
-                    "initializer": null,
-                    "line": 2,
-                    "col": 5,
-                    "resolvedType": {
-                        "kind": "array",
-                        "element": {
-                            "kind": "int",
-                            "copyable": true,
-                            "iterable": false
-                        },
-                        "copyable": false,
-                        "iterable": true
-                    }
-                }
-            ],
-            "line": 1,
-            "col": 1
-        },
-        {
-            "type": "StructDecl",
-            "name": "A",
-            "generic": null,
-            "members": [
-                {
-                    "type": "VariableDecl",
-                    "kind": "let",
-                    "name": "p",
-                    "varType": {
-                        "type": "GenericType",
-                        "name": "Point",
-                        "typeArg": null,
-                        "line": 6,
-                        "col": 12
-                    },
-                    "initializer": null,
-                    "line": 6,
-                    "col": 5,
-                    "resolvedType": {
-                        "kind": "struct",
-                        "name": "Point",
-                        "copyable": true,
-                        "iterable": false
-                    }
-                }
-            ],
-            "line": 5,
-            "col": 1
-        },
-        {
             "type": "RootOrbitDecl",
             "body": {
                 "type": "Block",
                 "statements": [
                     {
-                        "type": "VariableDecl",
-                        "kind": "let",
-                        "name": "hello",
-                        "varType": null,
-                        "initializer": {
-                            "type": "ArrayLiteral",
-                            "elements": [
+                        "type": "ExpressionStatement",
+                        "expression": {
+                            "type": "FunctionCall",
+                            "name": "print",
+                            "args": [
                                 {
                                     "type": "StrLiteral",
                                     "value": "hello",
-                                    "line": 10,
-                                    "col": 18,
-                                    "resolvedType": {
-                                        "kind": "String",
-                                        "copyable": false,
-                                        "iterable": true
-                                    }
-                                },
-                                {
-                                    "type": "StrLiteral",
-                                    "value": "world",
-                                    "line": 10,
-                                    "col": 27,
+                                    "line": 2,
+                                    "col": 11,
                                     "resolvedType": {
                                         "kind": "String",
                                         "copyable": false,
@@ -105,54 +24,82 @@
                                     }
                                 }
                             ],
-                            "line": 10,
-                            "col": 17,
+                            "line": 2,
+                            "col": 5,
+                            "builtin": true,
                             "resolvedType": {
-                                "kind": "array",
-                                "element": {
-                                    "kind": "String",
-                                    "copyable": false,
-                                    "iterable": true
-                                },
-                                "copyable": false,
-                                "iterable": true
+                                "kind": "void",
+                                "copyable": true,
+                                "iterable": false
                             }
                         },
-                        "line": 10,
-                        "col": 5,
-                        "resolvedType": {
-                            "kind": "array",
-                            "element": {
-                                "kind": "String",
-                                "copyable": false,
-                                "iterable": true
-                            },
-                            "copyable": false,
-                            "iterable": true
-                        }
-                    }
-                ],
-                "needFree": [
+                        "line": 2,
+                        "col": 5
+                    },
                     {
-                        "kind": "variable",
-                        "name": "hello",
-                        "type": {
-                            "kind": "array",
-                            "element": {
-                                "kind": "String",
-                                "copyable": false,
-                                "iterable": true
-                            },
-                            "copyable": false,
-                            "iterable": true
+                        "type": "ExpressionStatement",
+                        "expression": {
+                            "type": "FunctionCall",
+                            "name": "print",
+                            "args": [
+                                {
+                                    "type": "ArrayLiteral",
+                                    "elements": [
+                                        {
+                                            "type": "StrLiteral",
+                                            "value": "hello",
+                                            "line": 3,
+                                            "col": 12,
+                                            "resolvedType": {
+                                                "kind": "String",
+                                                "copyable": false,
+                                                "iterable": true
+                                            }
+                                        },
+                                        {
+                                            "type": "StrLiteral",
+                                            "value": "world",
+                                            "line": 3,
+                                            "col": 21,
+                                            "resolvedType": {
+                                                "kind": "String",
+                                                "copyable": false,
+                                                "iterable": true
+                                            }
+                                        }
+                                    ],
+                                    "line": 3,
+                                    "col": 11,
+                                    "resolvedType": {
+                                        "kind": "array",
+                                        "element": {
+                                            "kind": "String",
+                                            "copyable": false,
+                                            "iterable": true
+                                        },
+                                        "copyable": false,
+                                        "iterable": true
+                                    }
+                                }
+                            ],
+                            "line": 3,
+                            "col": 5,
+                            "builtin": true,
+                            "resolvedType": {
+                                "kind": "void",
+                                "copyable": true,
+                                "iterable": false
+                            }
                         },
-                        "mutable": false
+                        "line": 3,
+                        "col": 5
                     }
                 ],
-                "line": 9,
+                "needFree": [],
+                "line": 1,
                 "col": 12
             },
-            "line": 9,
+            "line": 1,
             "col": 1
         }
     ]
