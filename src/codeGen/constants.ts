@@ -19,43 +19,79 @@ typedef struct __orbit_String
     size_t capacity;
 } __orbit_String;
 
-__orbit_String __orbit_create_string(char *string);
-__orbit_String __orbit_concat_strings(__orbit_String string1, __orbit_String string2);
+__orbit_String* __orbit_create_string(const char *string);
+__orbit_String* __orbit_concat_strings(const __orbit_String *string1, const __orbit_String *string2);
 void __orbit_free_string(__orbit_String *string);
-char __orbit_string_index(int32_t index, __orbit_String string);
+char __orbit_string_index(int32_t index, const __orbit_String *string);
 
-__orbit_String __orbit_create_string(char *string)
+__orbit_String* __orbit_create_string(const char *string)
 {
-    __orbit_String s = {0};
-    s.string = (char *)malloc(sizeof(char) * (strlen(string) + 1));
-    s.length = strlen(string);
-    s.capacity = s.length + 1;
-    snprintf(s.string, s.capacity, "%s", string);
+    __orbit_String *s = (__orbit_String *)malloc(sizeof(__orbit_String));
+    if (!s) return NULL;
+
+    size_t str_len = string ? strlen(string) : 0;
+    
+    s->string = (char *)malloc(str_len + 1);
+    if (!s->string) {
+        free(s);
+        return NULL;
+    }
+
+    s->length = str_len;
+    s->capacity = str_len + 1;
+
+    if (string) {
+        memcpy(s->string, string, str_len);
+    }
+    s->string[str_len] = '\\0';
+
     return s;
 }
 
-__orbit_String __orbit_concat_strings(__orbit_String string1, __orbit_String string2)
+__orbit_String* __orbit_concat_strings(const __orbit_String *string1, const __orbit_String *string2)
 {
-    size_t length = string1.length + string2.length + 1;
-    __orbit_String new_string = {0};
-    new_string.string = (char *)malloc(sizeof(char) * length);
-    new_string.length = length;
-    new_string.capacity = length;
-    snprintf(new_string.string, length, "%s%s", string1.string, string2.string);
+    const char *s1 = (string1 && string1->string) ? string1->string : "";
+    const char *s2 = (string2 && string2->string) ? string2->string : "";
+
+    size_t len1 = string1 ? string1->length : 0;
+    size_t len2 = string2 ? string2->length : 0;
+
+    if (len1 > SIZE_MAX - len2 - 1) return NULL; // Overflow guard
+
+    size_t total_length = len1 + len2;
+    
+    __orbit_String *new_string = (__orbit_String *)malloc(sizeof(__orbit_String));
+    if (!new_string) return NULL;
+
+    new_string->string = (char *)malloc(total_length + 1);
+    if (!new_string->string) {
+        free(new_string);
+        return NULL;
+    }
+
+    new_string->length = total_length;
+    new_string->capacity = total_length + 1;
+
+    memcpy(new_string->string, s1, len1);
+    memcpy(new_string->string + len1, s2, len2);
+    new_string->string[total_length] = '\\0';
+
     return new_string;
 }
 
-char __orbit_string_index(int32_t index, __orbit_String string)
+char __orbit_string_index(int32_t index, const __orbit_String *string)
 {
-    return string.string[index];
+    if (!string || !string->string || index < 0 || (size_t)index >= string->length) {
+        return '\\0'; // Return null terminator on out-of-bounds or NULL
+    }
+    return string->string[index];
 }
 
 void __orbit_free_string(__orbit_String *string)
 {
+    if (!string) return;
     free(string->string);
-    string->string = NULL;
-    string->length = 0;
-    string->capacity = 0;
+    free(string);
 }
 `;
 
@@ -63,25 +99,45 @@ export const RangeMethods = {
     emitCall: {
         open: () => `__orbit_make_range(`,
         sep: () => `, `,
-        close: () => `, )`,
+        close: () => `)`,
     },
     emitRuntimeFn: () =>
         `
-__orbit_array_int32_t __orbit_make_range(size_t start, size_t end, bool inclusive)
+__orbit_array_int32_t* __orbit_make_range(int64_t start, int64_t end, bool inclusive)
 {
-    int32_t count = inclusive ? (end - start + 1) : (end - start);
-    if (count < 0)
-        count = 0;
+    int64_t diff = end - start;
+    int64_t count_64 = inclusive ? (diff + 1) : diff;
 
-    __orbit_array_int32_t result;
-    result.capacity = count > 0 ? count : 1;
-    result.array = (int32_t *)malloc(result.capacity * sizeof(int32_t));
-    result.length = count;
+    if (count_64 <= 0)
+    {
+        // Return an empty valid dynamic array
+        return __orbit_array_int32_t_create(4, NULL, 0);
+    }
+
+    if (count_64 > (int64_t)(SIZE_MAX / sizeof(int32_t)))
+    {
+        return NULL; // Prevent size_t allocation overflow
+    }
+
+    size_t count = (size_t)count_64;
+
+    __orbit_array_int32_t *result = (__orbit_array_int32_t *)malloc(sizeof(__orbit_array_int32_t));
+    if (!result) return NULL;
+
+    result->array = (int32_t *)malloc(count * sizeof(int32_t));
+    if (!result->array)
+    {
+        free(result);
+        return NULL;
+    }
+
+    result->capacity = count;
+    result->length = count;
 
     int32_t val = (int32_t)start;
-    for (int32_t i = 0; i < count; i++)
+    for (size_t i = 0; i < count; i++)
     {
-        result.array[i] = val++;
+        result->array[i] = val++;
     }
 
     return result;
@@ -110,9 +166,11 @@ typedef struct ${name} {
 
 export const variableDeclTemplate = (
     name: string,
-    type: string
+    type: string,
+    is_pointer?: boolean
 ) => cleanTemplate`
-${type} ${name}`;
+${type}${is_pointer ? '*' : ''} ${name}
+`;
 
 export const nullableTemplate = (type: string) => `
 typedef struct __orbit_nullable_${type} {
@@ -128,25 +186,26 @@ export const BuiltInMethodTemplate = {
             sep: () => `, `,
             close: () => `)`,
             impl: (type: string, key: string) => cleanTemplate`
-                ${key} ${key}_create(size_t capacity, const ${type} *initial_values, size_t initial_size) {
-                    ${key} array = {0};
-                    size_t max_elements = SIZE_MAX / sizeof(${type});
-
-                    if (initial_size > capacity || capacity == 0 || capacity > max_elements) {
-                        return array;
+                ${key}* ${key}_create(size_t capacity, const ${type} *initial_values, size_t initial_size) {
+                    if (initial_size > capacity || capacity == 0 || capacity > (SIZE_MAX / sizeof(${type}))) {
+                        return NULL;
                     }
 
-                    array.array = (${type} *)malloc(sizeof(${type}) * capacity);
-                    if (!array.array) {
-                        return array;
+                    ${key} *array = (${key} *)malloc(sizeof(${key}));
+                    if (!array) return NULL;
+
+                    array->array = (${type} *)malloc(sizeof(${type}) * capacity);
+                    if (!array->array) {
+                        free(array);
+                        return NULL;
                     }
 
-                    array.capacity = capacity;
-                    array.length = 0;
+                    array->capacity = capacity;
+                    array->length = 0;
 
                     if (initial_values && initial_size > 0) {
-                        memcpy(array.array, initial_values, sizeof(${type}) * initial_size);
-                        array.length = initial_size;
+                        memcpy(array->array, initial_values, sizeof(${type}) * initial_size);
+                        array->length = initial_size;
                     }
 
                     return array;
@@ -154,23 +213,22 @@ export const BuiltInMethodTemplate = {
             `,
         },
         free: {
-            open: (key: string) => `free_${key}(&`,
+            open: (key: string) => `${key}_free(`,
             close: () => `)`,
             impl: (key: string) => cleanTemplate`
-                void free_${key}(${key} *array) {
+                void ${key}_free(${key} *array) {
                     if (!array) return;
                     free(array->array);
-                    array->array = NULL;
-                    array->length = 0;
-                    array->capacity = 0;
+                    free(array);
                 }
             `,
         },
         grow: {
-            open: (key: string) => `${key}_grow(&`,
+            open: (key: string) => `${key}_grow(`,
             close: () => `)`,
             impl: (type: string, key: string) => cleanTemplate`
                 void ${key}_grow(${key} *array) {
+                    if (!array) return;
                     size_t max_elements = SIZE_MAX / sizeof(${type});
                     if (array->capacity >= max_elements) return;
 
@@ -194,55 +252,64 @@ export const BuiltInMethodTemplate = {
             `,
         },
         push: {
-            open: (key: string) => `push_${key}(&`,
+            open: (key: string) => `${key}_push(`,
             sep: () => `, `,
-            close: () => `)`,
+            close: () => `);\n`,
             impl: (type: string, key: string) => cleanTemplate`
                 void ${key}_push(${key} *array, ${type} value) {
                     if (!array) return;
                     if (array->length == array->capacity) {
                         ${key}_grow(array);
+                        if (array->length == array->capacity) return; // Allocation failed
                     }
                     array->array[array->length++] = value;
                 }
             `,
         },
         extend: {
-            open: (key: string) => `extend_${key}(&`,
+            open: (key: string) => `${key}_extend(`,
             sep: () => `, `,
             close: () => `)`,
             impl: (type: string, key: string) => cleanTemplate`
-                void ${key}_extend(${key} *array, ${key} array2) {
-                    if (!array || array2.length == 0 || !array2.array) return;
+                void ${key}_extend(${key} *array, ${key} *array2) {
+                    if (!array || !array2 || array2->length == 0 || !array2->array) return;
                     
                     size_t max_elements = SIZE_MAX / sizeof(${type});
-                    if (array2.length > max_elements - array->length) return;
+                    if (array2->length > max_elements - array->length) return;
 
-                    while ((array->capacity - array->length) < array2.length) {
+                    while ((array->capacity - array->length) < array2->length) {
+                        size_t prev_capacity = array->capacity;
                         ${key}_grow(array);
+                        if (array->capacity == prev_capacity) return; // Guard against OOM infinite loop
                     }
 
-                    memmove(array->array + array->length, array2.array, sizeof(${type}) * array2.length);
-                    array->length += array2.length;
+                    memmove(array->array + array->length, array2->array, sizeof(${type}) * array2->length);
+                    array->length += array2->length;
                 }
             `,
         },
         concat: {
-            open: (key: string) => `concat_${key}(`,
+            open: (key: string) => `${key}_concat(`,
             sep: () => `, `,
             close: () => `)`,
             impl: (key: string) => cleanTemplate`
-                ${key} ${key}_concat(${key} array1, ${key} array2) {
-                    size_t combined_size = array1.length + array2.length;
-                    ${key} result = create_${key}(combined_size, NULL, 0);
-                    extend_${key}(&result, array1);
-                    extend_${key}(&result, array2);
+                ${key}* ${key}_concat(${key} *array1, ${key} *array2) {
+                    if (!array1 || !array2) return NULL;
+
+                    size_t combined_size = array1->length + array2->length;
+                    if (combined_size == 0) combined_size = 4;
+
+                    ${key} *result = ${key}_create(combined_size, NULL, 0);
+                    if (!result) return NULL;
+
+                    ${key}_extend(result, array1);
+                    ${key}_extend(result, array2);
                     return result;
                 }
             `,
         },
         print: {
-            open: (key: string) => `${key}_print(&`,
+            open: (key: string) => `${key}_print(`,
             close: () => `)`,
             impl: (type: string, key: string) => {
                 let formatSpecifier = '%d';

@@ -371,6 +371,7 @@ function handleFunctionCall(node: FunctionCall, ctx: AnalyzerContext): OrbType {
             );
         }
     });
+    node.builtin = funcEntry.builtin;
 
     return funcEntry.returnType;
 }

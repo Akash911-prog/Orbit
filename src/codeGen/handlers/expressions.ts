@@ -6,7 +6,7 @@ import {
     structMethodNameTemplate,
 } from '../constants';
 import type { CodeGenContext } from '../context';
-import { addPrefixToFnName, getShapeKey, orbTypeToCType } from '../helper';
+import { addPrefix, getShapeKey, orbTypeToCType } from '../helper';
 
 export function generateExpressionStream(
     node: Expression,
@@ -76,7 +76,7 @@ export function generateExpressionStream(
 
         case 'MemberAccess':
             ctx.generate(node.object, ctx);
-            ctx.stream.write('.');
+            ctx.stream.write(node.object.resolvedType?.copyable ? '.' : '->');
             ctx.stream.write(node.property);
             break;
 
@@ -108,7 +108,7 @@ export function generateExpressionStream(
             break;
 
         case 'FunctionCall':
-            ctx.stream.write(addPrefixToFnName(node.name));
+            ctx.stream.write(addPrefix(node.name, node.builtin));
             ctx.stream.write('(');
             for (const arg of node.args) {
                 ctx.generate(arg, ctx);

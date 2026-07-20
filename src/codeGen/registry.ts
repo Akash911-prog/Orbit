@@ -1,9 +1,16 @@
 import type { TopLevelDeclaration } from '../parser/nodeTypes';
 import type { CodeGenContext } from './context';
+import { generateAssignmentStream } from './handlers/assignment';
+import { generateBlockStream } from './handlers/block';
 import { generateExpressionStream } from './handlers/expressions';
+import { generateForstream } from './handlers/for';
+import { generateFuncDeclstream } from './handlers/functionDecl';
+import { generateIfstream } from './handlers/ifStatement';
 import { generateOrbitStream } from './handlers/orbit';
 import { generateProgramStream } from './handlers/program';
+import { generateReturnstream } from './handlers/returnStatement';
 import { generateVariableDeclStream } from './handlers/variableDecl';
+import { generateWhilestream } from './handlers/whileStatement';
 
 export type CodeGenHandlerFn = (node: any, ctx: CodeGenContext) => void;
 
@@ -32,6 +39,17 @@ export const HandlerRegistry: Record<string, CodeGenHandlerFn> = {
     MapLiteral: generateExpressionStream,
     TupleLiteral: generateExpressionStream,
 
+    // orbit
     RootOrbitDecl: generateOrbitStream,
     OrbitBlock: generateOrbitStream,
+
+    // statements
+    IfStatement: generateIfstream,
+    WhileStatement: generateWhilestream,
+    ReturnStatement: generateReturnstream,
+    FunctionDecl: generateFuncDeclstream,
+    ForStatement: generateForstream,
+
+    Block: generateBlockStream,
+    Assignment: generateAssignmentStream,
 };

@@ -15,6 +15,7 @@ import { CodeGenBuiltInMethods } from './builtInMethods';
 import path from 'node:path';
 import { HandlerRegistry } from './registry';
 import { execSync } from 'node:child_process';
+import { getShapeKey } from './helper';
 
 export class CodeGen {
     private collector: ShapeCollector;
@@ -73,13 +74,33 @@ export class CodeGen {
         );
 
         if (needsIntRange) {
+            this.stream.write(
+                BuiltInMethodTemplate.array.create.impl(
+                    'int32_t',
+                    '__orbit_array_int32_t'
+                )
+            );
+            this.stream.write('\n\n');
             this.stream.write(RangeMethods.emitRuntimeFn());
             this.stream.write('\n\n');
         }
+
+        this.shapeInfoArray.forEach((shape) => {
+            if (!shape.type.copyable && shape.type.kind !== 'struct') {
+                this.stream.write(
+                    BuiltInMethodTemplate[shape.type.kind]['free'].impl(
+                        getShapeKey(shape.type)
+                    )
+                );
+            }
+        });
         this.stream.write('\n\n');
 
         // 5. Output function bodies
         this.generateMethods();
+
+        //TODO: Builtin Functions pass
+
         this.generate(this.ast, this.ctx);
 
         // 6. FIX: Handle clean stream termination lifetimes

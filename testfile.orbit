@@ -7,6 +7,5 @@ struct A {
 }
 
 orbit main {
-    let hello = [1,2,3,4,5];
-    hello.push(5);
+    let hello = "string";
 }

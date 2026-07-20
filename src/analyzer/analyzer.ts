@@ -182,6 +182,19 @@ export class SemanticAnalyzer {
                     for (const member of node.members) {
                         switch (member.type) {
                             case 'FunctionDecl': {
+                                const params = member.parameters.map((p) => ({
+                                    name: p.name,
+                                    type: this.typeNodeToOrbType(
+                                        p.paramType,
+                                        ctx
+                                    ),
+                                }));
+
+                                params.unshift({
+                                    name: node.name,
+                                    type: OrbTypes.struct(node.name, false),
+                                });
+
                                 const funcEntry: FunctionEntry = {
                                     kind: 'function',
                                     name: member.name,
@@ -200,6 +213,7 @@ export class SemanticAnalyzer {
                                         : OrbTypes.void(),
                                     builtin: false,
                                 };
+                                member.struct = node.name;
                                 methods.push(funcEntry);
                                 break;
                             }

@@ -67,6 +67,7 @@ export interface Assignment extends NodeBase {
     type: 'Assignment';
     target: string[]; // Identifier { "." Identifier } — the access chain
     value: Expression;
+    targetCopyable?: boolean;
 }
 
 export interface ReturnStatement extends NodeBase {
@@ -172,6 +173,7 @@ export interface FunctionDecl extends NodeBase {
     parameters: Parameter[];
     returnType: TypeNode | null;
     body: Block;
+    struct?: string;
 }
 
 export interface Parameter extends NodeBase {
@@ -290,6 +292,7 @@ export interface FunctionCall extends NodeBase {
     type: 'FunctionCall';
     name: string;
     args: Expression[];
+    builtin?: boolean;
 }
 
 export interface StructInit extends NodeBase {

@@ -13,7 +13,11 @@ export function generateVariableDeclStream(
         throw new Error('Variable type not resolved');
     }
     ctx.stream.write(
-        variableDeclTemplate(node.name, orbTypeToCType(node.resolvedType))
+        variableDeclTemplate(
+            node.name,
+            orbTypeToCType(node.resolvedType),
+            !node.resolvedType.copyable
+        )
     );
     if (node.initializer) {
         ctx.stream.write(' = ');

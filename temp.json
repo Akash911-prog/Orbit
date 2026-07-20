@@ -28,9 +28,11 @@
                         "kind": "array",
                         "element": {
                             "kind": "int",
-                            "copyable": true
+                            "copyable": true,
+                            "iterable": false
                         },
-                        "copyable": false
+                        "copyable": false,
+                        "iterable": true
                     }
                 }
             ],
@@ -59,7 +61,8 @@
                     "resolvedType": {
                         "kind": "struct",
                         "name": "Point",
-                        "copyable": true
+                        "copyable": true,
+                        "iterable": false
                     }
                 }
             ],
@@ -77,146 +80,26 @@
                         "name": "hello",
                         "varType": null,
                         "initializer": {
-                            "type": "ArrayLiteral",
-                            "elements": [
-                                {
-                                    "type": "IntLiteral",
-                                    "value": "1",
-                                    "line": 10,
-                                    "col": 18,
-                                    "resolvedType": {
-                                        "kind": "int",
-                                        "copyable": true
-                                    }
-                                },
-                                {
-                                    "type": "IntLiteral",
-                                    "value": "2",
-                                    "line": 10,
-                                    "col": 20,
-                                    "resolvedType": {
-                                        "kind": "int",
-                                        "copyable": true
-                                    }
-                                },
-                                {
-                                    "type": "IntLiteral",
-                                    "value": "3",
-                                    "line": 10,
-                                    "col": 22,
-                                    "resolvedType": {
-                                        "kind": "int",
-                                        "copyable": true
-                                    }
-                                },
-                                {
-                                    "type": "IntLiteral",
-                                    "value": "4",
-                                    "line": 10,
-                                    "col": 24,
-                                    "resolvedType": {
-                                        "kind": "int",
-                                        "copyable": true
-                                    }
-                                },
-                                {
-                                    "type": "IntLiteral",
-                                    "value": "5",
-                                    "line": 10,
-                                    "col": 26,
-                                    "resolvedType": {
-                                        "kind": "int",
-                                        "copyable": true
-                                    }
-                                }
-                            ],
+                            "type": "StrLiteral",
+                            "value": "string",
                             "line": 10,
                             "col": 17,
                             "resolvedType": {
-                                "kind": "array",
-                                "element": {
-                                    "kind": "int",
-                                    "copyable": true
-                                },
-                                "copyable": false
+                                "kind": "str",
+                                "copyable": true,
+                                "iterable": false
                             }
                         },
                         "line": 10,
                         "col": 5,
                         "resolvedType": {
-                            "kind": "array",
-                            "element": {
-                                "kind": "int",
-                                "copyable": true
-                            },
-                            "copyable": false
+                            "kind": "str",
+                            "copyable": true,
+                            "iterable": false
                         }
-                    },
-                    {
-                        "type": "ExpressionStatement",
-                        "expression": {
-                            "type": "MethodCall",
-                            "object": {
-                                "type": "Identifier",
-                                "name": "hello",
-                                "line": 11,
-                                "col": 5,
-                                "resolvedType": {
-                                    "kind": "array",
-                                    "element": {
-                                        "kind": "int",
-                                        "copyable": true
-                                    },
-                                    "copyable": false
-                                }
-                            },
-                            "method": "push",
-                            "args": [
-                                {
-                                    "type": "IntLiteral",
-                                    "value": "5",
-                                    "line": 11,
-                                    "col": 16,
-                                    "resolvedType": {
-                                        "kind": "int",
-                                        "copyable": true
-                                    }
-                                }
-                            ],
-                            "line": 11,
-                            "col": 5,
-                            "builtInReciever": {
-                                "kind": "array",
-                                "element": {
-                                    "kind": "int",
-                                    "copyable": true
-                                },
-                                "copyable": false
-                            },
-                            "resolvedType": {
-                                "kind": "void",
-                                "copyable": true
-                            }
-                        },
-                        "line": 11,
-                        "col": 5
                     }
                 ],
-                "needFree": [
-                    {
-                        "kind": "variable",
-                        "name": "hello",
-                        "type": {
-                            "kind": "array",
-                            "element": {
-                                "kind": "int",
-                                "copyable": true
-                            },
-                            "copyable": false
-                        },
-                        "mutable": false
-                    }
-                ],
+                "needFree": [],
                 "line": 9,
                 "col": 12
             },

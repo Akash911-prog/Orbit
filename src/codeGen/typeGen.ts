@@ -47,6 +47,12 @@ export function typeGen(
                     }
                 });
                 ctx.stream.write(`} ${shape.key};\n`);
+
+                structNode.members.forEach((member) => {
+                    if (member.type === 'FunctionDecl') {
+                        ctx.generate(member, ctx);
+                    }
+                });
                 break;
             case 'nullable':
                 emitString = nullableTemplate(orbTypeToCType(shape.type.inner));

@@ -67,5 +67,6 @@ export function handleAssignment(
     if (node.value.type === 'Identifier' && !valueType.copyable) {
         ctx.scope.update(node.value.name, { ...entry, moved: true });
     }
+    node.targetCopyable = targetType.copyable;
     return OrbTypes.void();
 }

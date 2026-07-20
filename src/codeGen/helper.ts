@@ -29,10 +29,6 @@ export function getShapeKey(t: OrbType): string {
     }
 }
 
-export function addPrefixToFnName(fnName: string) {
-    return `__orbit_${fnName}`;
-}
-
 export function directlyDependsOn(t: OrbType): OrbType[] {
     switch (t.kind) {
         case 'array':
@@ -95,4 +91,10 @@ export function cleanTemplate(strings, ...values) {
         .map((line) => line.slice(minIndent).trimEnd())
         .join('\n')
         .trim();
+}
+
+export function addPrefix(name: string, builtin?: boolean, struct?: string) {
+    if (builtin) return `__orbit_builtin_${name}`;
+    if (struct) return `__orbit_struct_${struct}_${name}`;
+    return `__orbit_${name}`;
 }

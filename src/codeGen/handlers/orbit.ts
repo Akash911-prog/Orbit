@@ -11,8 +11,8 @@ export function generateOrbitStream(
             break;
         case 'RootOrbitDecl':
             ctx.stream.write(`int main () {\n`);
-            // ctx.generate(node.body, ctx);
-            ctx.stream.write('return 0;\n}\n');
+            ctx.generate(node.body, ctx);
+            ctx.stream.write('  return 0;\n}\n');
             break;
     }
 }
