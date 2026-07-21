@@ -51,6 +51,8 @@ void _print_orbit_string(const __orbit_String *s) {
     printf("]\\n");
 }\n\n
     `,
+
+    nullable: () => {},
 };
 
 function generatePrintGenericMacro(branches: string[]): string {
@@ -97,6 +99,10 @@ export function generatePrintRuntime(
                 break;
             }
             case 'struct': {
+                const key = shape.key;
+                break;
+            }
+            case 'nullable': {
                 const key = shape.key;
                 break;
             }

@@ -8,8 +8,9 @@ export function generateFuncDeclstream(
 ): void {
     const funcEntry = ctx.scope.lookupLocal(node.name);
     if (!funcEntry || funcEntry.kind !== 'function') return;
+    const returnType = funcEntry.returnType;
     ctx.stream.write(
-        `${orbTypeToCType(funcEntry.returnType)} ${addPrefix(node.name, funcEntry.builtin, node.struct)}(`
+        `${orbTypeToCType(returnType)}${returnType.copyable ? '' : '*'} ${addPrefix(node.name, funcEntry.builtin, node.struct)}(`
     );
     funcEntry.params.forEach((param, i) => {
         ctx.stream.write(

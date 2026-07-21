@@ -36,6 +36,7 @@ export class CodeGen {
             globalScope: globalTable,
             scope: globalTable,
             shapeInfo: new Map(),
+            tempCounter: 0,
             generate: (node: any, ctx: CodeGenContext) =>
                 this.generate(node, ctx),
         };

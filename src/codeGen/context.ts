@@ -7,5 +7,6 @@ export interface CodeGenContext {
     stream: fs.WriteStream;
     shapeInfo: Map<string, ShapeInfo>;
     scope: SymbolTable;
+    tempCounter: number;
     generate: (node: any, ctx: CodeGenContext) => void;
 }

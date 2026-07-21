@@ -1,5 +1,10 @@
 import type { Program, StructDecl } from '../parser/nodeTypes';
-import { arrayTemplate, nullableTemplate, tupleTemplate } from './constants';
+import {
+    arrayTemplate,
+    nullableCreateTemplate,
+    nullableTemplate,
+    tupleTemplate,
+} from './constants';
 import type { CodeGenContext } from './context';
 import { generateVariableDeclStream } from './handlers/variableDecl';
 import { orbTypeToCType } from './helper';
@@ -55,7 +60,10 @@ export function typeGen(
                 });
                 break;
             case 'nullable':
-                emitString = nullableTemplate(orbTypeToCType(shape.type.inner));
+                ctx.stream.write(
+                    nullableTemplate(orbTypeToCType(shape.type.inner))
+                );
+                ctx.stream.write(nullableCreateTemplate(shape.type, shape.key));
                 break;
             case 'map':
                 throw new Error('Map type not supported yet');

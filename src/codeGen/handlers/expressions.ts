@@ -58,11 +58,11 @@ export function generateExpressionStream(
             break;
 
         case 'NullCheckExpr':
-            ctx.stream.write('(');
+            ctx.stream.write('!((');
             ctx.generate(node.expression, ctx);
             ctx.stream.write(')');
             ctx.stream.write('.');
-            ctx.stream.write('is_null');
+            ctx.stream.write('is_null)');
             break;
 
         case 'RangeExpr':

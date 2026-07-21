@@ -1,7 +1,9 @@
+// functionDecl.ts
 import type { FunctionDecl } from '../../parser/nodeTypes';
 import type { FunctionEntry } from '../../symbolTable/symbolTable';
 import { OrbTypes, type OrbType } from '../../types';
 import type { AnalyzerContext } from '../context';
+import { processBlockBody } from './block'; // adjust path
 
 export function handleFunctionDecl(
     node: FunctionDecl,
@@ -11,8 +13,6 @@ export function handleFunctionDecl(
     if (preDefined) {
         if (preDefined.kind === 'function' && preDefined.builtin) {
             ctx.reportError(`${node.name} is a builtin function`, node);
-        } else {
-            ctx.reportError(`${node.name} is already defined`, node);
         }
     }
 
@@ -32,7 +32,25 @@ export function handleFunctionDecl(
 
     const previousFn = ctx.currentFunction;
     ctx.currentFunction = entry;
-    ctx.visit(node.body, ctx);
+
+    const parentScope = ctx.scope;
+    ctx.scope = ctx.scope.enterScope();
+
+    // define params in the function's own scope, not the block's nested one
+    for (const param of entry.params) {
+        ctx.scope.define(param.name, {
+            kind: 'variable',
+            name: param.name,
+            type: param.type,
+            moved: false,
+            mutable: false,
+        });
+    }
+
+    processBlockBody(node.body, ctx);
+
+    ctx.scope = parentScope;
     ctx.currentFunction = previousFn;
+
     return OrbTypes.void();
 }

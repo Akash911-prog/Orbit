@@ -1,4 +1,5 @@
-import { cleanTemplate } from './helper';
+import type { OrbType } from '../types';
+import { cleanTemplate, orbTypeToCType } from './helper';
 
 export const OUTPUT_PATH = './build/__temp_c_out.c';
 
@@ -374,4 +375,27 @@ export const structMethodNameTemplate = {
 };
 
 export const ForLoopStarte = (start: string, end: string) =>
-    cleanTemplate`for (int32_t __i = ${start}; __i < ${end}; __i++) {\n`;
+    `for (int32_t __i = ${start}; __i < ${end}; __i++) {\n`;
+
+// in BuiltInMethodTemplate['nullable']['create'].impl(cType, shapeKey)
+
+export function isPointerType(cType: OrbType): boolean {
+    return !cType.copyable;
+}
+export function nullableCreateTemplate(
+    type: OrbType,
+    shapeKey: string
+): string {
+    const structName = `${shapeKey}`;
+    const nullValue = isPointerType(type) ? 'NULL' : '0';
+
+    return `
+static inline ${structName} ${structName}_create_null(void) {
+    return (${structName}){ .value = ${nullValue}, .is_null = true };
+}
+
+static inline ${structName} ${structName}_create_value(${orbTypeToCType(type.inner)} v) {
+    return (${structName}){ .value = v, .is_null = false };
+}
+`;
+}

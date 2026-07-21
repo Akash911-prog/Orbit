@@ -2,7 +2,7 @@ import { OrbTypes, type OrbType } from '../../types';
 import type { AnalyzerContext } from '../context';
 import type { IfStatement } from '../../parser/nodeTypes';
 import { expectType } from '../helper';
-import { handleBlock } from './block';
+import { handleBlock, processBlockBody } from './block';
 
 export function handleIfStatement(
     node: IfStatement,
@@ -10,6 +10,9 @@ export function handleIfStatement(
 ): OrbType {
     const condType = ctx.visit(node.condition, ctx);
     expectType(OrbTypes.bool(), condType, node, ctx);
+
+    const parent = ctx.scope;
+    ctx.scope = ctx.scope.enterScope();
 
     if (
         node.condition.type === 'NullCheckExpr' &&
@@ -24,7 +27,9 @@ export function handleIfStatement(
         }
     }
 
-    handleBlock(node.thenBranch, ctx);
+    processBlockBody(node.thenBranch, ctx);
+
+    ctx.scope = parent;
 
     if (node.elseBranch) {
         ctx.visit(node.elseBranch, ctx);

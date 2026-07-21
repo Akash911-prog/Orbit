@@ -14,6 +14,7 @@ import type {
     TupleLiteral,
 } from '../../parser/nodeTypes';
 import { OrbTypes, type OrbType } from '../../types';
+import { BUILT_IN_TYPE_PROPERTIES } from '../constants';
 import type { AnalyzerContext } from '../context';
 import { expectNumeric, expectType, isAssignable, typesEqual } from '../helper';
 import { BuiltinMethods } from '../registery';
@@ -229,6 +230,16 @@ function handleMemberAccess(node: MemberAccess, ctx: AnalyzerContext): OrbType {
     const objType = ctx.visit(node.object, ctx);
 
     if (objType.kind === 'unknown') return OrbTypes.unknown();
+    if (['array', 'String', 'tuple'].includes(objType.kind)) {
+        const type = BUILT_IN_TYPE_PROPERTIES.common![node.property];
+        if (type) return type;
+
+        const specificType =
+            BUILT_IN_TYPE_PROPERTIES[objType.kind]![node.property];
+        if (specificType) return specificType;
+    }
+
+    //TODO: ADD FOR MAPS PROPERTY LIST
 
     if (objType.kind !== 'struct') {
         ctx.reportError(

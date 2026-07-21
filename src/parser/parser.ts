@@ -575,9 +575,11 @@ export class Parser {
         this.log('parseForStatement');
         const { line, col, ..._ } = this.current;
         this.expect([TokenType.KeywordFor]);
+        this.expect([TokenType.OpenParen]);
         const variable = this.expect([TokenType.Identifier]).value;
         this.expect([TokenType.KeywordIn]);
         const expr = this.parseExpression();
+        this.expect([TokenType.CloseParen]);
         const block = this.parseBlock();
 
         return {

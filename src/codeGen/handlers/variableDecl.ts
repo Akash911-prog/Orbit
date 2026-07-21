@@ -1,8 +1,6 @@
 import type { VariableDecl } from '../../parser/nodeTypes';
-import fs from 'node:fs';
 import { variableDeclTemplate } from '../constants';
-import { orbTypeToCType } from '../helper';
-import { generateExpressionStream } from './expressions';
+import { getShapeKey, orbTypeToCType } from '../helper';
 import type { CodeGenContext } from '../context';
 
 export function generateVariableDeclStream(
@@ -19,7 +17,19 @@ export function generateVariableDeclStream(
             !node.resolvedType.copyable
         )
     );
-    if (node.initializer) {
+    if (
+        node.resolvedType.kind === 'nullable' &&
+        node.initializer?.resolvedType?.kind === 'null'
+    ) {
+        ctx.stream.write(' = ');
+        ctx.stream.write(`${getShapeKey(node.resolvedType)}_create_null()`);
+    } else if (node.resolvedType.kind === 'nullable') {
+        ctx.stream.write(' = ');
+        ctx.stream.write(`${getShapeKey(node.resolvedType)}_create_value(`);
+        ctx.generate(node.initializer, ctx);
+        ctx.stream.write(')');
+    }
+    if (node.initializer && node.resolvedType.kind !== 'nullable') {
         ctx.stream.write(' = ');
         ctx.generate(node.initializer, ctx);
     }

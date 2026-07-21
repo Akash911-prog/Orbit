@@ -2,38 +2,1385 @@
     "type": "Program",
     "declarations": [
         {
+            "type": "StructDecl",
+            "name": "Point",
+            "generic": null,
+            "members": [
+                {
+                    "type": "VariableDecl",
+                    "kind": "var",
+                    "name": "x",
+                    "varType": {
+                        "type": "BaseType",
+                        "name": "int",
+                        "line": 2,
+                        "col": 12
+                    },
+                    "initializer": null,
+                    "line": 2,
+                    "col": 5,
+                    "resolvedType": {
+                        "kind": "int",
+                        "copyable": true,
+                        "iterable": false
+                    }
+                },
+                {
+                    "type": "VariableDecl",
+                    "kind": "var",
+                    "name": "y",
+                    "varType": {
+                        "type": "BaseType",
+                        "name": "int",
+                        "line": 3,
+                        "col": 12
+                    },
+                    "initializer": null,
+                    "line": 3,
+                    "col": 5,
+                    "resolvedType": {
+                        "kind": "int",
+                        "copyable": true,
+                        "iterable": false
+                    }
+                }
+            ],
+            "line": 1,
+            "col": 1
+        },
+        {
+            "type": "FunctionDecl",
+            "name": "add",
+            "body": {
+                "type": "Block",
+                "statements": [
+                    {
+                        "type": "ReturnStatement",
+                        "value": {
+                            "type": "BinaryExpr",
+                            "operator": "+",
+                            "left": {
+                                "type": "Identifier",
+                                "name": "a",
+                                "line": 7,
+                                "col": 12,
+                                "resolvedType": {
+                                    "kind": "int",
+                                    "copyable": true,
+                                    "iterable": false
+                                }
+                            },
+                            "right": {
+                                "type": "Identifier",
+                                "name": "b",
+                                "line": 7,
+                                "col": 16,
+                                "resolvedType": {
+                                    "kind": "int",
+                                    "copyable": true,
+                                    "iterable": false
+                                }
+                            },
+                            "line": 7,
+                            "col": 12,
+                            "resolvedType": {
+                                "kind": "int",
+                                "copyable": true,
+                                "iterable": false
+                            }
+                        },
+                        "line": 7,
+                        "col": 5
+                    }
+                ],
+                "needFree": [],
+                "line": 6,
+                "col": 29
+            },
+            "generic": null,
+            "parameters": [
+                {
+                    "type": "Parameter",
+                    "name": "a",
+                    "paramType": {
+                        "type": "BaseType",
+                        "name": "int",
+                        "line": 6,
+                        "col": 11
+                    },
+                    "line": 6,
+                    "col": 8
+                },
+                {
+                    "type": "Parameter",
+                    "name": "b",
+                    "paramType": {
+                        "type": "BaseType",
+                        "name": "int",
+                        "line": 6,
+                        "col": 19
+                    },
+                    "line": 6,
+                    "col": 16
+                }
+            ],
+            "returnType": {
+                "type": "BaseType",
+                "name": "int",
+                "line": 6,
+                "col": 25
+            },
+            "line": 6,
+            "col": 1
+        },
+        {
+            "type": "FunctionDecl",
+            "name": "describe",
+            "body": {
+                "type": "Block",
+                "statements": [
+                    {
+                        "type": "ReturnStatement",
+                        "value": {
+                            "type": "StrLiteral",
+                            "value": "point",
+                            "line": 11,
+                            "col": 12,
+                            "resolvedType": {
+                                "kind": "String",
+                                "copyable": false,
+                                "iterable": true
+                            }
+                        },
+                        "line": 11,
+                        "col": 5
+                    }
+                ],
+                "needFree": [],
+                "line": 10,
+                "col": 31
+            },
+            "generic": null,
+            "parameters": [
+                {
+                    "type": "Parameter",
+                    "name": "p",
+                    "paramType": {
+                        "type": "GenericType",
+                        "name": "Point",
+                        "typeArg": null,
+                        "line": 10,
+                        "col": 16
+                    },
+                    "line": 10,
+                    "col": 13
+                }
+            ],
+            "returnType": {
+                "type": "BaseType",
+                "name": "String",
+                "line": 10,
+                "col": 24
+            },
+            "line": 10,
+            "col": 1
+        },
+        {
             "type": "RootOrbitDecl",
             "body": {
                 "type": "Block",
                 "statements": [
                     {
-                        "type": "ExpressionStatement",
-                        "expression": {
-                            "type": "FunctionCall",
-                            "name": "print",
-                            "args": [
-                                {
-                                    "type": "StrLiteral",
-                                    "value": "hello",
-                                    "line": 2,
-                                    "col": 11,
-                                    "resolvedType": {
-                                        "kind": "String",
-                                        "copyable": false,
-                                        "iterable": true
-                                    }
-                                }
-                            ],
-                            "line": 2,
-                            "col": 5,
-                            "builtin": true,
+                        "type": "VariableDecl",
+                        "kind": "let",
+                        "name": "i",
+                        "varType": {
+                            "type": "BaseType",
+                            "name": "int",
+                            "line": 16,
+                            "col": 12
+                        },
+                        "initializer": {
+                            "type": "IntLiteral",
+                            "value": "42",
+                            "line": 16,
+                            "col": 18,
                             "resolvedType": {
-                                "kind": "void",
+                                "kind": "int",
                                 "copyable": true,
                                 "iterable": false
                             }
                         },
-                        "line": 2,
+                        "line": 16,
+                        "col": 5,
+                        "resolvedType": {
+                            "kind": "int",
+                            "copyable": true,
+                            "iterable": false
+                        }
+                    },
+                    {
+                        "type": "VariableDecl",
+                        "kind": "let",
+                        "name": "f",
+                        "varType": {
+                            "type": "BaseType",
+                            "name": "float",
+                            "line": 17,
+                            "col": 12
+                        },
+                        "initializer": {
+                            "type": "FloatLiteral",
+                            "value": "3.14",
+                            "line": 17,
+                            "col": 20,
+                            "resolvedType": {
+                                "kind": "float",
+                                "copyable": true,
+                                "iterable": false
+                            }
+                        },
+                        "line": 17,
+                        "col": 5,
+                        "resolvedType": {
+                            "kind": "float",
+                            "copyable": true,
+                            "iterable": false
+                        }
+                    },
+                    {
+                        "type": "VariableDecl",
+                        "kind": "let",
+                        "name": "s",
+                        "varType": {
+                            "type": "BaseType",
+                            "name": "String",
+                            "line": 18,
+                            "col": 12
+                        },
+                        "initializer": {
+                            "type": "StrLiteral",
+                            "value": "hello",
+                            "line": 18,
+                            "col": 21,
+                            "resolvedType": {
+                                "kind": "String",
+                                "copyable": false,
+                                "iterable": true
+                            }
+                        },
+                        "line": 18,
+                        "col": 5,
+                        "resolvedType": {
+                            "kind": "String",
+                            "copyable": false,
+                            "iterable": true
+                        }
+                    },
+                    {
+                        "type": "VariableDecl",
+                        "kind": "let",
+                        "name": "b",
+                        "varType": {
+                            "type": "BaseType",
+                            "name": "bool",
+                            "line": 19,
+                            "col": 12
+                        },
+                        "initializer": {
+                            "type": "BoolLiteral",
+                            "value": true,
+                            "line": 19,
+                            "col": 19,
+                            "resolvedType": {
+                                "kind": "bool",
+                                "copyable": true,
+                                "iterable": false
+                            }
+                        },
+                        "line": 19,
+                        "col": 5,
+                        "resolvedType": {
+                            "kind": "bool",
+                            "copyable": true,
+                            "iterable": false
+                        }
+                    },
+                    {
+                        "type": "VariableDecl",
+                        "kind": "let",
+                        "name": "n",
+                        "varType": {
+                            "type": "NullableType",
+                            "inner": {
+                                "type": "BaseType",
+                                "name": "int",
+                                "line": 20,
+                                "col": 12
+                            },
+                            "line": 20,
+                            "col": 12
+                        },
+                        "initializer": {
+                            "type": "NullLiteral",
+                            "line": 20,
+                            "col": 19,
+                            "resolvedType": {
+                                "kind": "null",
+                                "copyable": true,
+                                "iterable": false
+                            }
+                        },
+                        "line": 20,
+                        "col": 5,
+                        "resolvedType": {
+                            "kind": "nullable",
+                            "inner": {
+                                "kind": "int",
+                                "copyable": true,
+                                "iterable": false
+                            },
+                            "copyable": true,
+                            "iterable": false
+                        }
+                    },
+                    {
+                        "type": "IfStatement",
+                        "condition": {
+                            "type": "NullCheckExpr",
+                            "expression": {
+                                "type": "Identifier",
+                                "name": "n",
+                                "line": 21,
+                                "col": 9,
+                                "resolvedType": {
+                                    "kind": "nullable",
+                                    "inner": {
+                                        "kind": "int",
+                                        "copyable": true,
+                                        "iterable": false
+                                    },
+                                    "copyable": true,
+                                    "iterable": false
+                                }
+                            },
+                            "line": 21,
+                            "col": 9,
+                            "resolvedType": {
+                                "kind": "bool",
+                                "copyable": true,
+                                "iterable": false
+                            }
+                        },
+                        "thenBranch": {
+                            "type": "Block",
+                            "statements": [
+                                {
+                                    "type": "ExpressionStatement",
+                                    "expression": {
+                                        "type": "FunctionCall",
+                                        "name": "print",
+                                        "args": [
+                                            {
+                                                "type": "Identifier",
+                                                "name": "n",
+                                                "line": 22,
+                                                "col": 15,
+                                                "resolvedType": {
+                                                    "kind": "nullable",
+                                                    "inner": {
+                                                        "kind": "int",
+                                                        "copyable": true,
+                                                        "iterable": false
+                                                    },
+                                                    "copyable": true,
+                                                    "iterable": false
+                                                }
+                                            }
+                                        ],
+                                        "line": 22,
+                                        "col": 9,
+                                        "builtin": true,
+                                        "resolvedType": {
+                                            "kind": "void",
+                                            "copyable": true,
+                                            "iterable": false
+                                        }
+                                    },
+                                    "line": 22,
+                                    "col": 9
+                                }
+                            ],
+                            "needFree": [],
+                            "line": 21,
+                            "col": 13
+                        },
+                        "elseBranch": null,
+                        "line": 21,
+                        "col": 5
+                    },
+                    {
+                        "type": "VariableDecl",
+                        "kind": "let",
+                        "name": "neg",
+                        "varType": {
+                            "type": "BaseType",
+                            "name": "int",
+                            "line": 26,
+                            "col": 14
+                        },
+                        "initializer": {
+                            "type": "UnaryExpr",
+                            "operator": "-",
+                            "operand": {
+                                "type": "Identifier",
+                                "name": "i",
+                                "line": 26,
+                                "col": 21,
+                                "resolvedType": {
+                                    "kind": "int",
+                                    "copyable": true,
+                                    "iterable": false
+                                }
+                            },
+                            "line": 26,
+                            "col": 20,
+                            "resolvedType": {
+                                "kind": "int",
+                                "copyable": true,
+                                "iterable": false
+                            }
+                        },
+                        "line": 26,
+                        "col": 5,
+                        "resolvedType": {
+                            "kind": "int",
+                            "copyable": true,
+                            "iterable": false
+                        }
+                    },
+                    {
+                        "type": "VariableDecl",
+                        "kind": "let",
+                        "name": "notB",
+                        "varType": {
+                            "type": "BaseType",
+                            "name": "bool",
+                            "line": 27,
+                            "col": 15
+                        },
+                        "initializer": {
+                            "type": "UnaryExpr",
+                            "operator": "!",
+                            "operand": {
+                                "type": "Identifier",
+                                "name": "b",
+                                "line": 27,
+                                "col": 23,
+                                "resolvedType": {
+                                    "kind": "bool",
+                                    "copyable": true,
+                                    "iterable": false
+                                }
+                            },
+                            "line": 27,
+                            "col": 22,
+                            "resolvedType": {
+                                "kind": "bool",
+                                "copyable": true,
+                                "iterable": false
+                            }
+                        },
+                        "line": 27,
+                        "col": 5,
+                        "resolvedType": {
+                            "kind": "bool",
+                            "copyable": true,
+                            "iterable": false
+                        }
+                    },
+                    {
+                        "type": "VariableDecl",
+                        "kind": "let",
+                        "name": "sum",
+                        "varType": {
+                            "type": "BaseType",
+                            "name": "int",
+                            "line": 28,
+                            "col": 14
+                        },
+                        "initializer": {
+                            "type": "BinaryExpr",
+                            "operator": "+",
+                            "left": {
+                                "type": "Identifier",
+                                "name": "i",
+                                "line": 28,
+                                "col": 20,
+                                "resolvedType": {
+                                    "kind": "int",
+                                    "copyable": true,
+                                    "iterable": false
+                                }
+                            },
+                            "right": {
+                                "type": "IntLiteral",
+                                "value": "10",
+                                "line": 28,
+                                "col": 24,
+                                "resolvedType": {
+                                    "kind": "int",
+                                    "copyable": true,
+                                    "iterable": false
+                                }
+                            },
+                            "line": 28,
+                            "col": 20,
+                            "resolvedType": {
+                                "kind": "int",
+                                "copyable": true,
+                                "iterable": false
+                            }
+                        },
+                        "line": 28,
+                        "col": 5,
+                        "resolvedType": {
+                            "kind": "int",
+                            "copyable": true,
+                            "iterable": false
+                        }
+                    },
+                    {
+                        "type": "VariableDecl",
+                        "kind": "let",
+                        "name": "cmp",
+                        "varType": {
+                            "type": "BaseType",
+                            "name": "bool",
+                            "line": 29,
+                            "col": 14
+                        },
+                        "initializer": {
+                            "type": "BinaryExpr",
+                            "operator": ">",
+                            "left": {
+                                "type": "Identifier",
+                                "name": "sum",
+                                "line": 29,
+                                "col": 21,
+                                "resolvedType": {
+                                    "kind": "int",
+                                    "copyable": true,
+                                    "iterable": false
+                                }
+                            },
+                            "right": {
+                                "type": "IntLiteral",
+                                "value": "50",
+                                "line": 29,
+                                "col": 27,
+                                "resolvedType": {
+                                    "kind": "int",
+                                    "copyable": true,
+                                    "iterable": false
+                                }
+                            },
+                            "line": 29,
+                            "col": 21,
+                            "resolvedType": {
+                                "kind": "bool",
+                                "copyable": true,
+                                "iterable": false
+                            }
+                        },
+                        "line": 29,
+                        "col": 5,
+                        "resolvedType": {
+                            "kind": "bool",
+                            "copyable": true,
+                            "iterable": false
+                        }
+                    },
+                    {
+                        "type": "VariableDecl",
+                        "kind": "let",
+                        "name": "checked",
+                        "varType": {
+                            "type": "BaseType",
+                            "name": "bool",
+                            "line": 32,
+                            "col": 18
+                        },
+                        "initializer": {
+                            "type": "NullCheckExpr",
+                            "expression": {
+                                "type": "Identifier",
+                                "name": "n",
+                                "line": 32,
+                                "col": 25,
+                                "resolvedType": {
+                                    "kind": "nullable",
+                                    "inner": {
+                                        "kind": "int",
+                                        "copyable": true,
+                                        "iterable": false
+                                    },
+                                    "copyable": true,
+                                    "iterable": false
+                                }
+                            },
+                            "line": 32,
+                            "col": 25,
+                            "resolvedType": {
+                                "kind": "bool",
+                                "copyable": true,
+                                "iterable": false
+                            }
+                        },
+                        "line": 32,
+                        "col": 5,
+                        "resolvedType": {
+                            "kind": "bool",
+                            "copyable": true,
+                            "iterable": false
+                        }
+                    },
+                    {
+                        "type": "VariableDecl",
+                        "kind": "let",
+                        "name": "r",
+                        "varType": {
+                            "type": "ArrayType",
+                            "element": {
+                                "type": "BaseType",
+                                "name": "int",
+                                "line": 35,
+                                "col": 12
+                            },
+                            "line": 35,
+                            "col": 12
+                        },
+                        "initializer": {
+                            "type": "RangeExpr",
+                            "inclusive": true,
+                            "start": {
+                                "type": "IntLiteral",
+                                "value": "1",
+                                "line": 35,
+                                "col": 20,
+                                "resolvedType": {
+                                    "kind": "int",
+                                    "copyable": true,
+                                    "iterable": false
+                                }
+                            },
+                            "end": {
+                                "type": "IntLiteral",
+                                "value": "5",
+                                "line": 35,
+                                "col": 24,
+                                "resolvedType": {
+                                    "kind": "int",
+                                    "copyable": true,
+                                    "iterable": false
+                                }
+                            },
+                            "line": 35,
+                            "col": 20,
+                            "resolvedType": {
+                                "kind": "array",
+                                "element": {
+                                    "kind": "int",
+                                    "copyable": true,
+                                    "iterable": false
+                                },
+                                "copyable": false,
+                                "iterable": true
+                            }
+                        },
+                        "line": 35,
+                        "col": 5,
+                        "resolvedType": {
+                            "kind": "array",
+                            "element": {
+                                "kind": "int",
+                                "copyable": true,
+                                "iterable": false
+                            },
+                            "copyable": false,
+                            "iterable": true
+                        }
+                    },
+                    {
+                        "type": "VariableDecl",
+                        "kind": "let",
+                        "name": "arr",
+                        "varType": {
+                            "type": "ArrayType",
+                            "element": {
+                                "type": "BaseType",
+                                "name": "int",
+                                "line": 38,
+                                "col": 14
+                            },
+                            "line": 38,
+                            "col": 14
+                        },
+                        "initializer": {
+                            "type": "ArrayLiteral",
+                            "elements": [
+                                {
+                                    "type": "IntLiteral",
+                                    "value": "1",
+                                    "line": 38,
+                                    "col": 23,
+                                    "resolvedType": {
+                                        "kind": "int",
+                                        "copyable": true,
+                                        "iterable": false
+                                    }
+                                },
+                                {
+                                    "type": "IntLiteral",
+                                    "value": "2",
+                                    "line": 38,
+                                    "col": 26,
+                                    "resolvedType": {
+                                        "kind": "int",
+                                        "copyable": true,
+                                        "iterable": false
+                                    }
+                                },
+                                {
+                                    "type": "IntLiteral",
+                                    "value": "3",
+                                    "line": 38,
+                                    "col": 29,
+                                    "resolvedType": {
+                                        "kind": "int",
+                                        "copyable": true,
+                                        "iterable": false
+                                    }
+                                }
+                            ],
+                            "line": 38,
+                            "col": 22,
+                            "resolvedType": {
+                                "kind": "array",
+                                "element": {
+                                    "kind": "int",
+                                    "copyable": true,
+                                    "iterable": false
+                                },
+                                "copyable": false,
+                                "iterable": true
+                            }
+                        },
+                        "line": 38,
+                        "col": 5,
+                        "resolvedType": {
+                            "kind": "array",
+                            "element": {
+                                "kind": "int",
+                                "copyable": true,
+                                "iterable": false
+                            },
+                            "copyable": false,
+                            "iterable": true
+                        }
+                    },
+                    {
+                        "type": "VariableDecl",
+                        "kind": "let",
+                        "name": "pt",
+                        "varType": {
+                            "type": "GenericType",
+                            "name": "Point",
+                            "typeArg": null,
+                            "line": 47,
+                            "col": 13
+                        },
+                        "initializer": {
+                            "type": "StructInit",
+                            "name": "Point",
+                            "fields": [
+                                {
+                                    "type": "FieldInit",
+                                    "name": "x",
+                                    "value": {
+                                        "type": "IntLiteral",
+                                        "value": "3",
+                                        "line": 47,
+                                        "col": 32,
+                                        "resolvedType": {
+                                            "kind": "int",
+                                            "copyable": true,
+                                            "iterable": false
+                                        }
+                                    },
+                                    "line": 47,
+                                    "col": 29
+                                },
+                                {
+                                    "type": "FieldInit",
+                                    "name": "y",
+                                    "value": {
+                                        "type": "IntLiteral",
+                                        "value": "4",
+                                        "line": 47,
+                                        "col": 38,
+                                        "resolvedType": {
+                                            "kind": "int",
+                                            "copyable": true,
+                                            "iterable": false
+                                        }
+                                    },
+                                    "line": 47,
+                                    "col": 35
+                                }
+                            ],
+                            "line": 47,
+                            "col": 27,
+                            "resolvedType": {
+                                "kind": "struct",
+                                "name": "Point",
+                                "copyable": true,
+                                "iterable": false
+                            }
+                        },
+                        "line": 47,
+                        "col": 5,
+                        "resolvedType": {
+                            "kind": "struct",
+                            "name": "Point",
+                            "copyable": true,
+                            "iterable": false
+                        }
+                    },
+                    {
+                        "type": "VariableDecl",
+                        "kind": "let",
+                        "name": "px",
+                        "varType": {
+                            "type": "BaseType",
+                            "name": "int",
+                            "line": 48,
+                            "col": 13
+                        },
+                        "initializer": {
+                            "type": "MemberAccess",
+                            "object": {
+                                "type": "Identifier",
+                                "name": "pt",
+                                "line": 48,
+                                "col": 19,
+                                "resolvedType": {
+                                    "kind": "struct",
+                                    "name": "Point",
+                                    "copyable": true,
+                                    "iterable": false
+                                }
+                            },
+                            "property": "x",
+                            "line": 48,
+                            "col": 19,
+                            "resolvedType": {
+                                "kind": "int",
+                                "copyable": true,
+                                "iterable": false
+                            }
+                        },
+                        "line": 48,
+                        "col": 5,
+                        "resolvedType": {
+                            "kind": "int",
+                            "copyable": true,
+                            "iterable": false
+                        }
+                    },
+                    {
+                        "type": "VariableDecl",
+                        "kind": "let",
+                        "name": "called",
+                        "varType": {
+                            "type": "BaseType",
+                            "name": "int",
+                            "line": 51,
+                            "col": 17
+                        },
+                        "initializer": {
+                            "type": "FunctionCall",
+                            "name": "add",
+                            "args": [
+                                {
+                                    "type": "IntLiteral",
+                                    "value": "2",
+                                    "line": 51,
+                                    "col": 27,
+                                    "resolvedType": {
+                                        "kind": "int",
+                                        "copyable": true,
+                                        "iterable": false
+                                    }
+                                },
+                                {
+                                    "type": "IntLiteral",
+                                    "value": "3",
+                                    "line": 51,
+                                    "col": 30,
+                                    "resolvedType": {
+                                        "kind": "int",
+                                        "copyable": true,
+                                        "iterable": false
+                                    }
+                                }
+                            ],
+                            "line": 51,
+                            "col": 23,
+                            "builtin": false,
+                            "resolvedType": {
+                                "kind": "int",
+                                "copyable": true,
+                                "iterable": false
+                            }
+                        },
+                        "line": 51,
+                        "col": 5,
+                        "resolvedType": {
+                            "kind": "int",
+                            "copyable": true,
+                            "iterable": false
+                        }
+                    },
+                    {
+                        "type": "VariableDecl",
+                        "kind": "let",
+                        "name": "len",
+                        "varType": {
+                            "type": "BaseType",
+                            "name": "int",
+                            "line": 54,
+                            "col": 14
+                        },
+                        "initializer": {
+                            "type": "MemberAccess",
+                            "object": {
+                                "type": "Identifier",
+                                "name": "arr",
+                                "line": 54,
+                                "col": 20,
+                                "resolvedType": {
+                                    "kind": "array",
+                                    "element": {
+                                        "kind": "int",
+                                        "copyable": true,
+                                        "iterable": false
+                                    },
+                                    "copyable": false,
+                                    "iterable": true
+                                }
+                            },
+                            "property": "length",
+                            "line": 54,
+                            "col": 20,
+                            "resolvedType": {
+                                "kind": "int",
+                                "copyable": true,
+                                "iterable": false
+                            }
+                        },
+                        "line": 54,
+                        "col": 5,
+                        "resolvedType": {
+                            "kind": "int",
+                            "copyable": true,
+                            "iterable": false
+                        }
+                    },
+                    {
+                        "type": "VariableDecl",
+                        "kind": "let",
+                        "name": "desc",
+                        "varType": null,
+                        "initializer": {
+                            "type": "FunctionCall",
+                            "name": "describe",
+                            "args": [
+                                {
+                                    "type": "Identifier",
+                                    "name": "pt",
+                                    "line": 57,
+                                    "col": 25,
+                                    "resolvedType": {
+                                        "kind": "struct",
+                                        "name": "Point",
+                                        "copyable": true,
+                                        "iterable": false
+                                    }
+                                }
+                            ],
+                            "line": 57,
+                            "col": 16,
+                            "builtin": false,
+                            "resolvedType": {
+                                "kind": "String",
+                                "copyable": false,
+                                "iterable": true
+                            }
+                        },
+                        "line": 57,
+                        "col": 5,
+                        "resolvedType": {
+                            "kind": "String",
+                            "copyable": false,
+                            "iterable": true
+                        }
+                    },
+                    {
+                        "type": "VariableDecl",
+                        "kind": "var",
+                        "name": "counter",
+                        "varType": {
+                            "type": "BaseType",
+                            "name": "int",
+                            "line": 60,
+                            "col": 18
+                        },
+                        "initializer": {
+                            "type": "IntLiteral",
+                            "value": "0",
+                            "line": 60,
+                            "col": 24,
+                            "resolvedType": {
+                                "kind": "int",
+                                "copyable": true,
+                                "iterable": false
+                            }
+                        },
+                        "line": 60,
+                        "col": 5,
+                        "resolvedType": {
+                            "kind": "int",
+                            "copyable": true,
+                            "iterable": false
+                        }
+                    },
+                    {
+                        "type": "Assignment",
+                        "target": [
+                            "counter"
+                        ],
+                        "value": {
+                            "type": "BinaryExpr",
+                            "operator": "+",
+                            "left": {
+                                "type": "Identifier",
+                                "name": "counter",
+                                "line": 61,
+                                "col": 15,
+                                "resolvedType": {
+                                    "kind": "int",
+                                    "copyable": true,
+                                    "iterable": false
+                                }
+                            },
+                            "right": {
+                                "type": "IntLiteral",
+                                "value": "1",
+                                "line": 61,
+                                "col": 25,
+                                "resolvedType": {
+                                    "kind": "int",
+                                    "copyable": true,
+                                    "iterable": false
+                                }
+                            },
+                            "line": 61,
+                            "col": 15,
+                            "resolvedType": {
+                                "kind": "int",
+                                "copyable": true,
+                                "iterable": false
+                            }
+                        },
+                        "line": 61,
+                        "col": 5,
+                        "targetCopyable": true
+                    },
+                    {
+                        "type": "IfStatement",
+                        "condition": {
+                            "type": "Identifier",
+                            "name": "cmp",
+                            "line": 64,
+                            "col": 9,
+                            "resolvedType": {
+                                "kind": "bool",
+                                "copyable": true,
+                                "iterable": false
+                            }
+                        },
+                        "thenBranch": {
+                            "type": "Block",
+                            "statements": [
+                                {
+                                    "type": "Assignment",
+                                    "target": [
+                                        "counter"
+                                    ],
+                                    "value": {
+                                        "type": "BinaryExpr",
+                                        "operator": "+",
+                                        "left": {
+                                            "type": "Identifier",
+                                            "name": "counter",
+                                            "line": 65,
+                                            "col": 19,
+                                            "resolvedType": {
+                                                "kind": "int",
+                                                "copyable": true,
+                                                "iterable": false
+                                            }
+                                        },
+                                        "right": {
+                                            "type": "IntLiteral",
+                                            "value": "1",
+                                            "line": 65,
+                                            "col": 29,
+                                            "resolvedType": {
+                                                "kind": "int",
+                                                "copyable": true,
+                                                "iterable": false
+                                            }
+                                        },
+                                        "line": 65,
+                                        "col": 19,
+                                        "resolvedType": {
+                                            "kind": "int",
+                                            "copyable": true,
+                                            "iterable": false
+                                        }
+                                    },
+                                    "line": 65,
+                                    "col": 9,
+                                    "targetCopyable": true
+                                }
+                            ],
+                            "needFree": [],
+                            "line": 64,
+                            "col": 14
+                        },
+                        "elseBranch": {
+                            "type": "Block",
+                            "statements": [
+                                {
+                                    "type": "Assignment",
+                                    "target": [
+                                        "counter"
+                                    ],
+                                    "value": {
+                                        "type": "BinaryExpr",
+                                        "operator": "-",
+                                        "left": {
+                                            "type": "Identifier",
+                                            "name": "counter",
+                                            "line": 67,
+                                            "col": 19,
+                                            "resolvedType": {
+                                                "kind": "int",
+                                                "copyable": true,
+                                                "iterable": false
+                                            }
+                                        },
+                                        "right": {
+                                            "type": "IntLiteral",
+                                            "value": "1",
+                                            "line": 67,
+                                            "col": 29,
+                                            "resolvedType": {
+                                                "kind": "int",
+                                                "copyable": true,
+                                                "iterable": false
+                                            }
+                                        },
+                                        "line": 67,
+                                        "col": 19,
+                                        "resolvedType": {
+                                            "kind": "int",
+                                            "copyable": true,
+                                            "iterable": false
+                                        }
+                                    },
+                                    "line": 67,
+                                    "col": 9,
+                                    "targetCopyable": true
+                                }
+                            ],
+                            "needFree": [],
+                            "line": 66,
+                            "col": 12
+                        },
+                        "line": 64,
+                        "col": 5
+                    },
+                    {
+                        "type": "WhileStatement",
+                        "condition": {
+                            "type": "BinaryExpr",
+                            "operator": "<",
+                            "left": {
+                                "type": "Identifier",
+                                "name": "counter",
+                                "line": 71,
+                                "col": 12,
+                                "resolvedType": {
+                                    "kind": "int",
+                                    "copyable": true,
+                                    "iterable": false
+                                }
+                            },
+                            "right": {
+                                "type": "IntLiteral",
+                                "value": "5",
+                                "line": 71,
+                                "col": 22,
+                                "resolvedType": {
+                                    "kind": "int",
+                                    "copyable": true,
+                                    "iterable": false
+                                }
+                            },
+                            "line": 71,
+                            "col": 12,
+                            "resolvedType": {
+                                "kind": "bool",
+                                "copyable": true,
+                                "iterable": false
+                            }
+                        },
+                        "body": {
+                            "type": "Block",
+                            "statements": [
+                                {
+                                    "type": "Assignment",
+                                    "target": [
+                                        "counter"
+                                    ],
+                                    "value": {
+                                        "type": "BinaryExpr",
+                                        "operator": "+",
+                                        "left": {
+                                            "type": "Identifier",
+                                            "name": "counter",
+                                            "line": 72,
+                                            "col": 19,
+                                            "resolvedType": {
+                                                "kind": "int",
+                                                "copyable": true,
+                                                "iterable": false
+                                            }
+                                        },
+                                        "right": {
+                                            "type": "IntLiteral",
+                                            "value": "1",
+                                            "line": 72,
+                                            "col": 29,
+                                            "resolvedType": {
+                                                "kind": "int",
+                                                "copyable": true,
+                                                "iterable": false
+                                            }
+                                        },
+                                        "line": 72,
+                                        "col": 19,
+                                        "resolvedType": {
+                                            "kind": "int",
+                                            "copyable": true,
+                                            "iterable": false
+                                        }
+                                    },
+                                    "line": 72,
+                                    "col": 9,
+                                    "targetCopyable": true
+                                }
+                            ],
+                            "needFree": [],
+                            "line": 71,
+                            "col": 25
+                        },
+                        "line": 71,
+                        "col": 5
+                    },
+                    {
+                        "type": "ForStatement",
+                        "iterable": {
+                            "type": "Identifier",
+                            "name": "r",
+                            "line": 76,
+                            "col": 15,
+                            "resolvedType": {
+                                "kind": "array",
+                                "element": {
+                                    "kind": "int",
+                                    "copyable": true,
+                                    "iterable": false
+                                },
+                                "copyable": false,
+                                "iterable": true
+                            }
+                        },
+                        "body": {
+                            "type": "Block",
+                            "statements": [
+                                {
+                                    "type": "Assignment",
+                                    "target": [
+                                        "counter"
+                                    ],
+                                    "value": {
+                                        "type": "BinaryExpr",
+                                        "operator": "+",
+                                        "left": {
+                                            "type": "Identifier",
+                                            "name": "counter",
+                                            "line": 77,
+                                            "col": 19,
+                                            "resolvedType": {
+                                                "kind": "int",
+                                                "copyable": true,
+                                                "iterable": false
+                                            }
+                                        },
+                                        "right": {
+                                            "type": "Identifier",
+                                            "name": "x",
+                                            "line": 77,
+                                            "col": 29,
+                                            "resolvedType": {
+                                                "kind": "int",
+                                                "copyable": true,
+                                                "iterable": false
+                                            }
+                                        },
+                                        "line": 77,
+                                        "col": 19,
+                                        "resolvedType": {
+                                            "kind": "int",
+                                            "copyable": true,
+                                            "iterable": false
+                                        }
+                                    },
+                                    "line": 77,
+                                    "col": 9,
+                                    "targetCopyable": true
+                                }
+                            ],
+                            "needFree": [],
+                            "line": 76,
+                            "col": 18
+                        },
+                        "variable": "x",
+                        "line": 76,
                         "col": 5
                     },
                     {
@@ -43,46 +1390,18 @@
                             "name": "print",
                             "args": [
                                 {
-                                    "type": "ArrayLiteral",
-                                    "elements": [
-                                        {
-                                            "type": "StrLiteral",
-                                            "value": "hello",
-                                            "line": 3,
-                                            "col": 12,
-                                            "resolvedType": {
-                                                "kind": "String",
-                                                "copyable": false,
-                                                "iterable": true
-                                            }
-                                        },
-                                        {
-                                            "type": "StrLiteral",
-                                            "value": "world",
-                                            "line": 3,
-                                            "col": 21,
-                                            "resolvedType": {
-                                                "kind": "String",
-                                                "copyable": false,
-                                                "iterable": true
-                                            }
-                                        }
-                                    ],
-                                    "line": 3,
+                                    "type": "Identifier",
+                                    "name": "counter",
+                                    "line": 80,
                                     "col": 11,
                                     "resolvedType": {
-                                        "kind": "array",
-                                        "element": {
-                                            "kind": "String",
-                                            "copyable": false,
-                                            "iterable": true
-                                        },
-                                        "copyable": false,
-                                        "iterable": true
+                                        "kind": "int",
+                                        "copyable": true,
+                                        "iterable": false
                                     }
                                 }
                             ],
-                            "line": 3,
+                            "line": 80,
                             "col": 5,
                             "builtin": true,
                             "resolvedType": {
@@ -91,15 +1410,66 @@
                                 "iterable": false
                             }
                         },
-                        "line": 3,
+                        "line": 80,
                         "col": 5
                     }
                 ],
-                "needFree": [],
-                "line": 1,
+                "needFree": [
+                    {
+                        "kind": "variable",
+                        "name": "s",
+                        "type": {
+                            "kind": "String",
+                            "copyable": false,
+                            "iterable": true
+                        },
+                        "mutable": false
+                    },
+                    {
+                        "kind": "variable",
+                        "name": "r",
+                        "type": {
+                            "kind": "array",
+                            "element": {
+                                "kind": "int",
+                                "copyable": true,
+                                "iterable": false
+                            },
+                            "copyable": false,
+                            "iterable": true
+                        },
+                        "mutable": false
+                    },
+                    {
+                        "kind": "variable",
+                        "name": "arr",
+                        "type": {
+                            "kind": "array",
+                            "element": {
+                                "kind": "int",
+                                "copyable": true,
+                                "iterable": false
+                            },
+                            "copyable": false,
+                            "iterable": true
+                        },
+                        "mutable": false
+                    },
+                    {
+                        "kind": "variable",
+                        "name": "desc",
+                        "type": {
+                            "kind": "String",
+                            "copyable": false,
+                            "iterable": true
+                        },
+                        "mutable": false
+                    }
+                ],
+                "line": 14,
                 "col": 12
             },
-            "line": 1,
+            "line": 14,
             "col": 1
         }
     ]

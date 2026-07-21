@@ -13,4 +13,5 @@ export function generateAssignmentStream(
 
     ctx.stream.write(' = ');
     ctx.generate(node.value, ctx);
+    ctx.stream.write(';\n');
 }

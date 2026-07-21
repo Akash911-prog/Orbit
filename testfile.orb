@@ -1,4 +1,82 @@
+struct Point {
+    var x: int;
+    var y: int;
+}
+
+fn add(a: int, b: int): int {
+    return a + b;
+}
+
+fn describe(p: Point): String {
+    return "point";
+}
+
 orbit main {
-    print("hello");
-    print(["hello", "world"]);
+    // Literals
+    let i: int = 42;
+    let f: float = 3.14;
+    let s: String = "hello";
+    let b: bool = true;
+    let n: int? = null;
+    if (n?) {
+        print(n);
+        print("hello");
+    }
+
+    // Unary + Binary
+    let neg: int = -i;
+    let notB: bool = !b;
+    let sum: int = i + 10;
+    let cmp: bool = sum > 50;
+
+    // NullCheckExpr
+    let checked: bool = n?;
+
+    // RangeExpr
+    let r: int[] = 1..=5;
+
+    // ArrayLiteral
+    let arr: int[] = [1, 2, 3];
+
+    // MapLiteral
+    // let m: Map<str, int> = { one: 1, two: 2 };
+
+    // TupleLiteral
+    // let t: (int, str) = (1, "one");
+
+    // StructInit + MemberAccess
+    let pt: Point = Point { x: 3, y: 4 };
+    let px: int = pt.x;
+
+    // FunctionCall
+    let called: int = add(2, 3);
+
+    // MethodCall (assuming arrays/strings have builtin methods per your registry)
+    let len: int = arr.length;
+
+    // MethodCall on struct instance
+    let desc = describe(pt);
+
+    // Assignment
+    var counter: int = 0;
+    counter = counter + 1;
+
+    // IfStatement
+    if (cmp) {
+        counter = counter + 1;
+    } else {
+        counter = counter - 1;
+    }
+
+    // WhileStatement
+    while (counter < 5) {
+        counter = counter + 1;
+    }
+
+    // ForStatement
+    for (x in r) {
+        counter = counter + x;
+    }
+
+    print(counter);
 }
